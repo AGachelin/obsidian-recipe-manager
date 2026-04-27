@@ -1,13 +1,19 @@
 ---
-note:
+note: 0
 ingredients:
-  - amount:
-    unit: "-"
-    name: at
-  - name: "4"
-    amount: 7
-    unit: 0
-view: true
+  - 2
+  - id: 0
+    name: ""
+    amount: ""
+    unit: ""
+  - id: 1
+    name: ""
+    amount: ""
+    unit: ""
+  - id: 2
+    name: ""
+    amount: ""
+    unit: ""
 content: |-
   # 1
   furieoznrjiezfrejizfrejzk,fre
@@ -16,6 +22,8 @@ content: |-
   this is a test
   #test
   gtrvbgtr
+view: false
+available_ingredients: option(test),option(test2)
 ---
 <%*
 const fill_in = await tp.system.suggester(["Oui", "Non"], [true, false], false, "Fill-in automatically ?");
@@ -29,25 +37,39 @@ if(fill_in){
     content = await tp.system.prompt("Content", null, false, true);
 }
 %>
-<%* tR='' -%>
+<%* tR = "" -%>
 ---
+view: false
 note: <% note %>
 content: <% content %>
 ingredients:
 ---
-Edit : `INPUT[toggle(showcase, title(Edit)):view]`
-
+<% await tp.file.include(tp.file.find_tfile("toggle-button")) %>
+```meta-bind-button
+style: default
+label: add ingredient
+id: add-ingredient
+hidden: false
+actions:
+  - type: updateMetadata
+    bindTarget: ingredients
+    evaluate: true
+    value: 'x == null|[] ? [0,{id:0,name:"",amount:"",unit:""}] : [x[0]+1, ...x.slice(1), {id:x[0]+1,name:"",amount:"",unit:""}]'   
+  - type: "insertIntoNote"
+    line: selfEnd - 13
+    value: "Templates/elements/ingredients"
+    templater: true
+```
 ```meta-bind-js-view
-{note} as note
-{ingredients} as ingredients
 {view} as view
-{content} as content
 ---
 // get current view : this.app.workspace.activeLeaf.view.currentMode.type
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
 const note_input = `\`INPUT[number(placeholder(Note)):note]\``;
+const note_view = `\`VIEW[{note}]\``;
+const ingredients_view = `\`VIEW[{ingredients}][text(renderMarkdown)]\``;
 if(context.bound.view){
-	return engine.markdown.create(`${context.bound.note}\n${context.bound.ingredients}`);
+	return engine.markdown.create(`${note_view}\n${ingredients_view}`);
 }
 else{
 	return engine.markdown.create(`${note_input}`);
@@ -64,13 +86,15 @@ function render(view){
 	if(view){
 		return;
 	}
+	//const options = mb.getMetadata(await mb.parseBindTarget('available_ingredients', context.file.path)).map(x => `option(${x})`).join(", ");
 	const tableOptions = {
 		bindTarget: mb.createBindTarget('frontmatter', context.file.path, ['ingredients']),
-		tableHead: ['Nom', 'Quantité', 'Unité'],
+		tableHead: ['Nom', 'Quantité', 'Unité',''],
 		columns: [
-			'INPUT[suggester(optionQuery("Ingredients")):scope^name]',
+			'BUTTON[dark-mode]',
 			'INPUT[number:scope^amount]',
-			'INPUT[inlineSelect(option(-, unproductive), option(0, normal), option(+, productive)):scope^unit]'
+			'INPUT[inlineSelect(option(-, unproductive), option(0, normal), option(+, productive)):scope^unit]',
+			'INPUT[]'
 		],
 	};
 	const table_mountable = mb.createTableMountable(context.file.path, tableOptions);
@@ -89,7 +113,7 @@ return reactive;
 {view} as view
 ---
 if(context.bound.view){
-	console.log(context);
+	const content_view = `\`VIEW[{content}][text(renderMarkdown)]\``;
 	return engine.markdown.create(`${context.metadata.frontmatter.content}`);
 }
 else {
