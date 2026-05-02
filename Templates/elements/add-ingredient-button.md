@@ -1,6 +1,5 @@
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
-const test = 3;
 const bindTargetCurrentIng = mb.parseBindTarget('ingredients', context.file.path);
 const buttonConfig = {
 	id: 'add-ingredient',
@@ -9,7 +8,7 @@ const buttonConfig = {
 	hidden: false,
 	action:
 	{type: 'js',
-	file: 'ingredients_input.js',
+	file: 'Templates/Scripts/ingredients_input.js',
 }
 }
 const buttonOptions = {

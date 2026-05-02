@@ -2,15 +2,20 @@
 view: false
 note: 4
 ingredients:
-  "34":
-    id: 34
+  "51":
+    id: 51
     name: a.md
     amount: 0
     unit: ""
-  last_id: 34
-content: "3"
+  "52":
+    id: 52
+    name: test.md
+    amount: 0
+    unit: ""
+  last_id: 52
+content: vfzvtrzebtre
 available_ingredients:
-  - test.md
+  - b.md
 ---
 ```meta-bind-button
 label: View
@@ -84,7 +89,7 @@ const buttonConfig = {
 	hidden: false,
 	action:
 	{type: 'js',
-	file: 'ingredients_input.js'
+	file: 'Templates/Scripts/ingredients_input.js'
 }
 }
 const buttonOptions = {
