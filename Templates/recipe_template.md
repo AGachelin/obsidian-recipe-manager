@@ -21,13 +21,13 @@ if(fill_in){
 ---
 view: false
 note: <% note %>
-ingredients: [0]
+ingredients: {last_id: 0}
 content: <% content %>
-available_ingredients: <%available_ingredients%>
+available_ingredients: <%available_ingredients.map(ing => `\n- ${ing}`)%>
 ---
 <% await tp.file.include(tp.file.find_tfile("toggle-button")) %>
+<% await tp.file.include(tp.file.find_tfile("ingredient-table"))%>
 <% await tp.file.include(tp.file.find_tfile("add-ingredient-button")) %>
-
 ```meta-bind-js-view
 {view} as view
 ---

@@ -1,6 +1,8 @@
-<%* const dv = this.app.plugins.plugins["dataview"].api; const id_file = await dv.page(tp.config.target_file.path); console.log(id_file); const id = id_file.ingredients[id_file.ingredients.length-1]["id"]; const name = id_file.ingredients[id_file.ingredients.length-1]["name"];// fix with correct id
-%>
-<%* tR = "" -%>
+<%* 
+const mb = this.app.plugins.plugins['obsidian-meta-bind-plugin'].api;
+const bindTarget_ing = mb.parseBindTarget('ingredients', tp.config.target_file.path);
+const ingredients = mb.getMetadata(bindTarget_ing);
+for(id in ingredients){if(id!="last_id"){const name = ingredients[id]["name"];%>
 ```meta-bind-button
 style: default
 label: x
@@ -8,22 +10,26 @@ id: id-<%id%>
 hidden: true
 actions:
   - type: updateMetadata
+    bindTarget: available_ingredients
+    evaluate: true
+    value: 'x==null?["<%name%>"]:["<%name%>",...x]'
+  - type: updateMetadata
     bindTarget: ingredients
     evaluate: true
-    value: x.filter((ing)=>ing.id!=<%id%>)
-  - type: regexpReplaceInNote
-    regexp: "```meta-bind-button\nstyle: default\nlabel: x\nid: id-<%id%>\n[\\s\\S]*?BUTTON\\[id-<%id%>\\]`\n\n"
-    replacement: ""
+    value: (delete x["<%id%>"])?x:x
 ```
 ```meta-bind-button
 style: default
 id: ingredient-<%id%>
-label: <% name ? name : "select an ingredient" %>
+label: <% name %>
 hidden: true
 actions:
-  - type: updateMetadata
-    bindTarget: note
-    evaluate: false
-    value: 0
+  - type: js
+    file: 'ingredients_input.js'
+    args:
+      id: <%id%>
 ```
-`BUTTON[ingredient-<%id%>]` | `INPUT[number:ingredients[<%id%>].amount]` | `INPUT[inlineSelect(option(-, unproductive), option(0, normal), option(+, productive)):ingredients[<%id%>].unit]` | `BUTTON[id-<%id%>]`
+<%*}}%>
+<%*const [first, ...keys] = Object.keys(ingredients); keys.pop();if(first!="last_id"){const name = ingredients[first]["name"];%>| `BUTTON[ingredient-<%first%>]` | `INPUT[number:ingredients["<%first%>"]["amount"]]` | `INPUT[inlineSelect(option(-, unproductive), option(0, normal), option(+, productive)):ingredients["<%first%>"]["unit"]]` | `BUTTON[id-<%first%>]`|
+<%*if(keys.length==0){%>| --- | --- | --- | --- |<%*}else {for(id of keys){console.log(id); const name = ingredients[id]["name"];%>| --- | --- | --- | --- |
+| `BUTTON[ingredient-<%id%>]` | `INPUT[number:ingredients["<%id%>"]["amount"]]` | `INPUT[inlineSelect(option(-, unproductive), option(0, normal), option(+, productive)):ingredients["<%id%>"]["unit"]]` | `BUTTON[id-<%id%>]`|<%*}}}%>

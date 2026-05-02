@@ -1,5 +1,10 @@
-module.exports = function () {
-    let ingredient_list = {};
-    let available_ingredients = await tp.app.vault.getFolderByPath("Ingredients").children.filter(x => x instanceof tp.obsidian.TFile).map(x => x.name);
-    return ingredient_list;
+module.exports = async function (tp, context, engine, change) {
+    let ing;
+    if (change) {
+        ing = await tp.system.suggester(ing => ing.split(".")[0], context.metadata.frontmatter.available_ingredients);
+    }
+    else {
+        ing = await tp.system.multi_suggester(ing => ing.split(".")[0], context.metadata.frontmatter.available_ingredients);
+    }
+    return ing;
 };
