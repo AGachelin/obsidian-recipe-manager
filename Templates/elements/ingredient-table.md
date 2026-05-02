@@ -22,7 +22,7 @@ const subscription_view = mb.subscribeToMetadata(
 const subscription_ing = mb.subscribeToMetadata(
 	bindTarget_ing,
 	component,
-	(value) => reactive_ing.refresh(false)
+	(value) => reactive_ing.refresh(mb.getMetadata(bindTarget_view))
 );
 
 return reactive_ing;

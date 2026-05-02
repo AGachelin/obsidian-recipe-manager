@@ -2,7 +2,7 @@
 liquid: 1
 single: 1
 ---
-<%*const name = await tp.system.prompt("Ingredient name", '', true); await tp.file.rename(name);%>Rho : `INPUT[number(defaultValue(1)):liquid]`
+Rho : `INPUT[number(defaultValue(1)):liquid]`
 Weight of one unit : `INPUT[number(defaultValue(1)):single]`
 ```js-engine
 let check = await engine.importJs('check.js');
