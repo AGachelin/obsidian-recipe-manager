@@ -85,7 +85,7 @@ function render(view){
 		renderChildType:'inline',
 		});
 		mb.wrapInMDRC(ButtonGroup, span2, comp);
-		internal.renderMarkdown("`VIEW[Movie Title: {person.current}][text]`", span1, context.file.path);
+		internal.renderMarkdown("`VIEW[{person.current} personnes][text]`", span1, context.file.path);
 	}
 }
 const reactive = engine.reactive(render, mb.getMetadata(bindTargetView));

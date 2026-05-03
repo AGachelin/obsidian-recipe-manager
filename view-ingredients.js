@@ -4,7 +4,7 @@ function viewIngredients(ingredients){
     for(key in ingredients){
         if(key !=="last_id"){
             if(ingredients[key].amount){
-                view+=`\`VIEW[convertBack({ingredients["`+key+`"].unit}, {ingredients["`+key+`"].amount}, {ingredients["`+key+`"].name})]\``+' ';
+                view+=`\`VIEW[convertBack({ingredients["`+key+`"].unit}, {ingredients["`+key+`"].amount}, {ingredients["`+key+`"].name}, {person.current}/{person.raw})]\``+' ';
                 if (ingredients[key]["unit"] === ""){
                     view+=`\`VIEW[{ingredients["`+key+`"].unit}]\``+' ';
                     view+=`\`VIEW[{ingredients["`+key+`"].name}]\``;
