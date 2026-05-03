@@ -24,6 +24,9 @@ note: <% note %>
 ingredients: {last_id: 0}
 content: <% content %>
 available_ingredients: <%available_ingredients.map(ing => `\n- ${ing}`)%>
+rest: 0
+cook: 0
+prep: 0
 ---
 <% await tp.file.include(tp.file.find_tfile("toggle-button")) %>
 <% await tp.file.include(tp.file.find_tfile("ingredient-table"))%>
@@ -31,27 +34,24 @@ available_ingredients: <%available_ingredients.map(ing => `\n- ${ing}`)%>
 ```meta-bind-js-view
 {view} as view
 ---
-// get current view : this.app.workspace.activeLeaf.view.currentMode.type
+const input_duration = await engine.importJs("duration-input.js");
+const view_ingredients = await engine.importJs("view-ingredients.js");
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
-const note_input = `\`INPUT[number(placeholder(Note)):note]\``;
+const note_input = `\`INPUT[number(placeholder(Note), defaultValue({note})):memory^note]\`` + ' '+ `\`VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]\``;
+const content_input = "```meta-bind\nINPUT[editor:content]\n```";
+const cook_input = input_duration.default("cook", mb.mb.math.splitTime(context.metadata.frontmatter.cook, true));
+const rest_input = input_duration.default("rest", mb.mb.math.splitTime(context.metadata.frontmatter.rest, true));
+const prep_input = input_duration.default("prep", mb.mb.math.splitTime(context.metadata.frontmatter.prep, true));
 const note_view = `\`VIEW[{note}]\``;
-const ingredients_view = `\`VIEW[{ingredients}][text(renderMarkdown)]\``;
+const cook_view = `\`VIEW[splitTime({cook}, false)]\``;
+const rest_view = `\`VIEW[splitTime({rest}, false)]\``;
+const prep_view = `\`VIEW[splitTime({prep}, false)]\``;
+const content_view = `\`VIEW[{content}][text(renderMarkdown)]\``;
+const ingredients_view = view_ingredients.default(context.metadata.frontmatter.ingredients);
 if(context.bound.view){
-	return engine.markdown.create(`${note_view}\n${ingredients_view}`);
+	return engine.markdown.create(`${note_view}\n${ingredients_view}\n${cook_view}\n${rest_view}\n${prep_view}\n${content_view}`);
 }
 else{
-	return engine.markdown.create(`${note_input}`);
-}
-```
-```meta-bind-js-view
-{view} as view
----
-if(context.bound.view){
-	const content_view = `\`VIEW[{content}][text(renderMarkdown)]\``;
-	return engine.markdown.create(`${context.metadata.frontmatter.content}`);
-}
-else {
-	const comp = engine.markdown.create("```meta-bind\nINPUT[editor:content]\n```");
-	return comp;
+	return engine.markdown.create(`${note_input}\n${cook_input}\n${rest_input}\n${prep_input}\n${content_input}`);
 }
 ```
