@@ -1,27 +1,25 @@
 ---
-view: true
-note: 5
+view: false
+note:
 ingredients:
   "1":
     id: 1
-    name: R.md
-    amount: 1.8750000000000004
-    unit: pinch
-  "2":
-    id: 2
     name: f.md
-    amount: 141.747615625
-    unit: ounce
-  last_id: 2
-content: |-
-  fezvtrevbtre
-  rezvtre
+    amount: 5
+    unit: ""
+  last_id: 1
+content:
 available_ingredients:
   - b.md
+  - R.md
   - test.md
 rest: 0
 cook: 0
+source: ""
 prep: 0
+person:
+  current: "4"
+  raw: "2"
 ---
 
 
@@ -147,21 +145,24 @@ return reactive;
 const input_duration = await engine.importJs("duration-input.js");
 const view_ingredients = await engine.importJs("view-ingredients.js");
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
-const note_input = `\`INPUT[number(placeholder(Note), defaultValue(`+context.metadata.frontmatter.note+`)):memory^note]\`` + ' '+ `\`VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]\``;
+const frontmatter = context.metadata.frontmatter;
+const note_input = `\`INPUT[number(placeholder(Note), defaultValue(`+frontmatter.note+`)):memory^note]\`` + ' '+ `\`VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]\``;
 const content_input = "```meta-bind\nINPUT[editor:content]\n```";
-const cook_input = input_duration.default("cook", mb.mb.math.splitTime(context.metadata.frontmatter.cook, true));
-const rest_input = input_duration.default("rest", mb.mb.math.splitTime(context.metadata.frontmatter.rest, true));
-const prep_input = input_duration.default("prep", mb.mb.math.splitTime(context.metadata.frontmatter.prep, true));
+const cook_input = input_duration.default("cook", mb.mb.math.splitTime(frontmatter.cook, true));
+const rest_input = input_duration.default("rest", mb.mb.math.splitTime(frontmatter.rest, true));
+const prep_input = input_duration.default("prep", mb.mb.math.splitTime(frontmatter.prep, true));
+const source_input = `\`INPUT[text(placeholder(Source)):source]\``;
+const source_view = `\`VIEW[{source}][text(renderMarkdown)]\``;
 const note_view = `\`VIEW[{note}]\``;
 const cook_view = `\`VIEW[splitTime({cook}, false)]\``;
 const rest_view = `\`VIEW[splitTime({rest}, false)]\``;
 const prep_view = `\`VIEW[splitTime({prep}, false)]\``;
 const content_view = `\`VIEW[{content}][text(renderMarkdown)]\``;
-const ingredients_view = view_ingredients.default(context.metadata.frontmatter.ingredients);
+const ingredients_view = view_ingredients.default(frontmatter.ingredients);
 if(context.bound.view){
-	return engine.markdown.create(`${note_view}\n${ingredients_view}\n${cook_view}\n${rest_view}\n${prep_view}\n${content_view}`);
+	return engine.markdown.create(`${note_view}\n${source_view}\n${ingredients_view}\n${cook_view}\n${rest_view}\n${prep_view}\n${content_view}`);
 }
 else{
-	return engine.markdown.create(`${note_input}\n${cook_input}\n${rest_input}\n${prep_input}\n${content_input}`);
+	return engine.markdown.create(`${note_input}\n${source_input}\n${cook_input}\n${rest_input}\n${prep_input}\n${content_input}`);
 }
 ```
