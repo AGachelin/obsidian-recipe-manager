@@ -1,11 +1,3 @@
----
-view: false
-person:
-  current: 0
-  raw: 3
-cssclasses:
-  - global
----
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
 const internal = engine.getPlugin('obsidian-meta-bind-plugin').mb.internal;
@@ -16,14 +8,14 @@ const bindTargetView = mb.parseBindTarget('view', context.file.path);
 const bindTargetPerson = mb.parseBindTarget('person', context.file.path);
 function render(view){
 	comp.unload();
-    comp.load();
-    container.empty();
-    const div = container.createEl('div', {cls:'same_row'})
-    const span1 = div.createEl('span');
-    const span2 = div.createEl('span');
-    const span3 = container.createEl('span');
-    container.createEl('br');
-    if(!view){
+	comp.load();
+	container.empty();
+	const div = container.createEl('div', {cls:'same_row'})
+	const span1 = div.createEl('span');
+	const span2 = div.createEl('span');
+	const span3 = container.createEl('span');
+	container.createEl('br');
+	if(view){
 	    const person = mb.getMetadata(bindTargetPerson);
 	    const IncButtonConfig = {
 			label: "+1",

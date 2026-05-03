@@ -3,15 +3,22 @@ view: true
 note:
 ingredients:
   last_id: 0
-content:
+content: ""
 available_ingredients:
-  - f.md,
   - b.md,
+  - f.md,
   - R.md,
   - test.md
 rest: 0
-cook: 62162
+cook: 0
+source:
+oven:
 prep: 0
+person:
+  current: 0
+  raw: 1
+tags:
+cssclasses: global
 ---
 
 
@@ -20,6 +27,7 @@ label: View
 id: "switch-mode-view"
 hidden: true
 style: default
+class: edit
 actions:
   - type: updateMetadata
     bindTarget: view
@@ -31,6 +39,7 @@ label: Edit
 id: "switch-mode-edit"
 hidden: true
 style: default
+class: edit
 actions:
   - type: updateMetadata
     bindTarget: view
@@ -131,27 +140,124 @@ const subscription = mb.subscribeToMetadata(
 
 return reactive;
 ```
+```js-engine
+const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
+const internal = engine.getPlugin('obsidian-meta-bind-plugin').mb.internal;
+const comp = new obsidian.Component(component);
+let builder = engine.markdown.createBuilder();
+component.addChild(comp);
+const bindTargetView = mb.parseBindTarget('view', context.file.path);
+const bindTargetPerson = mb.parseBindTarget('person', context.file.path);
+function render(view){
+	comp.unload();
+    comp.load();
+    container.empty();
+    const div = container.createEl('div', {cls:'same_row'})
+    const span1 = div.createEl('span');
+    const span2 = div.createEl('span');
+    const span3 = container.createEl('span');
+    container.createEl('br');
+    if(view){
+	    const person = mb.getMetadata(bindTargetPerson);
+	    const IncButtonConfig = {
+			label: "+1",
+			hidden: true,
+			id: "count-increment",
+			style: "default",
+			action:{
+			    type: "updateMetadata",
+			    bindTarget: "person.current",
+			    evaluate: true,
+			    value: "x + 1"
+			}
+		};
+		const DecButtonConfig = {
+			label: "-1",
+			hidden: true,
+			id: "count-decrement",
+			style: "default",
+			action:{
+			    type: "updateMetadata",
+			    bindTarget: "person.current",
+			    evaluate: true,
+			    value: "Math.max(0, x - 1)"
+			}
+		};
+		const ResetButtonConfig = {
+			label: "Reset",
+			hidden: true,
+			id: "count-reset",
+			style: "default",
+			action:{
+			    type: "updateMetadata",
+			    bindTarget: "person.current",
+			    evaluate: true,
+			    value: person.raw
+			}
+		};
+		const IncButtonOptions = {
+		    declaration: IncButtonConfig,
+		    isPreview: false
+		};
+		const DecButtonOptions = {
+		    declaration: DecButtonConfig,
+		    isPreview: false
+		};
+		const ResetButtonOptions = {
+		    declaration: ResetButtonConfig,
+		    isPreview: false
+		};
+		
+		const IncButton = mb.createButtonMountable(context.file.path, IncButtonOptions);
+		const DecButton = mb.createButtonMountable(context.file.path, DecButtonOptions);
+		const ResetButton = mb.createButtonMountable(context.file.path, ResetButtonOptions);
+		mb.wrapInMDRC(IncButton, span3, comp);
+		mb.wrapInMDRC(DecButton, span3, comp);
+		mb.wrapInMDRC(ResetButton, span3, comp);
+		const ButtonGroup = mb.createButtonGroupMountable(context.file.path, {
+		declaration: {referencedButtonIds:['count-decrement', 'count-reset','count-increment']},
+		renderChildType:'inline',
+		});
+		mb.wrapInMDRC(ButtonGroup, span2, comp);
+		internal.renderMarkdown("`VIEW[{person.current} personnes][text]`", span1, context.file.path);
+	}
+}
+const reactive = engine.reactive(render, mb.getMetadata(bindTargetView));
+const subscription = mb.subscribeToMetadata(
+	bindTargetView,
+	component,
+	(value) => reactive.refresh(value)
+);
+
+return reactive;
+```
 ```meta-bind-js-view
 {view} as view
 ---
 const input_duration = await engine.importJs("duration-input.js");
 const view_ingredients = await engine.importJs("view-ingredients.js");
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
-const note_input = `\`INPUT[number(placeholder(Note)):note]\``;
+const frontmatter = context.metadata.frontmatter;
+const note_input = `\`INPUT[number(placeholder(Note), defaultValue(`+frontmatter.note+`)):memory^note]\`` + ' '+ `\`VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]\``;
+const oven_input = `\`INPUT[number(placeholder(Oven temp), defaultValue(`+frontmatter.oven+`)):memory^oven]\`` + ' '+ `\`VIEW[bind({memory^oven}, 0, null)][math(hidden):oven]\``;
+const person_input = `\`INPUT[number(placeholder(Nombre de personnes), defaultValue(`+frontmatter.person.raw+`)):memory^person.raw]\`` + ' '+ `\`VIEW[bind({memory^person.raw}, 0, 1)][math(hidden):person.raw]\``;
 const content_input = "```meta-bind\nINPUT[editor:content]\n```";
-const cook_input = input_duration.default("cook");
-const rest_input = input_duration.default("rest");
-const prep_input = input_duration.default("prep");
+const cook_input = input_duration.default("cook", mb.mb.math.splitTime(frontmatter.cook, true));
+const rest_input = input_duration.default("rest", mb.mb.math.splitTime(frontmatter.rest, true));
+const prep_input = input_duration.default("prep", mb.mb.math.splitTime(frontmatter.prep, true));
+const source_input = `\`INPUT[text(placeholder(Source)):source]\``;
+const source_view = `\`VIEW[{source}][text(renderMarkdown)]\``;
 const note_view = `\`VIEW[{note}]\``;
+const oven_view = `\`VIEW[{oven}]\``;
+const cook_view = `\`VIEW[splitTime({cook}, false)]\``;
+const rest_view = `\`VIEW[splitTime({rest}, false)]\``;
+const prep_view = `\`VIEW[splitTime({prep}, false)]\``;
 const content_view = `\`VIEW[{content}][text(renderMarkdown)]\``;
-const cook_view = `\`VIEW[splitTime({cook})]\``;
-const rest_view = `\`VIEW[splitTime({rest})]\``;
-const prep_view = `\`VIEW[splitTime({prep})]\``;
-const ingredients_view = view_ingredients.default(context.metadata.frontmatter.ingredients);
+const ingredients_view = view_ingredients.default(frontmatter.ingredients);
 if(context.bound.view){
-	return engine.markdown.create(`${note_view}\n${ingredients_view}\n${cook_view}\n${rest_view}\n${prep_view}\n${content_view}`);
+	return engine.markdown.create(`${note_view}\n${source_view}\n${ingredients_view}\n${cook_view}\n${rest_view}\n${prep_view}\n${content_view}`);
 }
 else{
-	return engine.markdown.create(`${note_input}\n${cook_input}\n${rest_input}\n${prep_input}\n${content_input}`);
+	return engine.markdown.create(`${note_input}\n${source_input}\n${person_input}\n${cook_input}\n${rest_input}\n${prep_input}\n${content_input}`);
 }
 ```

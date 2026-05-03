@@ -3,6 +3,7 @@ note: 0
 ingredients: []
 content: ""
 view: false
+tags:
 ---
 <%*
 const fill_in = await tp.system.suggester(["Oui", "Non"], [true, false], false, "Fill-in automatically ?");
@@ -32,6 +33,8 @@ prep: 0
 person:
   current: 0
   raw: 1
+tags:
+cssclasses: global
 ---
 <% await tp.file.include(tp.file.find_tfile("toggle-button")) %>
 <% await tp.file.include(tp.file.find_tfile("ingredient-table"))%>
