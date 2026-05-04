@@ -3,6 +3,7 @@ label: View
 id: "switch-mode-view"
 hidden: true
 style: default
+class: edit
 actions:
   - type: updateMetadata
     bindTarget: view
@@ -14,6 +15,7 @@ label: Edit
 id: "switch-mode-edit"
 hidden: true
 style: default
+class: edit
 actions:
   - type: updateMetadata
     bindTarget: view

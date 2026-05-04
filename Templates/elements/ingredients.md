@@ -17,6 +17,10 @@ actions:
     bindTarget: ingredients
     evaluate: true
     value: (delete x["<%id%>"])?x:x
+  - type: updateMetadata
+    bindTarget: ingredients
+    evaluate: true
+    value: (delete x["<%id%>"])?x:x
 ```
 ```meta-bind-button
 style: default

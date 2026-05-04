@@ -10,7 +10,7 @@ function filterAvailable(available, current, change){
 }
 async function run(){
     const tp = await engine.getPlugin("templater-obsidian")?.templater.current_functions_object;
-    const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
+    const mb = await engine.getPlugin('obsidian-meta-bind-plugin').api;
     const change = context.args !== undefined;
     const available = await tp.app.vault.getFolderByPath("Ingredients").children.filter(x => x instanceof tp.obsidian.TFile).map(x => x.name);
     const currently_available = filterAvailable(available, context.metadata.frontmatter.ingredients, false);

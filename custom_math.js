@@ -5,6 +5,9 @@ mb.mathJSImport({
     clamp: (val, min, max) => val?mb.mb.math.min(mb.mb.math.max(min, val), max):null,
     bind: (val, min, default_val) => val?(val>min?val:default_val):default_val,
     convert: (unit, value, name) => {
+        if(!name){
+            return;
+        }
         if(unit==''||unit=='sachet'){
             const target = mb.parseBindTarget('single', 'Ingredients/'+name);
             const coeff = mb.getMetadata(target);

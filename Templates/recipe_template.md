@@ -37,6 +37,7 @@ tags:
 cssclasses: global
 ---
 <% await tp.file.include(tp.file.find_tfile("toggle-button")) %>
+<% await tp.file.include(tp.file.find_tfile("tags")) %>
 <% await tp.file.include(tp.file.find_tfile("ingredient-table"))%>
 <% await tp.file.include(tp.file.find_tfile("add-ingredient-button")) %>
 <% await tp.file.include(tp.file.find_tfile("person-button")) %>

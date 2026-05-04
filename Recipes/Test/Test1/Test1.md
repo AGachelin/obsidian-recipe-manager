@@ -1,30 +1,40 @@
 ---
 view: false
-note:
 ingredients:
-  last_id: 0
-content:
+  last_id: 8
+content: |-
+  ## Nom
+  blabla
+  ## bidule
+  test
+  ![[fond.jpg]]
 available_ingredients:
-  - b.md,
-  - R.md,
-  - f.md,
   - test.md
-rest: 0
-cook: 0
-source:
+  - f.md
+  - b.md
+  - R.md
+rest: 1080
+cook: 57600
+source: https://docs.obsidian.md/Reference/TypeScript+API/MarkdownPostProcessorContext
 oven:
-prep: 0
+prep: 1080
 person:
-  current: 0
-  raw: 1
-tags: []
+  current: 6
+  raw: 4
+tags:
+  - az
+  - b
 cssclasses: global
+banner_y: "69.5"
+note: 3
+thumbnail: "[[fond.jpg]]"
 ---
 ```meta-bind-button
 label: View
 id: "switch-mode-view"
 hidden: true
 style: default
+class: edit
 actions:
   - type: updateMetadata
     bindTarget: view
@@ -36,6 +46,7 @@ label: Edit
 id: "switch-mode-edit"
 hidden: true
 style: default
+class: edit
 actions:
   - type: updateMetadata
     bindTarget: view
@@ -146,14 +157,14 @@ const bindTargetView = mb.parseBindTarget('view', context.file.path);
 const bindTargetPerson = mb.parseBindTarget('person', context.file.path);
 function render(view){
 	comp.unload();
-	comp.load();
-	container.empty();
-	const div = container.createEl('div', {cls:'same_row'})
-	const span1 = div.createEl('span');
-	const span2 = div.createEl('span');
-	const span3 = container.createEl('span');
-	container.createEl('br');
-	if(view){
+    comp.load();
+    container.empty();
+    const div = container.createEl('div', {cls:'same_row'})
+    const span1 = div.createEl('span');
+    const span2 = div.createEl('span');
+    const span3 = container.createEl('span');
+    container.createEl('br');
+    if(view){
 	    const person = mb.getMetadata(bindTargetPerson);
 	    const IncButtonConfig = {
 			label: "+1",
