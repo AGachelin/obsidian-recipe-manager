@@ -1,32 +1,30 @@
 ---
 view: false
 ingredients:
-  last_id: 8
-content: |-
-  ## Nom
-  blabla
-  ## bidule
-  test
-  ![[fond.jpg]]
+  "9":
+    id: 9
+    name: test.md
+    amount: 4000
+    unit: kilogram
+  last_id: 9
 available_ingredients:
-  - test.md
-  - f.md
   - b.md
   - R.md
-rest: 1080
-cook: 57600
+  - f.md
+rest: 3601
+cook: 55076
 source: https://docs.obsidian.md/Reference/TypeScript+API/MarkdownPostProcessorContext
 oven:
 prep: 1080
 person:
-  current: 6
-  raw: 4
+  current: 2
+  raw: 2
 tags:
   - az
   - b
 cssclasses: global
 banner_y: "69.5"
-note: 3
+note: 2
 thumbnail: "[[fond.jpg]]"
 ---
 ```meta-bind-button
@@ -160,10 +158,9 @@ function render(view){
     comp.load();
     container.empty();
     const div = container.createEl('div', {cls:'same_row'})
-    const span1 = div.createEl('span');
-    const span2 = div.createEl('span');
-    const span3 = container.createEl('span');
-    container.createEl('br');
+    const span1 = div.createEl('div', {cls:'child'});
+    const span2 = div.createEl('div', {cls:'child'});
+    const span3 = container.createEl('div', {cls:'child'});
     if(view){
 	    const person = mb.getMetadata(bindTargetPerson);
 	    const IncButtonConfig = {
@@ -248,18 +245,18 @@ const frontmatter = context.metadata.frontmatter;
 const note_input = `\`INPUT[number(placeholder(Note), defaultValue(`+frontmatter.note+`)):memory^note]\`` + ' '+ `\`VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]\``;
 const oven_input = `\`INPUT[number(placeholder(Oven temp), defaultValue(`+frontmatter.oven+`)):memory^oven]\`` + ' '+ `\`VIEW[bind({memory^oven}, 0, null)][math(hidden):oven]\``;
 const person_input = `\`INPUT[number(placeholder(Nombre de personnes), defaultValue(`+frontmatter.person.raw+`)):memory^person.raw]\`` + ' '+ `\`VIEW[bind({memory^person.raw}, 0, 1)][math(hidden):person.raw]\``;
-const content_input = "```meta-bind\nINPUT[editor:content]\n```";
+const content_input = "[[content|Modifier le contenu]]";
 const cook_input = input_duration.default("cook", mb.mb.math.splitTime(frontmatter.cook, true));
 const rest_input = input_duration.default("rest", mb.mb.math.splitTime(frontmatter.rest, true));
 const prep_input = input_duration.default("prep", mb.mb.math.splitTime(frontmatter.prep, true));
 const source_input = `\`INPUT[text(placeholder(Source)):source]\``;
 const source_view = `\`VIEW[{source}][text(renderMarkdown)]\``;
-const note_view = `\`VIEW[{note}]\``;
+const note_view = `<div class="star-rating" style="--rating: ${context.metadata.frontmatter.note};"></div>\n`;
 const oven_view = `\`VIEW[{oven}]\``;
 const cook_view = `\`VIEW[splitTime({cook}, false)]\``;
 const rest_view = `\`VIEW[splitTime({rest}, false)]\``;
 const prep_view = `\`VIEW[splitTime({prep}, false)]\``;
-const content_view = `\`VIEW[{content}][text(renderMarkdown)]\``;
+const content_view = '```meta-bind-embed\n[[content]]\n```';
 const ingredients_view = view_ingredients.default(frontmatter.ingredients);
 if(context.bound.view){
 	return engine.markdown.create(`${note_view}\n${source_view}\n${ingredients_view}\n${cook_view}\n${rest_view}\n${prep_view}\n${content_view}`);
