@@ -10,7 +10,7 @@ function render(view){
 	container.empty();
 	container.createEl('div')
 	if(!view){
-		const multiSelectConfig = {
+		const inlineListConfig = {
 			inputFieldType: "inlineListSuggester",
 			bindTarget: mb.createBindTarget('frontmatter', context.file.path, ['tags']),
 		    arguments:
@@ -21,12 +21,12 @@ function render(view){
 		        };
 		    }).concat([{name:"allowOther", value:["true"]}])
 		};
-		const multiSelectOptions = {
-		    declaration: multiSelectConfig,
+		const inlineListOptions = {
+		    declaration: inlineListConfig,
 		    renderChildType: 'inline'
 		};
-		const MultiSelect = mb.createInputFieldMountable(context.file.path, multiSelectOptions);
-		mb.wrapInMDRC(MultiSelect, container, comp);
+		const InlineList = mb.createInputFieldMountable(context.file.path, inlineListOptions);
+		mb.wrapInMDRC(InlineList, container, comp);
 	}
 }
 const reactive = engine.reactive(render, mb.getMetadata(bindTargetView));

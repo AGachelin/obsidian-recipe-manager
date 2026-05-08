@@ -106,7 +106,7 @@ const mb = mb_plugin.api;
 const comp = new obsidian.Component(component);
 const bindTarget_view = mb.parseBindTarget('view', context.file.path);
 const bindTarget_ing = mb.parseBindTarget('available_ingredients', context.file.path);
-const templateFile = 'Templates/elements/ingredients.md'
+const templateFile = 'source/src/components/ingredients.md'
 async function addIngredient(view){
 	if(view){
 		container.empty();
@@ -146,7 +146,7 @@ function render(view){
 			hidden: true,
 			action:
 			{type: 'templaterCreateNote',
-			templateFile: 'Templates/ingredient_template.md',
+			templateFile: 'source/templatesingredient_template.md',
 			folderPath: 'Ingredients',
 			fileName: 'ing'}
 		};
@@ -157,7 +157,7 @@ function render(view){
 			hidden: false,
 			action:
 			{type: 'js',
-			file: 'Templates/Scripts/ingredients_input.js'}
+			file: 'source/src/ingredients_input.js'}
 		}
 		const AddButtonOptions = {
 		    declaration: AddButtonConfig,
@@ -281,9 +281,9 @@ return reactive;
 ```
 ```js-engine
 // Import modularized utilities and business logic
-const durationUtils = await engine.importJs("Templates/Scripts/utils/duration.js");
-const ingredientsView = await engine.importJs("Templates/Scripts/lib/ingredients-view.js");
-const recipeRenderer = await engine.importJs("Templates/Scripts/lib/recipe-renderer.js");
+const durationUtils = await engine.importJs("source/src/utils/duration.js");
+const ingredientsView = await engine.importJs("source/src/lib/ingredients-view.js");
+const recipeRenderer = await engine.importJs("source/src/lib/recipe-renderer.js");
 
 // Get plugin APIs
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;

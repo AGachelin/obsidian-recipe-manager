@@ -54,7 +54,7 @@ const mb = mb_plugin.api;
 const comp = new obsidian.Component(component);
 const bindTarget_view = mb.parseBindTarget('view', context.file.path);
 const bindTarget_ing = mb.parseBindTarget('available_ingredients', context.file.path);
-const templateFile = 'Templates/elements/ingredients.md'
+const templateFile = 'source/src/components/ingredients.md'
 async function addIngredient(view){
 	if(view){
 		container.empty();
@@ -94,7 +94,7 @@ function render(view){
 			hidden: true,
 			action:
 			{type: 'templaterCreateNote',
-			templateFile: 'Templates/ingredient_template.md',
+			templateFile: 'source/templatesingredient_template.md',
 			folderPath: 'Ingredients',
 			fileName: 'ing'}
 		};
@@ -105,7 +105,7 @@ function render(view){
 			hidden: false,
 			action:
 			{type: 'js',
-			file: 'Templates/Scripts/ingredients_input.js'}
+			file: 'source/src/ingredients_input.js'}
 		}
 		const AddButtonOptions = {
 		    declaration: AddButtonConfig,

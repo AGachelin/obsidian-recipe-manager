@@ -15,7 +15,7 @@ function render(view){
 			hidden: true,
 			action:
 			{type: 'templaterCreateNote',
-			templateFile: 'Templates/ingredient_template.md',
+			templateFile: 'source/templatesingredient_template.md',
 			folderPath: 'Ingredients',
 			fileName: 'ing'}
 		};
@@ -26,7 +26,7 @@ function render(view){
 			hidden: false,
 			action:
 			{type: 'js',
-			file: 'Templates/Scripts/ingredients_input.js'}
+			file: 'source/src/ingredients_input.js'}
 		}
 		const AddButtonOptions = {
 		    declaration: AddButtonConfig,

@@ -29,7 +29,7 @@ label: <% name %>
 hidden: true
 actions:
   - type: js
-    file: 'Templates/Scripts/ingredients_input.js'
+    file: 'source/src/ingredients_input.js'
     args:
       id: <%id%>
 ```

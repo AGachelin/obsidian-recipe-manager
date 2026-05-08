@@ -4,7 +4,7 @@ const mb = mb_plugin.api;
 const comp = new obsidian.Component(component);
 const bindTarget_view = mb.parseBindTarget('view', context.file.path);
 const bindTarget_ing = mb.parseBindTarget('available_ingredients', context.file.path);
-const templateFile = 'Templates/elements/ingredients.md'
+const templateFile = 'source/src/components/ingredients.md'
 async function addIngredient(view){
 	if(view){
 		container.empty();

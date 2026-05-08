@@ -14,7 +14,6 @@ const file = await tp.file.find_tfile(tp.file.path(true));
 const available_ingredients = await tp.app.vault.getFolderByPath("Ingredients").children.filter(x => x instanceof tp.obsidian.TFile).map(x => x.name);
 if(fill_in){
     note = await tp.system.prompt("Note");
-    // ingredients = await tp.user.
     content = await tp.system.prompt("Content", null, false, true);
 }
 %>
@@ -43,9 +42,9 @@ cssclasses: global
 <% await tp.file.include(tp.file.find_tfile("person-button")) %>
 ```js-engine
 // Import modularized utilities and business logic
-const durationUtils = await engine.importJs("Templates/Scripts/utils/duration.js");
-const ingredientsView = await engine.importJs("Templates/Scripts/lib/ingredients-view.js");
-const recipeRenderer = await engine.importJs("Templates/Scripts/lib/recipe-renderer.js");
+const durationUtils = await engine.importJs("source/src/utils/duration.js");
+const ingredientsView = await engine.importJs("source/src/lib/ingredients-view.js");
+const recipeRenderer = await engine.importJs("source/src/lib/recipe-renderer.js");
 
 // Get plugin APIs
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
