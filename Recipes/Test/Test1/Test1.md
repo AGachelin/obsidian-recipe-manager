@@ -3,14 +3,18 @@ view: false
 ingredients:
   "9":
     id: 9
-    name: test.md
-    amount: 4000
-    unit: kilogram
-  last_id: 9
+    name: R.md
+    amount: 2
+    unit: sachet
+  "10":
+    id: 10
+    name: f.md
+    amount: 0.004999999999999999
+    unit: milligram
+  last_id: 10
 available_ingredients:
   - b.md
-  - R.md
-  - f.md
+  - test.md
 rest: 3601
 cook: 55076
 source: https://docs.obsidian.md/Reference/TypeScript+API/MarkdownPostProcessorContext

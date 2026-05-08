@@ -1,21 +1,25 @@
 ---
 view: false
-note:
+note: 4
 ingredients:
-  last_id: 0
+  "1":
+    id: 1
+    name: R.md
+    amount: 4
+    unit: sachet
+  last_id: 1
 content:
 available_ingredients:
-  - b.md,
-  - f.md,
-  - R.md,
+  - b.md
+  - f.md
   - test.md
-rest: 0
-cook: 0
-source:
+rest: 900
+cook: 7200
+source: vfre
 oven:
 prep: 0
 person:
-  current: 0
+  current: 1
   raw: 1
 tags: []
 cssclasses: global
@@ -275,33 +279,54 @@ const subscription = mb.subscribeToMetadata(
 
 return reactive;
 ```
-```meta-bind-js-view
-{view} as view
----
-const input_duration = await engine.importJs("duration-input.js");
-const view_ingredients = await engine.importJs("view-ingredients.js");
+```js-engine
+// Import modularized utilities and business logic
+const durationUtils = await engine.importJs("Templates/Scripts/utils/duration.js");
+const ingredientsView = await engine.importJs("Templates/Scripts/lib/ingredients-view.js");
+const recipeRenderer = await engine.importJs("Templates/Scripts/lib/recipe-renderer.js");
+
+// Get plugin APIs
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
-const frontmatter = context.metadata.frontmatter;
-const note_input = `\`INPUT[number(placeholder(Note), defaultValue(`+frontmatter.note+`)):memory^note]\`` + ' '+ `\`VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]\``;
-const oven_input = `\`INPUT[number(placeholder(Oven temp), defaultValue(`+frontmatter.oven+`)):memory^oven]\`` + ' '+ `\`VIEW[bind({memory^oven}, 0, null)][math(hidden):oven]\``;
-const person_input = `\`INPUT[number(placeholder(Nombre de personnes), defaultValue(`+frontmatter.person.raw+`)):memory^person.raw]\`` + ' '+ `\`VIEW[bind({memory^person.raw}, 0, 1)][math(hidden):person.raw]\``;
-const content_input = "```meta-bind\nINPUT[editor:content]\n```";
-const cook_input = input_duration.default("cook", mb.mb.math.splitTime(frontmatter.cook, true));
-const rest_input = input_duration.default("rest", mb.mb.math.splitTime(frontmatter.rest, true));
-const prep_input = input_duration.default("prep", mb.mb.math.splitTime(frontmatter.prep, true));
-const source_input = `\`INPUT[text(placeholder(Source)):source]\``;
-const source_view = `\`VIEW[{source}][text(renderMarkdown)]\``;
-const note_view = `\`VIEW[{note}]\``;
-const oven_view = `\`VIEW[{oven}]\``;
-const cook_view = `\`VIEW[splitTime({cook}, false)]\``;
-const rest_view = `\`VIEW[splitTime({rest}, false)]\``;
-const prep_view = `\`VIEW[splitTime({prep}, false)]\``;
-const content_view = `\`VIEW[{content}][text(renderMarkdown)]\``;
-const ingredients_view = view_ingredients.default(frontmatter.ingredients);
-if(context.bound.view){
-	return engine.markdown.create(`${note_view}\n${source_view}\n${ingredients_view}\n${cook_view}\n${rest_view}\n${prep_view}\n${content_view}`);
+let frontmatter = context.metadata.frontmatter;
+
+// Create input fields
+const inputs = recipeRenderer.default.createInputFields(frontmatter, mb);
+const views = recipeRenderer.default.createViewFields(frontmatter);
+
+// Create duration inputs and views
+const durations = ['cook', 'rest', 'prep'];
+const durationInputs = {};
+const durationViews = {};
+const bindTargetView = mb.parseBindTarget('view', context.file.path);
+
+// Render based on view mode
+function render(isViewMode) {
+	frontmatter = context.metadata.frontmatter;
+	durations.forEach(duration => {
+    const splitTimes = mb.mb.math.splitTime(frontmatter[duration], true);
+    const { input, view } = durationUtils.default.createDurationInput(duration, splitTimes, mb);
+    durationInputs[duration] = input;
+    durationViews[duration] = view;
+});
+	const ingredientsMarkdown = ingredientsView.default.viewIngredients(frontmatter.ingredients);
+    return engine.markdown.create(
+        recipeRenderer.default.renderRecipe(
+            isViewMode,
+            inputs,
+            recipeRenderer.default.createViewFields(frontmatter),
+            ingredientsMarkdown,
+            durationViews,
+            durationInputs
+        )
+    );
 }
-else{
-	return engine.markdown.create(`${note_input}\n${source_input}\n${person_input}\n${cook_input}\n${rest_input}\n${prep_input}\n${content_input}`);
-}
+
+const reactive = engine.reactive(render, mb.getMetadata(bindTargetView));
+const subscription = mb.subscribeToMetadata(
+	bindTargetView,
+	component,
+	(value) => reactive.refresh(value)
+);
+
+return reactive;
 ```
