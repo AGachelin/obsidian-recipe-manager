@@ -1,12 +1,15 @@
-import { InputConfig } from "./input-config";
+import { InputConfig } from "./input-config.js";
 
 export class TagsInput extends InputConfig {
     constructor(target, path) {
         super('inlineListSuggester', target);
         this.path = path;
+        this.isGenerated = false;
     }
     
-    render(mb) {
+    generate(mb) {
+        this.isGenerated = true;
+        this.mb = mb;
         this.declaration_arguments = Object.keys(mb.mb.app.metadataCache.getTags()).map(x => {
 		        return {
 		            name: 'option',
@@ -15,6 +18,12 @@ export class TagsInput extends InputConfig {
 		    }).concat([{name:"allowOther", value:["true"]}]);
         this.config = super.render();
         this.inputField = mb.createInputFieldMountable(this.path, this.config);
+    }
+
+    render(mb) {
+        if (!this.isGenerated) {
+            this.generate(mb);
+        }
         return [this.inputField];
     }
 

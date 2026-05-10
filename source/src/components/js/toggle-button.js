@@ -38,11 +38,21 @@ export class AddIngredientButton {
 		    declaration: this.editModeButtonConfig,
 		    isPreview: false
 		};
+        this.isGenerated = false;
+    }
+
+    generate(mb, isViewMode) {
+        this.isGenerated = true;
+        this.mb = mb;
+        this.isViewMode = isViewMode;
+        const buttonOptions = isViewMode ? this.viewModeButtonOptions : this.editModeButtonOptions;
+        this.toggleButton = mb.createButtonMountable(this.path, buttonOptions);
     }
 
     render(mb, isViewMode) {
-        const buttonOptions = isViewMode ? this.viewModeButtonOptions : this.editModeButtonOptions;
-        this.toggleButton = mb.createButtonMountable(this.path, buttonOptions);
+        if (!this.isGenerated || this.isViewMode !== isViewMode) {
+            this.generate(mb, isViewMode);
+        }
         return [this.toggleButton];
     }
 }

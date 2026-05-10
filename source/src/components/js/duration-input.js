@@ -27,6 +27,7 @@ export class DurationInput {
     constructor(path, bindTargetHour, bindTargetMinute, bindTargetSecond, bindTarget, target) {
         this.path = path;
         this.target = target;
+        this.label = FRONTMATTER_LABELS.COOK;
         this.editView = `VIEW[number({memory^${target}["hour"]} h, s)+number({memory^${target}["min"]} minute, s)+number({memory^${target}["sec"]} s, s)][math(hidden):${target}]`;
         this.editViewConfig = new ViewConfig("toggle", bindTarget);
         this.view = `VIEW[splitTime({${target}}, false)]`;
@@ -34,9 +35,11 @@ export class DurationInput {
         this.hourSelect = new DurationSelect(bindTargetHour, 24);
         this.minuteSelect = new DurationSelect(bindTargetMinute, 60);
         this.secondSelect = new DurationSelect(bindTargetSecond, 60);
+        this.isGenerated = false;
     }
 
-    render(mb, view, value=null) {
+    generate(mb, view, value=null) {
+        this.isGenerated = true;
         if(view){
             const hourValue = Math.floor(value / 3600);
             mb.setMetadata(this.hourSelect.bindTarget, hourValue);
@@ -53,12 +56,38 @@ export class DurationInput {
             this.minuteSelectField = mb.createInputFieldMountable(this.path, this.minuteSelectConfig);
             this.secondSelectField = mb.createInputFieldMountable(this.path, this.secondSelectConfig);
             this.editViewField = mb.createViewFieldMountable(this.path, this.editViewConfig_);
-            return [this.hourSelectField, this.minuteSelectField, this.secondSelectField, this.editViewField];
-
         } else {
             this.viewConfig_ = this.viewConfig.render(this.view);
             this.viewField = mb.createViewFieldMountable(this.path, this.viewConfig_);
-            return [this.viewField];
+        }
+    }
+
+    render(mb, container, component, view, value=null) {
+        if(!this.isGenerated || value !== null){
+            this.generate(mb, view, value);
+        }
+
+        this.container = container;
+        this.component = component;
+
+        this.component.unload();
+        this.component.load();
+        this.container.empty();
+        if (!view) {        
+            const containerDiv = this.container.createEl('div', { cls: 'duration-input-group' });
+            containerDiv.createEl('label', { text: this.label + ': ' });
+            const inputContainer = containerDiv.createEl('div', { cls: 'duration-inputs' });
+            mb.wrapInMDRC(this.hourSelect, inputContainer, this.component);
+            inputContainer.createEl('span', { text: 'h ' });
+            mb.wrapInMDRC(this.minuteSelect, inputContainer, this.component);
+            inputContainer.createEl('span', { text: 'min ' });
+            mb.wrapInMDRC(this.secondSelect, inputContainer, this.component);
+            inputContainer.createEl('span', { text: 's' });
+            mb.wrapInMDRC(this.editViewField, containerDiv, this.component);
+        } else {
+            const viewContainer = this.container.createEl('div', { cls: 'duration-view-group' });
+            viewContainer.createEl('strong', { text: this.label + ': ' });
+            mb.wrapInMDRC(this.viewField, viewContainer, this.component);
         }
     }
 }

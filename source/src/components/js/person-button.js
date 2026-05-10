@@ -1,4 +1,4 @@
-import { ViewConfig } from "./view-config";
+import { ViewConfig } from "./view-config.js";
 
 export class PersonButton {
     constructor(path, target, raw) {
@@ -60,14 +60,23 @@ export class PersonButton {
 		}
 
         this.viewDeclaration = "VIEW[{person.current} personnes][text]";
+        this.isGenerated = false;
+    }
+
+    generate(mb) {
+        this.isGenerated = true;
+        this.mb = mb;
+		this.IncButton = mb.createButtonMountable(this.path, this.incButtonOptions);
+		this.DecButton = mb.createButtonMountable(this.path, this.decButtonOptions);
+		this.ResetButton = mb.createButtonMountable(this.path, this.resetButtonOptions);
+        this.ButtonGroup = mb.createButtonGroupMountable(this.path, this.buttonGroupOptions);
+        this.PersonView = mb.createViewFieldMountable(this.path, new ViewConfig('text').render(this.viewDeclaration));
     }
 
     render(mb) {
-		const IncButton = mb.createButtonMountable(context.file.path, this.incButtonOptions);
-		const DecButton = mb.createButtonMountable(context.file.path, this.decButtonOptions);
-		const ResetButton = mb.createButtonMountable(context.file.path, this.resetButtonOptions);
-        const ButtonGroup = mb.createButtonGroupMountable(context.file.path, this.buttonGroupOptions);
-        const PersonView = mb.createViewFieldMountable(context.file.path, new ViewConfig('text').render(this.viewDeclaration));
-        return [IncButton, DecButton, ResetButton, ButtonGroup, PersonView];
+        if (!this.isGenerated) {
+            this.generate(mb);
+        }
+        return [this.IncButton, this.DecButton, this.ResetButton, this.ButtonGroup, this.PersonView];
     }
 }

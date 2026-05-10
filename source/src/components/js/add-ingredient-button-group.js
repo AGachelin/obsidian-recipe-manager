@@ -17,7 +17,7 @@ export class AddIngredientButton {
 			id: 'add-ingredient',
 			style: 'default',
 			label: 'add ingredient',
-			hidden: false,
+			hidden: true,
 			action: {
 				type: 'js',
 				file: 'source/src/components/js/ingredients-input.js'
@@ -25,12 +25,12 @@ export class AddIngredientButton {
 		}
 
 		this.addButtonOptions = {
-		    declaration: AddButtonConfig,
+		    declaration: this.addButtonConfig,
 		    isPreview: false
 		};
 
 		this.newButtonOptions = {
-		    declaration: NewButtonConfig,
+		    declaration: this.newButtonConfig,
 		    isPreview: false
 		};
 
@@ -38,12 +38,27 @@ export class AddIngredientButton {
 			declaration: {referencedButtonIds:['add-ingredient','new-ingredient']},
 			renderChildType:'inline',
 		};
+		this.isGenerated = false;
     }
 
-    render(mb) {
+    generate(mb) {
+        this.isGenerated = true;
+        this.mb = mb;
         this.addButton = mb.createButtonMountable(this.path, this.addButtonOptions);
         this.newButton = mb.createButtonMountable(this.path, this.newButtonOptions);
 		this.buttonGroup = mb.createButtonGroupMountable(this.path, this.buttonGroupOptions);
-        return [this.addButton, this.newButton, this.buttonGroup];
     }
+
+	render(mb, container, component) {
+		if (!this.isGenerated) {
+			this.generate(mb);
+		}
+		
+		this.container = container;
+		this.component = component;
+
+		mb.wrapInMDRC(this.newButton, container, component);
+		mb.wrapInMDRC(this.addButton, container, component);
+		mb.wrapInMDRC(this.buttonGroup, container, component);
+	}
 }

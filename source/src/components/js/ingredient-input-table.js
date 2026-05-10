@@ -2,7 +2,7 @@ import {UNIT_OPTIONS, UNIT_LABELS} from "../../shared/constants/custom_units.js"
 import {InputConfig} from "./input-config.js";
 import {ViewConfig} from "./view-config.js";
 
-class rowConfig {
+class IngredientInputRow {
     constructor(path, id, name) {
         this.path = path;
         this.id = id;
@@ -63,6 +63,23 @@ class rowConfig {
             declaration: this.changeButtonConfig,
             isPreview: false
         };
+        this.isGenerated = false;
+    }
+
+    generate(mb, amount = 0, unit = '') {
+        this.isGenerated = true;
+        this.mb = mb;
+        this.amount = amount;
+        this.unit = unit;
+        this.bindTargetAmount ??= mb.createBindTarget('memory', this.path, ["ingredients", `${this.id}`, "amount"]);
+        this.bindTargetAmount_view ??= mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "amount"]);
+        this.bindTargetUnit ??= mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "unit"]);
+
+        this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonOptions);
+        this.changeButton = mb.createButtonMountable(this.path, this.changeButtonOptions);
+        this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(amount));
+        this.amountHiddenView = mb.createViewFieldMountable(this.path, this.createConvertViewConfig());
+        this.unitSelect = mb.createInputFieldMountable(this.path, this.createUnitSelectConfig(unit));
     }
 
     createAmountInputConfig(amount = 0) {
@@ -89,16 +106,9 @@ class rowConfig {
     }
 
     render(mb, amount = 0, unit = '') {
-        this.bindTargetAmount ??= mb.createBindTarget('memory', this.path, ["ingredients", `${this.id}`, "amount"]);
-        this.bindTargetAmount_view ??= mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "amount"]);
-        this.bindTargetUnit ??= mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "unit"]);
-
-        this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonOptions);
-        this.changeButton = mb.createButtonMountable(this.path, this.changeButtonOptions);
-        this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(amount));
-        this.amountHiddenView = mb.createViewFieldMountable(this.path, this.createConvertViewConfig());
-        this.unitSelect = mb.createInputFieldMountable(this.path, this.createUnitSelectConfig(unit));
-
+        if (!this.isGenerated || this.amount !== amount || this.unit !== unit) {
+            this.generate(mb, amount, unit);
+        }
         return [
             this.changeButton,
             this.amountInput,
@@ -109,23 +119,32 @@ class rowConfig {
     }
 }
 
-export class IngredientTable {
+export class IngredientInputTable {
     constructor(path) {
         this.path = path;
+        this.isGenerated = false;
     }
 
-    render(mb, ingredients = {}) {
-        const fields = [];
+    generate(mb, ingredients = {}) {
+        this.isGenerated = true;
+        this.mb = mb;
+        this.ingredients = ingredients;
+        this.fields = [];
         const ingredientIds = Object.keys(ingredients)
             .filter((id) => id !== 'last_id')
             .sort();
 
         for (const id of ingredientIds) {
             const ingredient = ingredients[id] || {};
-            const row = new rowConfig(this.path, id, ingredient.name || 'ingredient');
-            fields.push(row.render(mb, ingredient.amount || 0, ingredient.unit || ''));
+            const row = new IngredientInputRow(this.path, id, ingredient.name || 'ingredient');
+            this.fields.push(row.render(mb, ingredient.amount || 0, ingredient.unit || ''));
         }
+    }
 
-        return fields;
+    render(mb, ingredients = {}) {
+        if (!this.isGenerated || this.ingredients !== ingredients) {
+            this.generate(mb, ingredients);
+        }
+        return this.fields;
     }
 }

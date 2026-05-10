@@ -10,22 +10,6 @@ function render(view){
 	container.empty();
 	container.createEl('div')
 	if(!view){
-		const inlineListConfig = {
-			inputFieldType: "inlineListSuggester",
-			bindTarget: mb.createBindTarget('frontmatter', context.file.path, ['tags']),
-		    arguments:
-		    Object.keys(mb.mb.app.metadataCache.getTags()).map(x => {
-		        return {
-		            name: 'option',
-		            value: [x.toString()],
-		        };
-		    }).concat([{name:"allowOther", value:["true"]}])
-		};
-		const inlineListOptions = {
-		    declaration: inlineListConfig,
-		    renderChildType: 'inline'
-		};
-		const InlineList = mb.createInputFieldMountable(context.file.path, inlineListOptions);
 		mb.wrapInMDRC(InlineList, container, comp);
 	}
 }
