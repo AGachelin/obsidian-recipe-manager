@@ -51,8 +51,8 @@ const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
 let frontmatter = context.metadata.frontmatter;
 
 // Create input fields
-const inputs = recipeRenderer.default.createInputFields(frontmatter, mb);
-const views = recipeRenderer.default.createViewFields(frontmatter);
+const inputs = recipeRenderer.createInputFields(frontmatter, mb);
+const views = recipeRenderer.createViewFields(frontmatter);
 
 // Create duration inputs and views
 const durations = ['cook', 'rest', 'prep'];
@@ -65,13 +65,13 @@ function render(isViewMode) {
 	frontmatter = context.metadata.frontmatter;
 	durations.forEach(duration => {
     const splitTimes = mb.mb.math.splitTime(frontmatter[duration], true);
-    const { input, view } = durationUtils.default.createDurationInput(duration, splitTimes, mb);
+    const { input, view } = durationUtils.createDurationInput(duration, splitTimes, mb);
     durationInputs[duration] = input;
     durationViews[duration] = view;
 });
-	const ingredientsMarkdown = ingredientsView.default.viewIngredients(frontmatter.ingredients);
+	const ingredientsMarkdown = ingredientsView.viewIngredients(frontmatter.ingredients);
     return engine.markdown.create(
-        recipeRenderer.default.renderRecipe(
+        recipeRenderer.renderRecipe(
             isViewMode,
             inputs,
             views,

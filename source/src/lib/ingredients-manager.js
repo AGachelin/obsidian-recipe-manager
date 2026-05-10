@@ -49,4 +49,4 @@ const ingredientsManager = {
     validateIngredient
 };
 
-export default ingredientsManager;
+export { ingredientsManager };

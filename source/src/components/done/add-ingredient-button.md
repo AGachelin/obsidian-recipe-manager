@@ -15,7 +15,7 @@ function render(view){
 			hidden: true,
 			action:
 			{type: 'templaterCreateNote',
-			templateFile: 'source/templatesingredient_template.md',
+			templateFile: 'source/templates/ingredient_template.md',
 			folderPath: 'Ingredients',
 			fileName: 'ing'}
 		};

@@ -5,8 +5,8 @@ ingredients:
   "1":
     id: 1
     name: R.md
-    amount: 4
-    unit: sachet
+    amount: 5000
+    unit: kilogram
   last_id: 1
 content:
 available_ingredients:
@@ -14,7 +14,7 @@ available_ingredients:
   - f.md
   - test.md
 rest: 900
-cook: 7200
+cook: 54000
 source: vfre
 oven:
 prep: 0
@@ -113,6 +113,7 @@ async function addIngredient(view){
 		return;
 	}
 	const ing_to_add = await mb_plugin.mb.internal.evaluateTemplaterTemplate(templateFile, context.file.path);
+	console.log(ing_to_add);
 	return engine.markdown.create(ing_to_add);
 }
 const reactive_ing = engine.reactive(addIngredient, mb.getMetadata(bindTarget_ing));
@@ -330,3 +331,4 @@ const subscription = mb.subscribeToMetadata(
 
 return reactive;
 ```
+`VIEW[bind(convert({ingredients["1"]["unit"]}, {memory^ingredients["1"]["amount"]}, {ingredients["1"]["name"]}), 0, null)][math(hidden):ingredients["1"]["amount"]]`

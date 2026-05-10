@@ -11,7 +11,7 @@ async function run() {
         .map(x => x.name);
 
     const currentIngredients = context.metadata.frontmatter.ingredients;
-    const availableOptions = ingredientsManager.default.filterAvailable(
+    const availableOptions = ingredientsManager.filterAvailable(
         availableIngredients,
         currentIngredients,
         isChanging ? context.args.id : null
@@ -40,12 +40,12 @@ async function run() {
 
     mb.updateMetadata(
         currentIngTarget,
-        (old) => ingredientsManager.default.updateIngredients(old, selectedIngredient, updateMode, updateId)
+        (old) => ingredientsManager.updateIngredients(old, selectedIngredient, updateMode, updateId)
     );
 
     mb.updateMetadata(
         availableIngTarget,
-        (old) => ingredientsManager.default.filterAvailable(availableIngredients, currentIngredients, updateId)
+        (old) => ingredientsManager.filterAvailable(availableIngredients, currentIngredients, updateId)
             .filter(i => !isChanging || i !== selectedIngredient)
             .filter(i => !Array.isArray(selectedIngredient) || !selectedIngredient.includes(i))
     );

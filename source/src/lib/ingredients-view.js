@@ -35,4 +35,4 @@ const ingredientsView = {
     formatIngredientAmount
 };
 
-export default ingredientsView;
+export { ingredientsView };
