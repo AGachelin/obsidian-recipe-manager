@@ -61,7 +61,7 @@ export class DurationInput {
         this.secondSelect.setBindTarget(btSecond);
         
         this.editView = `VIEW[number({memory^${this.durationField}["hour"]} h, s)+number({memory^${this.durationField}["minute"]} minute, s)+number({memory^${this.durationField}["second"]} s, s)][math(hidden):${this.durationField}]`;
-        this.editViewConfig = new ViewConfig("toggle", btTotal);
+        this.editViewConfig = new ViewConfig("math", btTotal);
         this.view = `VIEW[splitTime({${this.durationField}}, false)]`;
         this.viewConfig = new ViewConfig("splitTime", btTotal);
         

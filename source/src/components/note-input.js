@@ -3,47 +3,48 @@ import { ViewConfig } from "./config/view-config.js";
 
 export class NoteInput extends InputConfig {
     constructor(path) {
-        super('number', null);
+        super("number", null);
         this.path = path;
         this.isGenerated = false;
     }
 
-    generate(mb, view, value=null) {
+    generate(mb, view, value = null) {
         this.isGenerated = true;
         this.mb = mb;
         this.viewMode = view;
         this.value = value;
-        
-        const btNote = mb.parseBindTarget('note', this.path);
+
+        const btNote = mb.parseBindTarget("note", this.path);
         this.bindTarget = btNote;
-        
-        if(view) {
-            this.viewConfig = new ViewConfig('math', btNote).render("VIEW[{note}]");
+        const btNoteMem = mb.createBindTarget("memory", this.path, ["note"], true);
+
+        if (view) {
+            this.viewConfig = new ViewConfig("math", btNote).render("VIEW[{note}]");
             this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
+            this.inputField = null;
+            this.clampView = null;
         } else {
-            if(value!==null){
-                this.defaultValue = [`${value}`];
-                this.declaration_arguments = [{ name: 'defaultValue', value: this.defaultValue }];
-            }
-            this.config = super.render();
-            this.inputField = mb.createInputFieldMountable(this.path, this.config);
-            
+            const n = value != null && value !== "" ? Number(value) : 0;
+            mb.setMetadata(btNoteMem, Number.isFinite(n) ? n : 0);
+            const inputConfig = new InputConfig("number", btNoteMem, "inline", [
+                { name: "defaultValue", value: [`${Number.isFinite(n) ? n : 0}`] },
+            ]).render();
+            this.inputField = mb.createInputFieldMountable(this.path, inputConfig);
+
             const viewDeclaration = "VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]";
-            this.clampViewConfig = new ViewConfig('math', btNote).render(viewDeclaration);
+            this.clampViewConfig = new ViewConfig("math", btNote).render(viewDeclaration);
             this.clampView = mb.createViewFieldMountable(this.path, this.clampViewConfig);
+            this.view = null;
         }
     }
 
-    render(mb, view, value=null) {
+    render(mb, view, value = null) {
         if (!this.isGenerated || this.viewMode !== view || this.value !== value) {
             this.generate(mb, view, value);
         }
-        if(view) {
+        if (view) {
             return [this.view];
-        } else {
-            return [this.inputField, this.clampView];
         }
+        return [this.inputField, this.clampView];
     }
 }
-// this should be used instead to view the note
-// <div class="star-rating" style="--rating: ${frontmatter.note};"></div>\n`

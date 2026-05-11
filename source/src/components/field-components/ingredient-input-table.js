@@ -40,8 +40,22 @@ class IngredientInputRow {
             true
         );
         this.bindTargetUnit = mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "unit"], true);
+        this.bindTargetUnitMemory = mb.createBindTarget(
+            'memory',
+            this.path,
+            ["ingredients", `${this.id}`, "unit"],
+            true
+        );
+        this.bindTargetNameMemory = mb.createBindTarget(
+            'memory',
+            this.path,
+            ["ingredients", `${this.id}`, "name"],
+            true
+        );
 
         mb.setMetadata(this.bindTargetAmountMemory, Number(amount));
+        mb.setMetadata(this.bindTargetUnitMemory, unit);
+        mb.setMetadata(this.bindTargetNameMemory, this.name);
 
         this.deleteButtonConfig = {
             id: `delete-${this.id}`,
@@ -90,6 +104,7 @@ class IngredientInputRow {
         this.changeButton = mb.createButtonMountable(this.path, this.changeButtonOptions);
         this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(amount));
         this.amountHiddenView = mb.createViewFieldMountable(this.path, this.createConvertViewConfig());
+        this.unitSyncView = mb.createViewFieldMountable(this.path, this.createUnitSyncViewConfig());
         this.unitSelect = mb.createInputFieldMountable(this.path, this.createUnitSelectConfig(unit));
     }
 
@@ -105,15 +120,23 @@ class IngredientInputRow {
     createUnitSelectConfig(unit = '') {
         return new InputConfig(
             'inlineSelect',
-            this.bindTargetUnit,
+            this.bindTargetUnitMemory,
             'inline',
             this.unitOptionArguments.concat([{ name: 'defaultValue', value: [`${unit}`] }])
         ).render();
     }
 
     createConvertViewConfig() {
-        const declaration = `VIEW[bind(convert({ingredients["${this.id}"]["unit"]}, {memory^ingredients["${this.id}"]["amount"]}, {ingredients["${this.id}"]["name"]}), 0, null)][math(hidden):ingredients["${this.id}"]["amount"]]`;
+        // Read only memory paths so this derived field does not depend on parent `ingredients`,
+        // avoiding Meta Bind "bind target dependency loop" (ingredients.N.amount <-> ingredients).
+        const declaration = `VIEW[bind(convert({memory^ingredients["${this.id}"]["unit"]}, {memory^ingredients["${this.id}"]["amount"]}, {memory^ingredients["${this.id}"]["name"]}), 0, null)][math(hidden):ingredients["${this.id}"]["amount"]]`;
         const conf = new ViewConfig('math', this.bindTargetAmountFrontmatter).render(declaration);
+        return conf;
+    }
+
+    createUnitSyncViewConfig() {
+        const declaration = `VIEW[{memory^ingredients["${this.id}"]["unit"]}][text(hidden):ingredients["${this.id}"]["unit"]]`;
+        const conf = new ViewConfig('text', this.bindTargetUnit).render(declaration);
         return conf;
     }
 
@@ -126,6 +149,7 @@ class IngredientInputRow {
             this.amountInput,
             this.amountHiddenView,
             this.unitSelect,
+            this.unitSyncView,
             this.deleteButton
         ];
     }

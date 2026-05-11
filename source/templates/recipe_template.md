@@ -20,23 +20,23 @@ if(fill_in){
 <%* tR = "" -%>
 ---
 view: false
-note: <% note %>
+note: <% Number(note) || 0 %>
 ingredients: {last_id: 0}
 content: <% content %>
 prep_duration: 0
 cook_duration: 0
 rest_duration: 0
 oven: 0
-source:
+source: ""
 person:
-  current: 0
+  current: 1
   raw: 1
-tags:
+tags: []
 cssclasses: global
 ---
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
-const comp = new obsidian.Component(component);
+const comp = component;
 const renderer = new (await engine.importJs("source/src/lib/recipe-renderer.js")).RecipeRenderer(context.file.path);
 
 const bindTarget_view = mb.parseBindTarget('view', context.file.path);
@@ -53,10 +53,23 @@ const bindTarget_content = mb.parseBindTarget('content', context.file.path);
 const bindTarget_person_raw = mb.parseBindTarget('person.raw', context.file.path);
 
 function renderRecipe() {
-    const frontmatter =
-        typeof context.metadata?.frontmatter === "object" && context.metadata.frontmatter !== null
-            ? context.metadata.frontmatter
-            : {};
+    const viewValue = mb.getMetadata(bindTarget_view);
+    const frontmatter = {
+        view: viewValue === true || viewValue === "true",
+        ingredients: mb.getMetadata(bindTarget_ing),
+        person: {
+            current: mb.getMetadata(bindTarget_person),
+            raw: mb.getMetadata(bindTarget_person_raw),
+        },
+        prep_duration: mb.getMetadata(bindTarget_prep),
+        cook_duration: mb.getMetadata(bindTarget_cook),
+        rest_duration: mb.getMetadata(bindTarget_rest),
+        oven: mb.getMetadata(bindTarget_oven),
+        note: mb.getMetadata(bindTarget_note),
+        source: mb.getMetadata(bindTarget_source),
+        tags: mb.getMetadata(bindTarget_tags),
+        content: mb.getMetadata(bindTarget_content),
+    };
     renderer.render(mb, container, comp, frontmatter.view, frontmatter);
 }
 
