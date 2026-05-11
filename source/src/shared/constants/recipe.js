@@ -2,9 +2,9 @@ export const FRONTMATTER_LABELS = Object.freeze({
     NOTE: 'Note',
     OVEN: 'Oven temperature',
     RAW_PERSON: 'Nombre de personnes',
-    COOK: 'Cuisson :',
-    PREP: 'Préparation :',
-    REST: 'Repos :',
+    COOK: 'Cuisson',
+    PREP: 'Préparation',
+    REST: 'Repos',
 });
 
 export const FRONTMATTER = Object.freeze({
@@ -27,6 +27,9 @@ export const FRONTMATTER = Object.freeze({
         RAW: 'person.raw'
     },
     PREP_DURATION: 'prep_duration',
+    LEGACY_PREP: 'prep',
+    LEGACY_COOK: 'cook',
+    LEGACY_REST: 'rest',
     REST_DURATION: 'rest_duration',
     SOURCE: 'source',
     TAGS: 'tags',
@@ -42,6 +45,6 @@ export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.PERSON.CURRENT]: 1,
     DURATION: 0,
     [FRONTMATTER.PERSON.RAW]: 1,
-    [FRONTMATTER.VIEW]: 'false',
+    [FRONTMATTER.VIEW]: false,
     [FRONTMATTER.TAGS]: [],
 });

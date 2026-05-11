@@ -1,6 +1,16 @@
-export class AddIngredientButton {
+export class ToggleButton {
     constructor(path) {
         this.path = path;
+        this.isGenerated = false;
+    }
+
+    generate(mb, isViewMode) {
+        this.isGenerated = true;
+        this.mb = mb;
+        this.isViewMode = isViewMode;
+        
+        const btView = 'view';
+        
         this.viewModeButtonConfig = {
             id: 'switch-mode-view',
 			style: 'default',
@@ -9,8 +19,8 @@ export class AddIngredientButton {
 			hidden: false,
 			action: {
 				type: 'updateMetadata',
-				bindTarget: 'view',
-				evaluate: false,
+				bindTarget: btView,
+				evaluate: true,
 				value: true
 			}
 		}
@@ -23,8 +33,8 @@ export class AddIngredientButton {
 			hidden: false,
 			action: {
 				type: 'updateMetadata',
-				bindTarget: 'view',
-				evaluate: false,
+				bindTarget: btView,
+				evaluate: true,
 				value: false
 			}
 		}
@@ -38,14 +48,8 @@ export class AddIngredientButton {
 		    declaration: this.editModeButtonConfig,
 		    isPreview: false
 		};
-        this.isGenerated = false;
-    }
 
-    generate(mb, isViewMode) {
-        this.isGenerated = true;
-        this.mb = mb;
-        this.isViewMode = isViewMode;
-        const buttonOptions = isViewMode ? this.viewModeButtonOptions : this.editModeButtonOptions;
+        const buttonOptions = isViewMode ? this.editModeButtonOptions : this.viewModeButtonOptions;
         this.toggleButton = mb.createButtonMountable(this.path, buttonOptions);
     }
 

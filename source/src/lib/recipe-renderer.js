@@ -1,33 +1,34 @@
-import { FRONTMATTER, FRONTMATTER_DEFAULTS } from "../shared/constants/recipe.js";
-import { Content } from "../components/js/content.js";
-import { DurationInput } from "../components/js/duration-input.js";
-import { IngredientInputTable } from "../components/js/ingredient-input-table.js";
-import { IngredientViewTable } from "../components/js/ingredients-view.js";
-import { NoteInput } from "../components/js/note-input.js";
-import { OvenInput } from "../components/js/oven-input.js";
-import { PersonButton } from "../components/js/person-button.js";
-import { SourceInput } from "../components/js/source-input.js";
-import { TagsInput } from "../components/js/tags-input.js";
-import { AddIngredientButton } from "../components/js/add-ingredient-button-group.js";
-import { AddIngredientButton as ToggleButton } from "../components/js/toggle-button.js";
+import { FRONTMATTER, FRONTMATTER_DEFAULTS, FRONTMATTER_LABELS } from "../shared/constants/recipe.js";
+import { Content } from "../components/content.js";
+import { DurationInput } from "../components/field-components/duration-input.js";
+import { IngredientInputTable } from "../components/field-components/ingredient-input-table.js";
+import { IngredientViewTable } from "../components/field-components/ingredients-view.js";
+import { NoteInput } from "../components/note-input.js";
+import { OvenInput } from "../components/oven-input.js";
+import { PersonButton } from "../components/person-button.js";
+import { SourceInput } from "../components/source-input.js";
+import { TagsInput } from "../components/tags-input.js";
+import { AddIngredientButton } from "../components/add-ingredient-button-group.js";
+import { ToggleButton } from "../components/toggle-button.js";
 
 export class RecipeRenderer {
     constructor(path) {
         this.path = path;
         this.content = new Content(path);
-        this.prepDuration = new DurationInput(path, `memory.${path}.prep_duration.hour`, `memory.${path}.prep_duration.min`, `memory.${path}.prep_duration.sec`, `memory.${path}.prep_duration`, FRONTMATTER.PREP_DURATION);
-        this.cookDuration = new DurationInput(path, `memory.${path}.cook_duration.hour`, `memory.${path}.cook_duration.min`, `memory.${path}.cook_duration.sec`, `memory.${path}.cook_duration`, FRONTMATTER.COOK_DURATION);
-        this.restDuration = new DurationInput(path, `memory.${path}.rest_duration.hour`, `memory.${path}.rest_duration.min`, `memory.${path}.rest_duration.sec`, `memory.${path}.rest_duration`, FRONTMATTER.REST_DURATION);
+        this.prepDuration = new DurationInput(path, FRONTMATTER.PREP_DURATION);
+        this.cookDuration = new DurationInput(path, FRONTMATTER.COOK_DURATION);
+        this.restDuration = new DurationInput(path, FRONTMATTER.REST_DURATION);
         this.ingredientInputTable = new IngredientInputTable(path);
         this.ingredientViewTable = new IngredientViewTable(path);
-        this.noteInput = new NoteInput(FRONTMATTER.NOTE, path);
-        this.ovenInput = new OvenInput(FRONTMATTER.OVEN, path);
-        this.personButton = new PersonButton(path, FRONTMATTER.PERSON.LABEL, FRONTMATTER_DEFAULTS[FRONTMATTER.PERSON.RAW]);
-        this.sourceInput = new SourceInput(FRONTMATTER.SOURCE, path);
-        this.tagsInput = new TagsInput(FRONTMATTER.TAGS, path);
+        this.noteInput = new NoteInput(path);
+        this.ovenInput = new OvenInput(path);
+        this.personButton = new PersonButton(path, FRONTMATTER_DEFAULTS[FRONTMATTER.PERSON.RAW]);
+        this.sourceInput = new SourceInput(path);
+        this.tagsInput = new TagsInput(path);
         this.addIngredientButton = new AddIngredientButton(path);
         this.toggleButton = new ToggleButton(path);
         this.isGenerated = false;
+        this.uiComponentAttached = false;
     }
 
     generate(mb, view, metadata) {
@@ -35,11 +36,26 @@ export class RecipeRenderer {
         this.mb = mb;
         this.view = view;
         this.metadata = metadata;
-        // Generate all components
+        
+        this.prepDuration.label = FRONTMATTER_LABELS.PREP;
+        this.cookDuration.label = FRONTMATTER_LABELS.COOK;
+        this.restDuration.label = FRONTMATTER_LABELS.REST;
+        
         this.content.generate(mb, view);
-        this.prepDuration.generate(mb, view, metadata[FRONTMATTER.PREP_DURATION] || FRONTMATTER_DEFAULTS.DURATION);
-        this.cookDuration.generate(mb, view, metadata[FRONTMATTER.COOK_DURATION] || FRONTMATTER_DEFAULTS.DURATION);
-        this.restDuration.generate(mb, view, metadata[FRONTMATTER.REST_DURATION] || FRONTMATTER_DEFAULTS.DURATION);
+        const prepSec =
+            metadata[FRONTMATTER.PREP_DURATION] ?? metadata[FRONTMATTER.LEGACY_PREP] ?? FRONTMATTER_DEFAULTS.DURATION;
+        const cookSec =
+            metadata[FRONTMATTER.COOK_DURATION] ?? metadata[FRONTMATTER.LEGACY_COOK] ?? FRONTMATTER_DEFAULTS.DURATION;
+        const restSec =
+            metadata[FRONTMATTER.REST_DURATION] ?? metadata[FRONTMATTER.LEGACY_REST] ?? FRONTMATTER_DEFAULTS.DURATION;
+        this.prepDuration.generate(mb, view, prepSec);
+        this.cookDuration.generate(mb, view, cookSec);
+        this.restDuration.generate(mb, view, restSec);
+        this.durationSecondsByField = Object.freeze({
+            prep_duration: prepSec,
+            cook_duration: cookSec,
+            rest_duration: restSec,
+        });
         this.ingredientInputTable.generate(mb, metadata[FRONTMATTER.INGREDIENTS] || FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS]);
         this.ingredientViewTable.generate(mb, metadata[FRONTMATTER.INGREDIENTS] || FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS]);
         this.noteInput.generate(mb, view, metadata[FRONTMATTER.NOTE]);
@@ -52,57 +68,54 @@ export class RecipeRenderer {
     }
 
     render(mb, container, component, view, metadata) {
-        if (!this.isGenerated || this.view !== view || this.metadata !== metadata) {
-            this.generate(mb, view, metadata);
-        }
-
-        // Clear container
+        component.unload();
+        component.load();
         container.empty();
 
-        // Render toggle button
-        const toggleContainer = container.createEl('div', { cls: 'toggle-container' });
+        this.generate(mb, view, metadata);
+        
+        const toggleContainer = container.createEl('div');
         this.toggleButton.render(mb, view).forEach(field => mb.wrapInMDRC(field, toggleContainer, component));
 
-        // Render ingredients
         const ingredientsContainer = container.createEl('div', { cls: 'ingredients-container' });
         ingredientsContainer.createEl('h3', { text: 'Ingredients' });
+        const fmIngredients = metadata?.[FRONTMATTER.INGREDIENTS];
+        const ingredients =
+            fmIngredients !== undefined && fmIngredients !== null ? fmIngredients : FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
         if (view) {
-            this.ingredientViewTable.render(mb, metadata[FRONTMATTER.INGREDIENTS]).forEach(row => row.forEach(field => mb.wrapInMDRC(field, ingredientsContainer, component)));
+            this.ingredientViewTable.render(mb, ingredients).forEach(row => row.forEach(field => mb.wrapInMDRC(field, ingredientsContainer, component)));
         } else {
-            this.ingredientInputTable.render(mb, metadata[FRONTMATTER.INGREDIENTS]).forEach(row => row.forEach(field => mb.wrapInMDRC(field, ingredientsContainer, component)));
+            this.ingredientInputTable.render(mb, ingredients).forEach(row => row.forEach(field => mb.wrapInMDRC(field, ingredientsContainer, component)));
             const addButtonContainer = ingredientsContainer.createEl('div', { cls: 'add-ingredient-container' });
             this.addIngredientButton.render(mb, addButtonContainer, component);
         }
 
-        // Render person button
         const personContainer = container.createEl('div', { cls: 'person-container' });
-        const result = this.personButton.render(mb);
-        console.log(result);
-        result.forEach(field => mb.wrapInMDRC(field, personContainer, component));
+        this.personButton.render(mb).forEach(field => mb.wrapInMDRC(field, personContainer, component));
 
-        // Render durations
         const durationsContainer = container.createEl('div', { cls: 'durations-container' });
         [this.prepDuration, this.cookDuration, this.restDuration].forEach(duration => {
-            duration.render(mb, durationsContainer, component, view);
+            duration.render(
+                mb,
+                durationsContainer,
+                component,
+                view,
+                this.durationSecondsByField[duration.durationField] ?? FRONTMATTER_DEFAULTS.DURATION
+            );
         });
 
-        // Render oven
         const ovenContainer = container.createEl('div', { cls: 'oven-container' });
         this.ovenInput.render(mb, ovenContainer, component, view);
 
-        // Render note
         const noteContainer = container.createEl('div', { cls: 'note-container' });
         this.noteInput.render(mb, view).forEach(field => mb.wrapInMDRC(field, noteContainer, component));
 
-        // Render content
         const contentContainer = container.createEl('div', { cls: 'content-container' });
         this.content.render(view, mb.mb.internal, contentContainer);
 
-        // Render source
         const sourceContainer = container.createEl('div', { cls: 'source-container' });
         this.sourceInput.render(view, sourceContainer, mb, component);
 
-        // Render tags
         const tagsContainer = container.createEl('div', { cls: 'tags-container' });
         this.tagsInput.render(mb).forEach(field => mb.wrapInMDRC(field, tagsContainer, component));
     }

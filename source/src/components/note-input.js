@@ -1,12 +1,10 @@
-import { InputConfig } from "./input-config.js";
-import { ViewConfig } from "./view-config.js";
+import { InputConfig } from "./config/input-config.js";
+import { ViewConfig } from "./config/view-config.js";
 
 export class NoteInput extends InputConfig {
-    constructor(target, path) {
-        super('number', target);
+    constructor(path) {
+        super('number', null);
         this.path = path;
-        this.viewDeclaration = "VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]";
-        this.clampViewConfig = new ViewConfig('math', this.target).render(this.viewDeclaration);
         this.isGenerated = false;
     }
 
@@ -15,14 +13,23 @@ export class NoteInput extends InputConfig {
         this.mb = mb;
         this.viewMode = view;
         this.value = value;
+        
+        const btNote = mb.parseBindTarget('note', this.path);
+        this.bindTarget = btNote;
+        
         if(view) {
-            this.viewConfig = new ViewConfig('math', this.target).render("View[{note}]");
+            this.viewConfig = new ViewConfig('math', btNote).render("VIEW[{note}]");
             this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
         } else {
-            this.defaultValue = value !== null ? [`${value}`] : [];
-            this.declaration_arguments = [{ name: 'defaultValue', value: this.defaultValue }];
+            if(value!==null){
+                this.defaultValue = [`${value}`];
+                this.declaration_arguments = [{ name: 'defaultValue', value: this.defaultValue }];
+            }
             this.config = super.render();
             this.inputField = mb.createInputFieldMountable(this.path, this.config);
+            
+            const viewDeclaration = "VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]";
+            this.clampViewConfig = new ViewConfig('math', btNote).render(viewDeclaration);
             this.clampView = mb.createViewFieldMountable(this.path, this.clampViewConfig);
         }
     }

@@ -23,71 +23,59 @@ view: false
 note: <% note %>
 ingredients: {last_id: 0}
 content: <% content %>
-available_ingredients: <%available_ingredients.map(ing => `\n- ${ing}`)%>
-rest: 0
-cook: 0
+prep_duration: 0
+cook_duration: 0
+rest_duration: 0
+oven: 0
 source:
-oven:
-prep: 0
 person:
   current: 0
   raw: 1
 tags:
 cssclasses: global
 ---
-<% await tp.file.include(tp.file.find_tfile("toggle-button")) %>
-<% await tp.file.include(tp.file.find_tfile("tags")) %>
-<% await tp.file.include(tp.file.find_tfile("ingredient-table"))%>
-<% await tp.file.include(tp.file.find_tfile("add-ingredient-button")) %>
-<% await tp.file.include(tp.file.find_tfile("person-button")) %>
 ```js-engine
-// Import modularized utilities and business logic
-const durationUtils = await engine.importJs("source/src/utils/duration.js");
-const ingredientsView = await engine.importJs("source/src/lib/ingredients-view.js");
-const recipeRenderer = await engine.importJs("source/src/lib/recipe-renderer.js");
-
-// Get plugin APIs
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
-let frontmatter = context.metadata.frontmatter;
+const comp = new obsidian.Component(component);
+const renderer = new (await engine.importJs("source/src/lib/recipe-renderer.js")).RecipeRenderer(context.file.path);
 
-// Create input fields
-const inputs = recipeRenderer.createInputFields(frontmatter, mb);
-const views = recipeRenderer.createViewFields(frontmatter);
+const bindTarget_view = mb.parseBindTarget('view', context.file.path);
+const bindTarget_ing = mb.parseBindTarget('ingredients', context.file.path);
+const bindTarget_person = mb.parseBindTarget('person.current', context.file.path);
+const bindTarget_prep = mb.parseBindTarget('prep_duration', context.file.path);
+const bindTarget_cook = mb.parseBindTarget('cook_duration', context.file.path);
+const bindTarget_rest = mb.parseBindTarget('rest_duration', context.file.path);
+const bindTarget_oven = mb.parseBindTarget('oven', context.file.path);
+const bindTarget_note = mb.parseBindTarget('note', context.file.path);
+const bindTarget_source = mb.parseBindTarget('source', context.file.path);
+const bindTarget_tags = mb.parseBindTarget('tags', context.file.path);
+const bindTarget_content = mb.parseBindTarget('content', context.file.path);
+const bindTarget_person_raw = mb.parseBindTarget('person.raw', context.file.path);
 
-// Create duration inputs and views
-const durations = ['cook', 'rest', 'prep'];
-const durationInputs = {};
-const durationViews = {};
-const bindTargetView = mb.parseBindTarget('view', context.file.path);
-
-// Render based on view mode
-function render(isViewMode) {
-	frontmatter = context.metadata.frontmatter;
-	durations.forEach(duration => {
-    const splitTimes = mb.mb.math.splitTime(frontmatter[duration], true);
-    const { input, view } = durationUtils.createDurationInput(duration, splitTimes, mb);
-    durationInputs[duration] = input;
-    durationViews[duration] = view;
-});
-	const ingredientsMarkdown = ingredientsView.viewIngredients(frontmatter.ingredients);
-    return engine.markdown.create(
-        recipeRenderer.renderRecipe(
-            isViewMode,
-            inputs,
-            views,
-            ingredientsMarkdown,
-            durationViews,
-            durationInputs
-        )
-    );
+function renderRecipe() {
+    const frontmatter =
+        typeof context.metadata?.frontmatter === "object" && context.metadata.frontmatter !== null
+            ? context.metadata.frontmatter
+            : {};
+    renderer.render(mb, container, comp, frontmatter.view, frontmatter);
 }
 
-const reactive = engine.reactive(render, mb.getMetadata(bindTargetView));
-const subscription = mb.subscribeToMetadata(
-	bindTargetView,
-	component,
-	(value) => reactive.refresh(value)
-);
+const reactive = engine.reactive(renderRecipe, mb.getMetadata(bindTarget_view));
+
+const subscriptions = [
+    mb.subscribeToMetadata(bindTarget_view, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_ing, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_person, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_prep, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_cook, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_rest, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_oven, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_note, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_source, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_tags, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_content, comp, () => reactive.refresh()),
+    mb.subscribeToMetadata(bindTarget_person_raw, comp, () => reactive.refresh()),
+];
 
 return reactive;
 ```

@@ -1,6 +1,7 @@
 import {UNIT_OPTIONS, UNIT_LABELS} from "../../shared/constants/custom_units.js";
-import {InputConfig} from "./input-config.js";
-import {ViewConfig} from "./view-config.js";
+import {UI_LABELS} from "../../shared/constants/ui.js";
+import {InputConfig} from "../config/input-config.js";
+import {ViewConfig} from "../config/view-config.js";
 
 class IngredientInputRow {
     constructor(path, id, name) {
@@ -14,43 +15,64 @@ class IngredientInputRow {
                 value: [unit, UNIT_LABELS[index]]
             }))
         ];
+        this.isGenerated = false;
+    }
+
+    generate(mb, amount = 0, unit = '') {
+        this.isGenerated = true;
+        this.mb = mb;
+        this.amount = amount;
+        this.unit = unit;
+        
+        const btAvailableIngredients ='available_ingredients';
+        const btIngredients ='ingredients';
+        
+        this.bindTargetAmountMemory = mb.createBindTarget(
+            'memory',
+            this.path,
+            ["ingredients", `${this.id}`, "amount"],
+            true
+        );
+        this.bindTargetAmountFrontmatter = mb.createBindTarget(
+            'frontmatter',
+            this.path,
+            ["ingredients", `${this.id}`, "amount"],
+            true
+        );
+        this.bindTargetUnit = mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "unit"], true);
+
+        mb.setMetadata(this.bindTargetAmountMemory, Number(amount));
 
         this.deleteButtonConfig = {
-            id: `delete-${id}`,
+            id: `delete-${this.id}`,
             style: 'default',
-            label: 'x',
+            label: UI_LABELS.DELETE,
             hidden: false,
             actions: [
                 {
                     type: "updateMetadata",
-                    bindTarget: "available_ingredients",
+                    bindTarget: btAvailableIngredients,
                     evaluate: true,
-                    value: `x==null?["${name}"]:["${name}",...x]`
+                    value: `x==null?["${this.name}"]:["${this.name}",...x]`
                 },
                 {
                     type: "updateMetadata",
-                    bindTarget: "ingredients",
+                    bindTarget: btIngredients,
                     evaluate: true,
-                    value: `(delete x["${id}"])?x:x`
-                },
-                {
-                    type: "updateMetadata",
-                    bindTarget: "ingredients",
-                    evaluate: true,
-                    value: `(delete x["${id}"])?x:x`
+                    value: `(delete x["${this.id}"])?x:x`
                 }
             ]
         };
 
         this.changeButtonConfig = {
-            id: `ingredient-${id}`,
+            id: `ingredient-${this.id}`,
             style: 'default',
-            label: `${name}`,
+            label: `${this.name}`,
             hidden: false,
             action: {
                 type: 'js',
                 file: 'source/src/components/ingredients-input.js',
-                args: { id: id }
+                args: { id: this.id }
             }
         };
 
@@ -63,17 +85,6 @@ class IngredientInputRow {
             declaration: this.changeButtonConfig,
             isPreview: false
         };
-        this.isGenerated = false;
-    }
-
-    generate(mb, amount = 0, unit = '') {
-        this.isGenerated = true;
-        this.mb = mb;
-        this.amount = amount;
-        this.unit = unit;
-        this.bindTargetAmount ??= mb.createBindTarget('memory', this.path, ["ingredients", `${this.id}`, "amount"]);
-        this.bindTargetAmount_view ??= mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "amount"]);
-        this.bindTargetUnit ??= mb.createBindTarget('frontmatter', this.path, ["ingredients", `${this.id}`, "unit"]);
 
         this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonOptions);
         this.changeButton = mb.createButtonMountable(this.path, this.changeButtonOptions);
@@ -85,7 +96,7 @@ class IngredientInputRow {
     createAmountInputConfig(amount = 0) {
         return new InputConfig(
             'number',
-            this.bindTargetAmount,
+            this.bindTargetAmountMemory,
             'inline',
             [{ name: 'defaultValue', value: [`${amount}`] }]
         ).render();
@@ -102,7 +113,8 @@ class IngredientInputRow {
 
     createConvertViewConfig() {
         const declaration = `VIEW[bind(convert({ingredients["${this.id}"]["unit"]}, {memory^ingredients["${this.id}"]["amount"]}, {ingredients["${this.id}"]["name"]}), 0, null)][math(hidden):ingredients["${this.id}"]["amount"]]`;
-        return new ViewConfig('math', this.bindTargetAmount_view).render(declaration);
+        const conf = new ViewConfig('math', this.bindTargetAmountFrontmatter).render(declaration);
+        return conf;
     }
 
     render(mb, amount = 0, unit = '') {
@@ -123,12 +135,13 @@ export class IngredientInputTable {
     constructor(path) {
         this.path = path;
         this.isGenerated = false;
+        this.fields = [];
+        this.previousIngredientIds = [];
     }
 
     generate(mb, ingredients = {}) {
-        this.isGenerated = true;
         this.mb = mb;
-        this.ingredients = ingredients;
+        this.ingredients = JSON.stringify(ingredients);
         this.fields = [];
         const ingredientIds = Object.keys(ingredients)
             .filter((id) => id !== 'last_id')
@@ -139,10 +152,18 @@ export class IngredientInputTable {
             const row = new IngredientInputRow(this.path, id, ingredient.name || 'ingredient');
             this.fields.push(row.render(mb, ingredient.amount || 0, ingredient.unit || ''));
         }
+        
+        this.previousIngredientIds = ingredientIds;
+        this.isGenerated = true;
     }
 
     render(mb, ingredients = {}) {
-        if (!this.isGenerated || this.ingredients !== ingredients) {
+        const ingredientIds = Object.keys(ingredients)
+            .filter((id) => id !== 'last_id')
+            .sort();
+        const ingredientString = JSON.stringify(ingredients);
+        
+        if (!this.isGenerated || this.ingredients !== ingredientString || this.previousIngredientIds.length !== ingredientIds.length) {
             this.generate(mb, ingredients);
         }
         return this.fields;

@@ -1,8 +1,8 @@
-import { InputConfig } from "./input-config.js";
+import { InputConfig } from "./config/input-config.js";
 
 export class TagsInput extends InputConfig {
-    constructor(target, path) {
-        super('inlineListSuggester', target);
+    constructor(path) {
+        super('inlineListSuggester', null);
         this.path = path;
         this.isGenerated = false;
     }
@@ -10,6 +10,8 @@ export class TagsInput extends InputConfig {
     generate(mb) {
         this.isGenerated = true;
         this.mb = mb;
+        const btTags = mb.parseBindTarget('tags', this.path);
+        this.bindTarget = btTags;
         this.declaration_arguments = Object.keys(mb.mb.app.metadataCache.getTags()).map(x => {
 		        return {
 		            name: 'option',

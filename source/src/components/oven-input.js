@@ -1,22 +1,31 @@
-import { InputConfig } from "./input-config.js";
-import { ViewConfig } from "./view-config.js";
+import { InputConfig } from "./config/input-config.js";
+import { ViewConfig } from "./config/view-config.js";
 
 export class OvenInput extends InputConfig {
-    constructor(target, path) {
-        super('number', target);
+    constructor(path) {
+        super('number', null);
         this.generated = false;
         this.path = path;
-        this.viewDeclaration = "VIEW[bind({memory^oven}, 0, null)][math(hidden):oven]";
-        this.bindViewConfig = new ViewConfig('math', this.target).render(this.viewDeclaration);
     }
+
     generate(mb, view, value=null) {
         this.generated = true;
-        this.viewConfig = new ViewConfig('math', this.target).render("View[{oven}]");
+        const btOven = mb.parseBindTarget('oven', this.path);
+        this.bindTarget = btOven;
+        this.viewConfig = new ViewConfig('math', btOven).render("VIEW[{oven}]");
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
-        this.defaultValue = value !== null ? [`${value}`] : [];
-        this.declaration_arguments = [{name:"placeholder", value: "Enter oven temperature"}, { name: 'defaultValue', value: this.defaultValue }];
+        this.declaration_arguments = [{name:"placeholder", value: ["Enter oven temperature"]}];
+
+        if(value!==null){
+            this.defaultValue = [`${value}`];
+            this.declaration_arguments.push({ name: 'defaultValue', value: this.defaultValue });
+        }
+
         this.config = super.render();
         this.inputField = mb.createInputFieldMountable(this.path, this.config);
+        
+        const viewDeclaration = "VIEW[bind({memory^oven}, 0, null)][math(hidden):oven]";
+        this.bindViewConfig = new ViewConfig('math', btOven).render(viewDeclaration);
         this.bindView = mb.createViewFieldMountable(this.path, this.bindViewConfig);
         return [this.inputField, this.bindView];
     }
@@ -24,14 +33,10 @@ export class OvenInput extends InputConfig {
         if (!this.generated || this.value !== value) {
             this.generate(mb, view, value);
         }
-        this.component?.unload();
-        this.container?.empty();
         this.container = container;
         this.component = component;
         this.value = value;
-        this.component.unload();
-        this.component.load();
-        this.container.empty();
+
         if (!view) {
             const inputWrapper = this.container.createEl('div', { cls: 'input-field oven-input' });
             inputWrapper.createEl('label', { text: 'Oven Temperature: ' });

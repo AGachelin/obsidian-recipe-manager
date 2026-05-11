@@ -2,30 +2,19 @@
 view: false
 note:
 ingredients:
-  "1":
-    id: 1
-    name: f.md
-    amount: '[MB_EXPRESSION] "failed to evaluate expression" caused by error "Undefined function bind"'
-    unit: ""
-  last_id: 1
+  last_id: 0
 content:
 prep_duration: 0
 cook_duration: 0
 rest_duration: 0
 oven: 0
-source: ""
+source:
 person:
   current: 0
   raw: 1
-tags: []
+tags:
 cssclasses: global
-available_ingredients:
-  - b.md
-  - R.md
-  - test.md
 ---
-
-
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
 const comp = new obsidian.Component(component);

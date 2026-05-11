@@ -1,10 +1,16 @@
-import { ViewConfig } from "./view-config.js";
+import { ViewConfig } from "./config/view-config.js";
 
 export class PersonButton {
-    constructor(path, target, raw) {
+    constructor(path, raw) {
         this.path = path;
-        this.target = target;
         this.raw = raw;
+        this.isGenerated = false;
+    }
+
+    generate(mb) {
+        this.isGenerated = true;
+        this.mb = mb;
+        const btPersonCurrent = 'person.current';        
         this.incButtonConfig = {
 			label: "+1",
 			hidden: true,
@@ -12,7 +18,7 @@ export class PersonButton {
 			style: "default",
 			action:{
 			    type: "updateMetadata",
-			    bindTarget: "person.current",
+			    bindTarget: btPersonCurrent,
 			    evaluate: true,
 			    value: "x + 1"
 			}
@@ -24,7 +30,7 @@ export class PersonButton {
 			style: "default",
 			action:{
 			    type: "updateMetadata",
-			    bindTarget: "person.current",
+			    bindTarget: btPersonCurrent,
 			    evaluate: true,
 			    value: "Math.max(0, x - 1)"
 			}
@@ -36,7 +42,7 @@ export class PersonButton {
 			style: "default",
 			action:{
 			    type: "updateMetadata",
-			    bindTarget: "person.current",
+			    bindTarget: btPersonCurrent,
 			    evaluate: true,
 			    value: this.raw
 			}
@@ -60,12 +66,6 @@ export class PersonButton {
 		}
 
         this.viewDeclaration = "VIEW[{person.current} personnes][text]";
-        this.isGenerated = false;
-    }
-
-    generate(mb) {
-        this.isGenerated = true;
-        this.mb = mb;
 		this.IncButton = mb.createButtonMountable(this.path, this.incButtonOptions);
 		this.DecButton = mb.createButtonMountable(this.path, this.decButtonOptions);
 		this.ResetButton = mb.createButtonMountable(this.path, this.resetButtonOptions);

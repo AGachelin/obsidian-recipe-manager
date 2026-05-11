@@ -59,8 +59,8 @@ async function run() {
         if (!selectedIngredient || selectedIngredient.length === 0) return;
     }
 
-    const currentIngTarget = mb.createBindTarget('frontmatter', this.path, ['ingredients']);
-    const availableIngTarget = mb.createBindTarget('frontmatter', this.path, ['available_ingredients']);
+    const currentIngTarget = mb.createBindTarget('frontmatter', context.file.path, ["ingredients"], true);
+    const availableIngTarget = mb.createBindTarget('frontmatter', context.file.path, ["available_ingredients"], true);
 
     const updateMode = isChanging ? 'change' : 'add';
     const updateId = isChanging ? context.args.id : null;

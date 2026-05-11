@@ -1,24 +1,30 @@
-import { InputConfig } from "./input-config.js";
-import { ViewConfig } from "./view-config.js";
+import { InputConfig } from "./config/input-config.js";
+import { ViewConfig } from "./config/view-config.js";
 
 export class SourceInput extends InputConfig {
-    constructor(target, path) {
-        super('text', target);
+    constructor(path) {
+        super('text', null);
         this.path = path;
     }
+
     generate(mb, view, value=null) {
-        this.viewConfig = new ViewConfig('text', this.target).render("View[{source}][text(renderMarkdown)]");
+        const btSource = mb.parseBindTarget('source', this.path);
+        this.bindTarget = btSource;
+        this.viewConfig = new ViewConfig('text', btSource).render("VIEW[{source}][text(renderMarkdown)]");
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
-        this.defaultValue = value !== null ? [`${value}`] : [];
-        this.declaration_arguments = [{name:"placeholder", value: "Enter source"}, { name: 'defaultValue', value: this.defaultValue }];
+        this.declaration_arguments = [{name:"placeholder", value: ["Enter source"]}];
+        if(value!==null){
+            this.defaultValue = [`${value}`];
+            this.declaration_arguments.push({ name: 'defaultValue', value: this.defaultValue });
+        }
         this.config = super.render();
         this.inputField = mb.createInputFieldMountable(this.path, this.config);
     }
 
     render(view, container, mb, comp){
-        comp.unload();
-        comp.load();
-        container.empty();
+        if (!this.inputField) {
+            this.generate(mb, view);
+        }
         if (!view) {
             const inputWrapper = container.createEl('div', { cls: 'input-field source-input' });
             inputWrapper.createEl('label', { text: 'Source: ' });

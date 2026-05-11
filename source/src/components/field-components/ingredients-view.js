@@ -1,4 +1,4 @@
-import {ViewConfig} from "./view-config.js";
+import {ViewConfig} from "../config/view-config.js";
 
 class IngredientViewRow {
     constructor(path, id, name, amount = 0, unit = '') {
@@ -13,9 +13,9 @@ class IngredientViewRow {
             name: `VIEW[{ingredients["${this.id}"].name}]`
         }
         this.viewConfigs = {
-            amount: new viewConfig('text', null).render(this.viewDeclaration.amount),
-            unit: new viewConfig('text', null).render(this.viewDeclaration.unit),
-            name: new viewConfig('text', null).render(this.viewDeclaration.name)
+            amount: new ViewConfig('text', null).render(this.viewDeclaration.amount),
+            unit: new ViewConfig('text', null).render(this.viewDeclaration.unit),
+            name: new ViewConfig('text', null).render(this.viewDeclaration.name)
         }
         this.isGenerated = false;
     }
@@ -44,12 +44,13 @@ export class IngredientViewTable {
     constructor(path) {
         this.path = path;
         this.isGenerated = false;
+        this.fields = [];
+        this.previousIngredientIds = [];
     }
 
     generate(mb, ingredients) {
-        this.isGenerated = true;
         this.mb = mb;
-        this.ingredients = ingredients;
+        this.ingredients = JSON.stringify(ingredients);
         this.fields = [];
         const ingredientIds = Object.keys(ingredients).filter(key => key !== "last_id");
         ingredientIds.forEach(id => {
@@ -57,10 +58,16 @@ export class IngredientViewTable {
             const row = new IngredientViewRow(this.path, id, ingredient.name, ingredient.amount, ingredient.unit);
             this.fields.push(row.render(mb));
         });
+        
+        this.previousIngredientIds = ingredientIds;
+        this.isGenerated = true;
     }
 
     render(mb, ingredients) {
-        if (!this.isGenerated || this.ingredients !== ingredients) {
+        const ingredientIds = Object.keys(ingredients).filter(key => key !== "last_id");
+        const ingredientString = JSON.stringify(ingredients);
+        
+        if (!this.isGenerated || this.ingredients !== ingredientString || this.previousIngredientIds.length !== ingredientIds.length) {
             this.generate(mb, ingredients);
         }
         return this.fields;

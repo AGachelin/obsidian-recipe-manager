@@ -1,10 +1,12 @@
+import { UI_LABELS } from "../shared/constants/ui.js";
+
 export class AddIngredientButton {
     constructor(path) {
         this.path = path;
         this.newButtonConfig = {
             id: 'new-ingredient',
 			style: 'default',
-			label: 'new ingredient',
+			label: UI_LABELS.NEW_INGREDIENT,
 			hidden: true,
 			action: {
 				type: 'templaterCreateNote',
@@ -16,11 +18,11 @@ export class AddIngredientButton {
         this.addButtonConfig = {
 			id: 'add-ingredient',
 			style: 'default',
-			label: 'add ingredient',
+			label: UI_LABELS.ADD_INGREDIENT,
 			hidden: true,
 			action: {
 				type: 'js',
-				file: 'source/src/components/js/ingredients-input.js'
+				file: 'source/src/components/ingredients-input.js'
 			}
 		}
 
