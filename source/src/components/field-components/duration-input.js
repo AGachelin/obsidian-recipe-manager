@@ -112,7 +112,11 @@ export class DurationInput {
                 { parent: inputContainer, spanText: "min " },
                 { parent: inputContainer, field: this.secondSelectField },
                 { parent: inputContainer, spanText: "s" },
-                { parent: containerDiv, field: this.editViewField },
+                {
+                    parent: containerDiv,
+                    wrapperCls: UI_CLASSES.HIDDEN_VIEW_FIELD,
+                    field: this.editViewField,
+                },
             ];
         }
         const viewContainer = container.createEl("div", { cls: UI_CLASSES.DURATION_VIEW_GROUP });

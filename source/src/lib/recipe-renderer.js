@@ -1,4 +1,5 @@
 import { FRONTMATTER, FRONTMATTER_DEFAULTS, FRONTMATTER_LABELS } from "../shared/constants/recipe.js";
+import { UI_CLASSES } from "../shared/constants/ui.js";
 import { Content } from "../components/content.js";
 import { DurationInput } from "../components/field-components/duration-input.js";
 import { IngredientInputTable } from "../components/field-components/ingredient-input-table.js";
@@ -14,17 +15,33 @@ import { ToggleButton } from "../components/toggle-button.js";
 /**
  * @param {unknown} mb
  * @param {import("obsidian").Component} component
- * @param {Array<{ parent: HTMLElement, field?: unknown, spanText?: string }>} steps
+ * @param {Array<{ parent: HTMLElement, field?: unknown, spanText?: string, wrapperCls?: string }>} steps
  */
 function applyMdrcLayoutSteps(mb, component, steps) {
     for (const step of steps) {
         if (step.field != null) {
-            mb.wrapInMDRC(step.field, step.parent, component);
+            const mountEl =
+                step.wrapperCls != null
+                    ? step.parent.createEl("div", { cls: step.wrapperCls })
+                    : step.parent.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });
+            mb.wrapInMDRC(step.field, mountEl, component);
         }
         if (step.spanText != null) {
             step.parent.createEl("span", { text: step.spanText });
         }
     }
+}
+
+/**
+ * `wrapInMDRC` replaces the mount node's contents — use a fresh element per field.
+ * @param {unknown} mb
+ * @param {import("obsidian").Component} component
+ * @param {unknown} field
+ * @param {HTMLElement} parent
+ */
+function wrapMdrcInDedicatedMount(mb, component, field, parent) {
+    const mount = parent.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });
+    mb.wrapInMDRC(field, mount, component);
 }
 
 export class RecipeRenderer {
@@ -88,40 +105,56 @@ export class RecipeRenderer {
 
     render(mb, container, component, view, metadata) {
         container.empty();
+        container.classList.add(UI_CLASSES.RECIPE_ROOT);
 
         this.generate(mb, view, metadata);
 
-        const toggleContainer = container.createEl("div");
-        this.toggleButton.render(mb, view).forEach((field) => mb.wrapInMDRC(field, toggleContainer, component));
+        const toggleContainer = container.createEl("div", { cls: UI_CLASSES.RECIPE_TOGGLE_BAR });
+        this.toggleButton
+            .render(mb, view)
+            .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, toggleContainer));
 
-        const ingredientsContainer = container.createEl("div", { cls: "ingredients-container" });
+        const ingredientsContainer = container.createEl("div", { cls: UI_CLASSES.INGREDIENTS_CONTAINER });
         ingredientsContainer.createEl("h3", { text: "Ingredients" });
         const ingredients =
             this.metadata[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
         if (view) {
             this.ingredientViewTable.render(mb, ingredients).forEach((row) => {
-                const rowEl = ingredientsContainer.createEl("div", { cls: "ingredient-row" });
-                row.forEach((field) => mb.wrapInMDRC(field, rowEl, component));
+                const rowEl = ingredientsContainer.createEl("div", { cls: UI_CLASSES.INGREDIENT_ROW });
+                row.forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, rowEl));
             });
         } else {
             this.ingredientInputTable.render(mb, ingredients).forEach((row) => {
-                const rowEl = ingredientsContainer.createEl("div", { cls: "ingredient-row" });
-                row.forEach((field) => mb.wrapInMDRC(field, rowEl, component));
+                const rowEl = ingredientsContainer.createEl("div", { cls: UI_CLASSES.INGREDIENT_ROW });
+                applyMdrcLayoutSteps(mb, component, row.layoutSteps(rowEl));
             });
-            const addButtonContainer = ingredientsContainer.createEl("div", { cls: "add-ingredient-container" });
+            const addButtonContainer = ingredientsContainer.createEl("div", {
+                cls: UI_CLASSES.ADD_INGREDIENT_CONTAINER,
+            });
             applyMdrcLayoutSteps(mb, component, this.addIngredientButton.layoutMdrc(mb, addButtonContainer));
         }
 
-        const personContainer = container.createEl("div", { cls: "person-container" });
-        this.personButton.render(mb, view).forEach((field) => mb.wrapInMDRC(field, personContainer, component));
+        const personContainer = container.createEl("div", { cls: UI_CLASSES.PERSON_CONTAINER });
+        this.personButton
+            .render(mb, view)
+            .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, personContainer));
 
-        const sourceContainer = container.createEl("div", { cls: "source-container" });
+        const sourceContainer = container.createEl("div", { cls: UI_CLASSES.SOURCE_CONTAINER });
         applyMdrcLayoutSteps(mb, component, this.sourceInput.layoutMdrc(view, sourceContainer, mb));
 
-        const noteContainer = container.createEl("div", { cls: "note-container" });
-        this.noteInput.render(mb, view).forEach((field) => mb.wrapInMDRC(field, noteContainer, component));
+        const noteContainer = container.createEl("div", { cls: UI_CLASSES.NOTE_CONTAINER });
+        applyMdrcLayoutSteps(
+            mb,
+            component,
+            this.noteInput.layoutMdrc(
+                mb,
+                noteContainer,
+                view,
+                this.metadata[FRONTMATTER.NOTE] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.NOTE]
+            )
+        );
 
-        const durationsContainer = container.createEl("div", { cls: "durations-container" });
+        const durationsContainer = container.createEl("div", { cls: UI_CLASSES.DURATIONS_CONTAINER });
         [this.cookDuration, this.restDuration, this.prepDuration].forEach((duration) => {
             const steps = duration.layoutMdrc(
                 mb,
@@ -132,7 +165,7 @@ export class RecipeRenderer {
             applyMdrcLayoutSteps(mb, component, steps);
         });
 
-        const ovenContainer = container.createEl("div", { cls: "oven-container" });
+        const ovenContainer = container.createEl("div", { cls: UI_CLASSES.OVEN_CONTAINER });
         applyMdrcLayoutSteps(
             mb,
             component,
@@ -144,10 +177,12 @@ export class RecipeRenderer {
             )
         );
 
-        const contentContainer = container.createEl("div", { cls: "content-container" });
+        const contentContainer = container.createEl("div", { cls: UI_CLASSES.CONTENT_CONTAINER });
         this.content.render(view, mb.mb.internal, contentContainer);
 
-        const tagsContainer = container.createEl("div", { cls: "tags-container" });
-        this.tagsInput.render(mb).forEach((field) => mb.wrapInMDRC(field, tagsContainer, component));
+        const tagsContainer = container.createEl("div", { cls: UI_CLASSES.TAGS_CONTAINER });
+        this.tagsInput
+            .render(mb)
+            .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, tagsContainer));
     }
 }

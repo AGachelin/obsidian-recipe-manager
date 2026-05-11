@@ -1,5 +1,5 @@
 import {UNIT_OPTIONS, UNIT_LABELS} from "../../shared/constants/custom_units.js";
-import {UI_LABELS} from "../../shared/constants/ui.js";
+import {UI_CLASSES, UI_LABELS} from "../../shared/constants/ui.js";
 import {InputConfig} from "../config/input-config.js";
 import {ViewConfig} from "../config/view-config.js";
 
@@ -127,8 +127,6 @@ class IngredientInputRow {
     }
 
     createConvertViewConfig() {
-        // Read only memory paths so this derived field does not depend on parent `ingredients`,
-        // avoiding Meta Bind "bind target dependency loop" (ingredients.N.amount <-> ingredients).
         const declaration = `VIEW[bind(convert({memory^ingredients["${this.id}"]["unit"]}, {memory^ingredients["${this.id}"]["amount"]}, {memory^ingredients["${this.id}"]["name"]}), 0, null)][math(hidden):ingredients["${this.id}"]["amount"]]`;
         const conf = new ViewConfig('math', this.bindTargetAmountFrontmatter).render(declaration);
         return conf;
@@ -144,13 +142,28 @@ class IngredientInputRow {
         if (!this.isGenerated || this.amount !== amount || this.unit !== unit) {
             this.generate(mb, amount, unit);
         }
+    }
+
+    /**
+     * @param {HTMLElement} rowEl
+     * @returns {Array<{ parent: HTMLElement, field: unknown, wrapperCls?: string }>}
+     */
+    layoutSteps(rowEl) {
         return [
-            this.changeButton,
-            this.amountInput,
-            this.amountHiddenView,
-            this.unitSelect,
-            this.unitSyncView,
-            this.deleteButton
+            { parent: rowEl, field: this.changeButton },
+            { parent: rowEl, field: this.amountInput },
+            {
+                parent: rowEl,
+                wrapperCls: UI_CLASSES.HIDDEN_VIEW_FIELD,
+                field: this.amountHiddenView,
+            },
+            { parent: rowEl, field: this.unitSelect },
+            {
+                parent: rowEl,
+                wrapperCls: UI_CLASSES.HIDDEN_VIEW_FIELD,
+                field: this.unitSyncView,
+            },
+            { parent: rowEl, field: this.deleteButton },
         ];
     }
 }
@@ -159,14 +172,15 @@ export class IngredientInputTable {
     constructor(path) {
         this.path = path;
         this.isGenerated = false;
-        this.fields = [];
+        /** @type {IngredientInputRow[]} */
+        this.rows = [];
         this.previousIngredientIds = [];
     }
 
     generate(mb, ingredients = {}) {
         this.mb = mb;
         this.ingredients = JSON.stringify(ingredients);
-        this.fields = [];
+        this.rows = [];
         const ingredientIds = Object.keys(ingredients)
             .filter((id) => id !== 'last_id')
             .sort();
@@ -174,22 +188,26 @@ export class IngredientInputTable {
         for (const id of ingredientIds) {
             const ingredient = ingredients[id] || {};
             const row = new IngredientInputRow(this.path, id, ingredient.name || 'ingredient');
-            this.fields.push(row.render(mb, ingredient.amount || 0, ingredient.unit || ''));
+            row.render(mb, ingredient.amount || 0, ingredient.unit || '');
+            this.rows.push(row);
         }
-        
+
         this.previousIngredientIds = ingredientIds;
         this.isGenerated = true;
     }
 
+    /**
+     * @returns {Array<{ layoutSteps: (rowEl: HTMLElement) => Array<{ parent: HTMLElement, field: unknown, wrapperCls?: string }> }>}
+     */
     render(mb, ingredients = {}) {
         const ingredientIds = Object.keys(ingredients)
             .filter((id) => id !== 'last_id')
             .sort();
         const ingredientString = JSON.stringify(ingredients);
-        
+
         if (!this.isGenerated || this.ingredients !== ingredientString || this.previousIngredientIds.length !== ingredientIds.length) {
             this.generate(mb, ingredients);
         }
-        return this.fields;
+        return this.rows;
     }
 }

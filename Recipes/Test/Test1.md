@@ -1,24 +1,29 @@
 ---
+prep_duration: 856
+oven: 9
+note: 3
+cook_duration: 18002
+rest_duration: 962
 view: false
-note:
 ingredients:
-  last_id: 1
+  "4":
+    id: 4
+    name: R.md
+    amount:
+    unit: ""
+  last_id: 4
 content:
-prep_duration: 8
-cook_duration: 0
-rest_duration: 0
-oven:
-source: ""
+source: cd
 person:
-  current: 1
+  current: 2
   raw: 1
 tags:
-  - "#test"
-cssclasses: global
+  - "#example-note"
+cssclasses:
+  - recipe-ui
 available_ingredients:
   - f.md
   - b.md
-  - R.md
   - test.md
 ---
 ```js-engine

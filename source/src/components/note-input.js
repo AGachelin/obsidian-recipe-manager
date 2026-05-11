@@ -1,3 +1,4 @@
+import { UI_CLASSES } from "../shared/constants/ui.js";
 import { InputConfig } from "./config/input-config.js";
 import { ViewConfig } from "./config/view-config.js";
 
@@ -38,13 +39,25 @@ export class NoteInput extends InputConfig {
         }
     }
 
-    render(mb, view, value = null) {
+    /**
+     * @returns {Array<{ parent: HTMLElement, field: unknown }>}
+     */
+    layoutMdrc(mb, container, view, value = null) {
         if (!this.isGenerated || this.viewMode !== view || this.value !== value) {
             this.generate(mb, view, value);
         }
         if (view) {
-            return [this.view];
+            const viewWrapper = container.createEl("div", { cls: `${UI_CLASSES.VIEW_FIELD} note-view` });
+            return [{ parent: viewWrapper, field: this.view }];
         }
-        return [this.inputField, this.clampView];
+        const inputWrapper = container.createEl("div", { cls: `${UI_CLASSES.INPUT_FIELD} note-input` });
+        return [
+            { parent: inputWrapper, field: this.inputField },
+            {
+                parent: container,
+                wrapperCls: UI_CLASSES.HIDDEN_VIEW_FIELD,
+                field: this.clampView,
+            },
+        ];
     }
 }

@@ -1,10 +1,3 @@
----
-note: 0
-ingredients: []
-content: ""
-view: false
-tags:
----
 <%*
 const fill_in = await tp.system.suggester(["Oui", "Non"], [true, false], false, "Fill-in automatically ?");
 let note = "";
@@ -32,7 +25,7 @@ person:
   current: 1
   raw: 1
 tags: []
-cssclasses: global
+cssclasses: recipe-ui
 ---
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;

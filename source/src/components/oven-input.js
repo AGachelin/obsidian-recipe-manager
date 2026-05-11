@@ -1,3 +1,4 @@
+import { UI_CLASSES } from "../shared/constants/ui.js";
 import { InputConfig } from "./config/input-config.js";
 import { ViewConfig } from "./config/view-config.js";
 
@@ -48,7 +49,11 @@ export class OvenInput extends InputConfig {
             inputWrapper.createEl("label", { text: "Oven Temperature: " });
             return [
                 { parent: inputWrapper, field: this.inputField },
-                { parent: inputWrapper, field: this.bindView },
+                {
+                    parent: inputWrapper,
+                    wrapperCls: UI_CLASSES.HIDDEN_VIEW_FIELD,
+                    field: this.bindView,
+                },
             ];
         }
         const viewWrapper = container.createEl("div", { cls: "view-field oven-view" });
