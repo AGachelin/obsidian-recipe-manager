@@ -1,5 +1,4 @@
 import { FRONTMATTER, FRONTMATTER_DEFAULTS, FRONTMATTER_LABELS } from "../shared/constants/recipe.js";
-import { UI_LABELS, UI_CLASSES } from "../shared/constants/ui.js";
 import { Content } from "../components/content.js";
 import { DurationInput } from "../components/field-components/duration-input.js";
 import { IngredientInputTable } from "../components/field-components/ingredient-input-table.js";
@@ -11,6 +10,22 @@ import { SourceInput } from "../components/source-input.js";
 import { TagsInput } from "../components/tags-input.js";
 import { AddIngredientButton } from "../components/add-ingredient-button-group.js";
 import { ToggleButton } from "../components/toggle-button.js";
+
+/**
+ * @param {unknown} mb
+ * @param {import("obsidian").Component} component
+ * @param {Array<{ parent: HTMLElement, field?: unknown, spanText?: string }>} steps
+ */
+function applyMdrcLayoutSteps(mb, component, steps) {
+    for (const step of steps) {
+        if (step.field != null) {
+            mb.wrapInMDRC(step.field, step.parent, component);
+        }
+        if (step.spanText != null) {
+            step.parent.createEl("span", { text: step.spanText });
+        }
+    }
+}
 
 export class RecipeRenderer {
     constructor(path) {
@@ -37,11 +52,15 @@ export class RecipeRenderer {
         this.mb = mb;
         this.view = view;
         this.metadata = metadata ?? {};
-        
+
         this.prepDuration.label = FRONTMATTER_LABELS.PREP;
         this.cookDuration.label = FRONTMATTER_LABELS.COOK;
         this.restDuration.label = FRONTMATTER_LABELS.REST;
-        
+
+        const prepSec = Number(this.metadata[FRONTMATTER.PREP_DURATION]) || 0;
+        const cookSec = Number(this.metadata[FRONTMATTER.COOK_DURATION]) || 0;
+        const restSec = Number(this.metadata[FRONTMATTER.REST_DURATION]) || 0;
+
         this.content.generate(mb, view);
         const noteValue =
             this.metadata[FRONTMATTER.NOTE] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.NOTE];
@@ -49,20 +68,11 @@ export class RecipeRenderer {
             this.metadata[FRONTMATTER.OVEN] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.OVEN];
         const sourceValue =
             this.metadata[FRONTMATTER.SOURCE] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.SOURCE];
-        const prepSec =
-            this.metadata[FRONTMATTER.PREP_DURATION] ?? FRONTMATTER_DEFAULTS.DURATION;
-        const cookSec =
-            this.metadata[FRONTMATTER.COOK_DURATION] ?? FRONTMATTER_DEFAULTS.DURATION;
-        const restSec =
-            this.metadata[FRONTMATTER.REST_DURATION] ?? FRONTMATTER_DEFAULTS.DURATION;
+
         this.prepDuration.generate(mb, view, prepSec);
         this.cookDuration.generate(mb, view, cookSec);
         this.restDuration.generate(mb, view, restSec);
-        this.durationSecondsByField = Object.freeze({
-            prep_duration: prepSec,
-            cook_duration: cookSec,
-            rest_duration: restSec,
-        });
+
         const ingredientsValue =
             this.metadata[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
         this.ingredientInputTable.generate(mb, ingredientsValue);
@@ -80,56 +90,64 @@ export class RecipeRenderer {
         container.empty();
 
         this.generate(mb, view, metadata);
-        
-        const toggleContainer = container.createEl('div');
-        this.toggleButton.render(mb, view).forEach(field => mb.wrapInMDRC(field, toggleContainer, component));
 
-        const ingredientsContainer = container.createEl('div', { cls: 'ingredients-container' });
-        ingredientsContainer.createEl('h3', { text: 'Ingredients' });
+        const toggleContainer = container.createEl("div");
+        this.toggleButton.render(mb, view).forEach((field) => mb.wrapInMDRC(field, toggleContainer, component));
+
+        const ingredientsContainer = container.createEl("div", { cls: "ingredients-container" });
+        ingredientsContainer.createEl("h3", { text: "Ingredients" });
         const ingredients =
-            this.metadata[FRONTMATTER.INGREDIENTS] ??
-            FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
+            this.metadata[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
         if (view) {
             this.ingredientViewTable.render(mb, ingredients).forEach((row) => {
-                const rowEl = ingredientsContainer.createEl('div', { cls: 'ingredient-row' });
+                const rowEl = ingredientsContainer.createEl("div", { cls: "ingredient-row" });
                 row.forEach((field) => mb.wrapInMDRC(field, rowEl, component));
             });
         } else {
             this.ingredientInputTable.render(mb, ingredients).forEach((row) => {
-                const rowEl = ingredientsContainer.createEl('div', { cls: 'ingredient-row' });
+                const rowEl = ingredientsContainer.createEl("div", { cls: "ingredient-row" });
                 row.forEach((field) => mb.wrapInMDRC(field, rowEl, component));
             });
-            const addButtonContainer = ingredientsContainer.createEl('div', { cls: 'add-ingredient-container' });
-            this.addIngredientButton.render(mb, addButtonContainer, component);
+            const addButtonContainer = ingredientsContainer.createEl("div", { cls: "add-ingredient-container" });
+            applyMdrcLayoutSteps(mb, component, this.addIngredientButton.layoutMdrc(mb, addButtonContainer));
         }
 
-        const personContainer = container.createEl('div', { cls: 'person-container' });
+        const personContainer = container.createEl("div", { cls: "person-container" });
         this.personButton.render(mb, view).forEach((field) => mb.wrapInMDRC(field, personContainer, component));
 
-        const durationsContainer = container.createEl('div', { cls: 'durations-container' });
-        [this.prepDuration, this.cookDuration, this.restDuration].forEach(duration => {
-            duration.render(
+        const sourceContainer = container.createEl("div", { cls: "source-container" });
+        applyMdrcLayoutSteps(mb, component, this.sourceInput.layoutMdrc(view, sourceContainer, mb));
+
+        const noteContainer = container.createEl("div", { cls: "note-container" });
+        this.noteInput.render(mb, view).forEach((field) => mb.wrapInMDRC(field, noteContainer, component));
+
+        const durationsContainer = container.createEl("div", { cls: "durations-container" });
+        [this.cookDuration, this.restDuration, this.prepDuration].forEach((duration) => {
+            const steps = duration.layoutMdrc(
                 mb,
                 durationsContainer,
-                component,
                 view,
-                this.durationSecondsByField[duration.durationField] ?? FRONTMATTER_DEFAULTS.DURATION
+                duration.lastValue ?? FRONTMATTER_DEFAULTS.DURATION
             );
+            applyMdrcLayoutSteps(mb, component, steps);
         });
 
-        const ovenContainer = container.createEl('div', { cls: 'oven-container' });
-        this.ovenInput.render(mb, ovenContainer, component, view);
+        const ovenContainer = container.createEl("div", { cls: "oven-container" });
+        applyMdrcLayoutSteps(
+            mb,
+            component,
+            this.ovenInput.layoutMdrc(
+                mb,
+                ovenContainer,
+                view,
+                this.metadata[FRONTMATTER.OVEN] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.OVEN]
+            )
+        );
 
-        const noteContainer = container.createEl('div', { cls: 'note-container' });
-        this.noteInput.render(mb, view).forEach(field => mb.wrapInMDRC(field, noteContainer, component));
-
-        const contentContainer = container.createEl('div', { cls: 'content-container' });
+        const contentContainer = container.createEl("div", { cls: "content-container" });
         this.content.render(view, mb.mb.internal, contentContainer);
 
-        const sourceContainer = container.createEl('div', { cls: 'source-container' });
-        this.sourceInput.render(view, sourceContainer, mb, component);
-
-        const tagsContainer = container.createEl('div', { cls: 'tags-container' });
-        this.tagsInput.render(mb).forEach(field => mb.wrapInMDRC(field, tagsContainer, component));
+        const tagsContainer = container.createEl("div", { cls: "tags-container" });
+        this.tagsInput.render(mb).forEach((field) => mb.wrapInMDRC(field, tagsContainer, component));
     }
 }

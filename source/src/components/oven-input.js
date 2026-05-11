@@ -35,23 +35,26 @@ export class OvenInput extends InputConfig {
         this.value = value;
     }
 
-    render(mb, container, component, view, value = null) {
+    /**
+     * @returns {Array<{ parent: HTMLElement, field: unknown }>}
+     */
+    layoutMdrc(mb, container, view, value = null) {
         if (!this.generated || this.value !== value || this.lastView !== view) {
             this.generate(mb, view, value);
         }
-        this.container = container;
-        this.component = component;
 
         if (!view) {
-            const inputWrapper = this.container.createEl("div", { cls: "input-field oven-input" });
+            const inputWrapper = container.createEl("div", { cls: "input-field oven-input" });
             inputWrapper.createEl("label", { text: "Oven Temperature: " });
-            mb.wrapInMDRC(this.inputField, inputWrapper, this.component);
-            mb.wrapInMDRC(this.bindView, inputWrapper, this.component);
-        } else {
-            const viewWrapper = this.container.createEl("div", { cls: "view-field oven-view" });
-            viewWrapper.createEl("label", { text: "Oven: " });
-            mb.wrapInMDRC(this.view, viewWrapper, this.component);
-            viewWrapper.createEl("span", { text: " °C" });
+            return [
+                { parent: inputWrapper, field: this.inputField },
+                { parent: inputWrapper, field: this.bindView },
+            ];
         }
+        const viewWrapper = container.createEl("div", { cls: "view-field oven-view" });
+        viewWrapper.createEl("label", { text: "Oven: " });
+        const mountSlot = viewWrapper.createEl("span", { cls: "oven-view-mdrc" });
+        viewWrapper.createEl("span", { text: " °C" });
+        return [{ parent: mountSlot, field: this.view }];
     }
 }

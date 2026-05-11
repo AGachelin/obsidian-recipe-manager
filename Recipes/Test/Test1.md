@@ -1,38 +1,25 @@
 ---
-note: 0
-ingredients: []
-content: ""
 view: false
-tags:
----
-<%*
-const fill_in = await tp.system.suggester(["Oui", "Non"], [true, false], false, "Fill-in automatically ?");
-let note = "";
-let content = "";
-let ingredients = [];
-const file = await tp.file.find_tfile(tp.file.path(true));
-const available_ingredients = await tp.app.vault.getFolderByPath("Ingredients").children.filter(x => x instanceof tp.obsidian.TFile).map(x => x.name);
-if(fill_in){
-    note = await tp.system.prompt("Note");
-    content = await tp.system.prompt("Content", null, false, true);
-}
-%>
-<%* tR = "" -%>
----
-view: false
-note: <% Number(note) || 0 %>
-ingredients: {last_id: 0}
-content: <% content %>
-prep_duration: 0
+note:
+ingredients:
+  last_id: 1
+content:
+prep_duration: 8
 cook_duration: 0
 rest_duration: 0
-oven: 0
+oven:
 source: ""
 person:
   current: 1
   raw: 1
-tags: []
+tags:
+  - "#test"
 cssclasses: global
+available_ingredients:
+  - f.md
+  - b.md
+  - R.md
+  - test.md
 ---
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
