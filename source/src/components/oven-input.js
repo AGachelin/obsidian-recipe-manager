@@ -45,7 +45,9 @@ export class OvenInput extends InputConfig {
         }
 
         if (!view) {
-            const inputWrapper = container.createEl("div", { cls: "input-field oven-input" });
+            const inputWrapper = container.createEl("div", {
+                cls: `${UI_CLASSES.INPUT_FIELD} oven-input`,
+            });
             inputWrapper.createEl("label", { text: "Oven Temperature: " });
             return [
                 { parent: inputWrapper, field: this.inputField },
@@ -56,7 +58,7 @@ export class OvenInput extends InputConfig {
                 },
             ];
         }
-        const viewWrapper = container.createEl("div", { cls: "view-field oven-view" });
+        const viewWrapper = container.createEl("div", { cls: `${UI_CLASSES.VIEW_FIELD} oven-view` });
         viewWrapper.createEl("label", { text: "Oven: " });
         const mountSlot = viewWrapper.createEl("span", { cls: "oven-view-mdrc" });
         viewWrapper.createEl("span", { text: " °C" });

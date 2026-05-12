@@ -1,32 +1,24 @@
 ---
-view: true
 note:
-ingredients:
-  "2":
-    id: 2
-    name: R.md
-    amount:
-    unit: ""
-  "3":
-    id: 3
-    name: test.md
-    amount:
-    unit: ""
-  last_id: 3
-content:
-prep_duration: 0
-cook_duration: 4
+cook_duration: 0
 rest_duration: 0
+prep_duration: 0
 oven:
-source: az
+view: true
+ingredients:
+  last_id: 1
+content:
+source: d
 person:
-  current: 1
+  current: 5
   raw: 1
 tags: []
 cssclasses: recipe-ui
 available_ingredients:
-  - b.md
   - f.md
+  - b.md
+  - R.md
+  - test.md
 ---
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;

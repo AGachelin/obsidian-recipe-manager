@@ -27,9 +27,7 @@ class DurationSelect extends InputConfig {
     }
 
     createSelectOptions(max) {
-        return [...Array(max).keys()].map((i) => {
-            return { name: "option", value: [`${i}`] };
-        });
+        return [...Array(max).keys()].map((i) => ({ name: "option", value: [`${i}`] }));
     }
 }
 
@@ -93,8 +91,7 @@ export class DurationInput {
     }
 
     /**
-     * Builds DOM under `container` and returns layout steps for the recipe renderer (`field` = wrapInMDRC, `spanText` = plain span).
-     * @returns {Array<{ parent: HTMLElement, field?: unknown, spanText?: string }>}
+     * @returns {Array<{ parent: HTMLElement, field?: unknown, spanText?: string, wrapperCls?: string }>}
      */
     layoutMDRC(mb, container, view, value = null) {
         if (!this.isGenerated || this.lastView !== view || this.lastValue !== value) {
@@ -103,7 +100,7 @@ export class DurationInput {
 
         if (!view) {
             const containerDiv = container.createEl("div", { cls: UI_CLASSES.DURATION_INPUT_GROUP });
-            containerDiv.createEl("label", { text: this.label + ": " });
+            containerDiv.createEl("label", { text: `${this.label}: ` });
             const inputContainer = containerDiv.createEl("div", { cls: UI_CLASSES.DURATION_INPUTS });
             return [
                 { parent: inputContainer, field: this.hourSelectField },
@@ -120,7 +117,7 @@ export class DurationInput {
             ];
         }
         const viewContainer = container.createEl("div", { cls: UI_CLASSES.DURATION_VIEW_GROUP });
-        viewContainer.createEl("strong", { text: this.label + ": " });
+        viewContainer.createEl("strong", { text: `${this.label}: ` });
         return [{ parent: viewContainer, field: this.viewField }];
     }
 }

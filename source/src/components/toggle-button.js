@@ -8,46 +8,46 @@ export class ToggleButton {
         this.isGenerated = true;
         this.mb = mb;
         this.isViewMode = isViewMode;
-        
-        const btView = 'view';
-        
+
+        const btView = "view";
+
         this.viewModeButtonConfig = {
-            id: 'switch-mode-view',
-			style: 'default',
-			label: 'View',
-            class: 'edit',
-			hidden: false,
-			action: {
-				type: 'updateMetadata',
-				bindTarget: btView,
-				evaluate: true,
-				value: true
-			}
-		}
+            id: "switch-mode-view",
+            style: "default",
+            label: "View",
+            class: "edit",
+            hidden: false,
+            action: {
+                type: "updateMetadata",
+                bindTarget: btView,
+                evaluate: true,
+                value: true,
+            },
+        };
 
         this.editModeButtonConfig = {
-            id: 'switch-mode-edit',
-			style: 'default',
-			label: 'Edit',
-            class: 'edit',
-			hidden: false,
-			action: {
-				type: 'updateMetadata',
-				bindTarget: btView,
-				evaluate: true,
-				value: false
-			}
-		}
+            id: "switch-mode-edit",
+            style: "default",
+            label: "Edit",
+            class: "edit",
+            hidden: false,
+            action: {
+                type: "updateMetadata",
+                bindTarget: btView,
+                evaluate: true,
+                value: false,
+            },
+        };
 
-		this.viewModeButtonOptions = {
-		    declaration: this.viewModeButtonConfig,
-		    isPreview: false
-		};
+        this.viewModeButtonOptions = {
+            declaration: this.viewModeButtonConfig,
+            isPreview: false,
+        };
 
-		this.editModeButtonOptions = {
-		    declaration: this.editModeButtonConfig,
-		    isPreview: false
-		};
+        this.editModeButtonOptions = {
+            declaration: this.editModeButtonConfig,
+            isPreview: false,
+        };
 
         const buttonOptions = isViewMode ? this.editModeButtonOptions : this.viewModeButtonOptions;
         this.toggleButton = mb.createButtonMountable(this.path, buttonOptions);

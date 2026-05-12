@@ -1,3 +1,4 @@
+import { FRONTMATTER } from "../shared/constants/recipe.js";
 import { InputConfig } from "./config/input-config.js";
 import { ViewConfig } from "./config/view-config.js";
 
@@ -11,8 +12,8 @@ export class PersonButton {
     generate(mb) {
         this.isGenerated = true;
         this.mb = mb;
-        const btPersonCurrent = mb.parseBindTarget("person.current", this.path);
-        const btPersonCurrentStr = "person.current";
+        const btPersonCurrentStr = FRONTMATTER.PERSON.CURRENT;
+        const btPersonCurrent = mb.parseBindTarget(btPersonCurrentStr, this.path);
 
         this.incButtonConfig = {
             label: "+1",
