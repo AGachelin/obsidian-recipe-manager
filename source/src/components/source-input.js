@@ -24,7 +24,7 @@ export class SourceInput extends InputConfig {
     /**
      * @returns {Array<{ parent: HTMLElement, field: unknown }>}
      */
-    layoutMdrc(view, container, mb) {
+    layoutMDRC(view, container, mb) {
         if (!this.inputField) {
             this.generate(mb, view);
         }

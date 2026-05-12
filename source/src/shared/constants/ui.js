@@ -7,8 +7,7 @@ export const UI_LABELS = Object.freeze({
 
 export const UI_CLASSES = Object.freeze({
     /**
-     * Add to note frontmatter `cssclasses` (with your theme globals) so
-     * `snippets/recipe-ui.css` applies in Obsidian.
+     * Applied to the root element in obsidian ; class to import
      */
     RECIPE_UI: 'recipe-ui',
     /** Root element created by the recipe js-engine block */
@@ -32,7 +31,7 @@ export const UI_CLASSES = Object.freeze({
     VIEW_FIELD: 'view-field',
     /** Wrapper for Meta Bind VIEW fields declared with `[math(hidden):…]` / `[text(hidden):…]` */
     HIDDEN_VIEW_FIELD: 'hidden-view-field',
-    /** Single-use host for `wrapInMDRC` — never mount twice on the same element */
+    /** Single-use host for `wrapInMDRC`*/
     MDRC_MOUNT: 'mdrc-mount',
     CONTENT_INPUT: 'content-input',
     CONTENT_VIEW: 'content-view',

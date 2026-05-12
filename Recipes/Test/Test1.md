@@ -1,30 +1,32 @@
 ---
-prep_duration: 856
-oven: 9
-note: 3
-cook_duration: 18002
-rest_duration: 962
-view: false
+view: true
+note:
 ingredients:
-  "4":
-    id: 4
+  "2":
+    id: 2
     name: R.md
     amount:
     unit: ""
-  last_id: 4
+  "3":
+    id: 3
+    name: test.md
+    amount:
+    unit: ""
+  last_id: 3
 content:
-source: cd
+prep_duration: 0
+cook_duration: 4
+rest_duration: 0
+oven:
+source: az
 person:
-  current: 2
+  current: 1
   raw: 1
-tags:
-  - "#example-note"
-cssclasses:
-  - recipe-ui
+tags: []
+cssclasses: recipe-ui
 available_ingredients:
-  - f.md
   - b.md
-  - test.md
+  - f.md
 ---
 ```js-engine
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;

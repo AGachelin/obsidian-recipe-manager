@@ -33,7 +33,6 @@ function applyMdrcLayoutSteps(mb, component, steps) {
 }
 
 /**
- * `wrapInMDRC` replaces the mount node's contents — use a fresh element per field.
  * @param {unknown} mb
  * @param {import("obsidian").Component} component
  * @param {unknown} field
@@ -131,7 +130,7 @@ export class RecipeRenderer {
             const addButtonContainer = ingredientsContainer.createEl("div", {
                 cls: UI_CLASSES.ADD_INGREDIENT_CONTAINER,
             });
-            applyMdrcLayoutSteps(mb, component, this.addIngredientButton.layoutMdrc(mb, addButtonContainer));
+            applyMdrcLayoutSteps(mb, component, this.addIngredientButton.layoutMDRC(mb, addButtonContainer));
         }
 
         const personContainer = container.createEl("div", { cls: UI_CLASSES.PERSON_CONTAINER });
@@ -140,13 +139,13 @@ export class RecipeRenderer {
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, personContainer));
 
         const sourceContainer = container.createEl("div", { cls: UI_CLASSES.SOURCE_CONTAINER });
-        applyMdrcLayoutSteps(mb, component, this.sourceInput.layoutMdrc(view, sourceContainer, mb));
+        applyMdrcLayoutSteps(mb, component, this.sourceInput.layoutMDRC(view, sourceContainer, mb));
 
         const noteContainer = container.createEl("div", { cls: UI_CLASSES.NOTE_CONTAINER });
         applyMdrcLayoutSteps(
             mb,
             component,
-            this.noteInput.layoutMdrc(
+            this.noteInput.layoutMDRC(
                 mb,
                 noteContainer,
                 view,
@@ -156,7 +155,7 @@ export class RecipeRenderer {
 
         const durationsContainer = container.createEl("div", { cls: UI_CLASSES.DURATIONS_CONTAINER });
         [this.cookDuration, this.restDuration, this.prepDuration].forEach((duration) => {
-            const steps = duration.layoutMdrc(
+            const steps = duration.layoutMDRC(
                 mb,
                 durationsContainer,
                 view,
@@ -169,7 +168,7 @@ export class RecipeRenderer {
         applyMdrcLayoutSteps(
             mb,
             component,
-            this.ovenInput.layoutMdrc(
+            this.ovenInput.layoutMDRC(
                 mb,
                 ovenContainer,
                 view,

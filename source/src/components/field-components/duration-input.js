@@ -96,7 +96,7 @@ export class DurationInput {
      * Builds DOM under `container` and returns layout steps for the recipe renderer (`field` = wrapInMDRC, `spanText` = plain span).
      * @returns {Array<{ parent: HTMLElement, field?: unknown, spanText?: string }>}
      */
-    layoutMdrc(mb, container, view, value = null) {
+    layoutMDRC(mb, container, view, value = null) {
         if (!this.isGenerated || this.lastView !== view || this.lastValue !== value) {
             this.generate(mb, view, value ?? this.lastValue);
         }

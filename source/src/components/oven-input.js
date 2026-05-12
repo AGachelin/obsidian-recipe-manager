@@ -39,7 +39,7 @@ export class OvenInput extends InputConfig {
     /**
      * @returns {Array<{ parent: HTMLElement, field: unknown }>}
      */
-    layoutMdrc(mb, container, view, value = null) {
+    layoutMDRC(mb, container, view, value = null) {
         if (!this.generated || this.value !== value || this.lastView !== view) {
             this.generate(mb, view, value);
         }

@@ -42,7 +42,7 @@ export class NoteInput extends InputConfig {
     /**
      * @returns {Array<{ parent: HTMLElement, field: unknown }>}
      */
-    layoutMdrc(mb, container, view, value = null) {
+    layoutMDRC(mb, container, view, value = null) {
         if (!this.isGenerated || this.viewMode !== view || this.value !== value) {
             this.generate(mb, view, value);
         }

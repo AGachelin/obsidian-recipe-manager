@@ -54,7 +54,7 @@ export class AddIngredientButton {
     /**
      * @returns {Array<{ parent: HTMLElement, field: unknown }>}
      */
-    layoutMdrc(mb, container) {
+    layoutMDRC(mb, container) {
         if (!this.isGenerated) {
             this.generate(mb);
         }

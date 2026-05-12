@@ -16,7 +16,7 @@ export class PersonButton {
 
         this.incButtonConfig = {
             label: "+1",
-            hidden: false,
+            hidden: true,
             id: "count-increment",
             style: "default",
             action: {
@@ -28,7 +28,7 @@ export class PersonButton {
         };
         this.decButtonConfig = {
             label: "-1",
-            hidden: false,
+            hidden: true,
             id: "count-decrement",
             style: "default",
             action: {
@@ -40,7 +40,7 @@ export class PersonButton {
         };
         this.resetButtonConfig = {
             label: "Reset",
-            hidden: false,
+            hidden: true,
             id: "count-reset",
             style: "default",
             action: {
@@ -99,6 +99,6 @@ export class PersonButton {
         if (viewMode) {
             return [this.IncButton, this.DecButton, this.ResetButton, this.ButtonGroup, this.PersonView];
         }
-        return [this.personCountInput, this.IncButton, this.DecButton, this.ResetButton, this.ButtonGroup, this.PersonView];
+        return [this.personCountInput, this.PersonView];
     }
 }
