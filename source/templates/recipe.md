@@ -6,6 +6,8 @@ if(type=="Other"){
     type = await tp.system.prompt("Type of recipe", default_value="Test", throw_on_cancel=true);
     await tp.app.vault.createFolder("Recipes/"+type);
 }
-await tp.file.create_new(tp.file.find_tfile("recipe_template"),`${title}`, true, "Recipes/"+type);
+const folderPath = `Recipes/${type}/${title}`;
+await tp.app.vault.createFolder(folderPath);
+await tp.file.create_new(tp.file.find_tfile("recipe_template"), `${title}`, true, folderPath);
+await tp.app.vault.create(`${folderPath}/content.md`, "");
 %>
-
