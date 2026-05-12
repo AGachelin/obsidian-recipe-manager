@@ -10,7 +10,6 @@ export const FRONTMATTER_LABELS = Object.freeze({
 export const FRONTMATTER = Object.freeze({
     AVAILABLE_INGREDIENTS: 'available_ingredients',
     CSS_CLASSES: 'cssclasses',
-    CONTENT: 'content',
     COOK_DURATION: 'cook_duration',
     INGREDIENTS: 'ingredients',
     INGREDIENTS_FIELDS: {
@@ -48,6 +47,5 @@ export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.OVEN]: 0,
     [FRONTMATTER.NOTE]: 0,
     [FRONTMATTER.SOURCE]: '',
-    [FRONTMATTER.CONTENT]: '',
-    [FRONTMATTER.CSS_CLASSES]: 'global',
+    [FRONTMATTER.CSS_CLASSES]: 'recipe-ui',
 });
