@@ -34,6 +34,11 @@ export const FRONTMATTER = Object.freeze({
     VIEW: 'view',
 });
 
+export const INGREDIENT_NOTEBOOK = Object.freeze({
+    RHO: "liquid",
+    SPECIFIC_WEIGHT: "single",
+});
+
 export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.AVAILABLE_INGREDIENTS]: [],
     [FRONTMATTER.INGREDIENTS]: {
@@ -48,4 +53,6 @@ export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.NOTE]: 0,
     [FRONTMATTER.SOURCE]: '',
     [FRONTMATTER.CSS_CLASSES]: 'recipe-ui',
+    [INGREDIENT_NOTEBOOK.RHO]: 1,
+    [INGREDIENT_NOTEBOOK.SPECIFIC_WEIGHT]: 1,
 });

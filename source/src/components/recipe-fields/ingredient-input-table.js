@@ -1,31 +1,15 @@
 import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom_units.js";
 import { FRONTMATTER } from "../../shared/constants/recipe.js";
-import { ingredientsContentSignature, listIngredientIds } from "../../shared/ingredients-utils.js";
+import {
+    bindIngredientMemory,
+    ingredientsContentSignature,
+    ingredientEntry,
+    listIngredientIds,
+} from "../../shared/ingredients-utils.js";
 import { convertBackAmount } from "../../shared/startup/math-units.js";
 import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
 import { InputConfig } from "../config/input-config.js";
 
-const FM = FRONTMATTER;
-
-/**
- * @param {unknown} mb
- * @param {string} recipePath
- * @param {string} id
- * @param {"amount" | "unit" | "name"} leaf
- */
-function memoryIngredientBind(mb, recipePath, id, leaf) {
-    return mb.parseBindTarget(`memory^ingredients["${id}"]["${leaf}"]`, recipePath);
-}
-
-/**
- * Ingredient row (edit mode):
- * - Amount and unit **inputs** bind to **memory** (recipe-scoped).
- * - Hidden VIEW strings write canonical amount (`convert` + `bind`) and display unit to nested frontmatter.
- *
- * Note: `createViewFieldMountable` cannot use a structured `SimpleViewFieldDeclaration` object today — Meta Bind’s
- * API validator wires `viewFieldType` to **input** field types (`Validators.ts` → `V_SimpleViewFieldDeclaration`),
- * so `math` / `text` are rejected. Use full `VIEW[…]` strings until that upstream bug is fixed.
- */
 class IngredientInputRow {
     constructor(path, id, name) {
         this.path = path;
@@ -39,23 +23,15 @@ class IngredientInputRow {
             })),
         ];
         this.isGenerated = false;
-        /** Canonical numeric amount from frontmatter (change detection only). */
         this._canonicalAmount = 0;
-        /** @type {string} */
         this._unit = "";
     }
 
-    /**
-     * @returns {string}
-     */
     amountCanonicalViewString() {
         const id = this.id;
         return `VIEW[bind(convert({memory^ingredients["${id}"]["unit"]}, {memory^ingredients["${id}"]["amount"]}, {memory^ingredients["${id}"]["name"]}), 0, null)][math(hidden):ingredients["${id}"].amount]`;
     }
 
-    /**
-     * @returns {string}
-     */
     unitSyncViewString() {
         const id = this.id;
         return `VIEW[{memory^ingredients["${id}"]["unit"]}][text(hidden):ingredients["${id}"].unit]`;
@@ -71,12 +47,9 @@ class IngredientInputRow {
         const display = convertBackAmount(mb, unit, this._canonicalAmount, this.name);
         const memoryAmount = Number.isFinite(Number(display)) ? Number(display) : this._canonicalAmount;
 
-        const btAvailable = FM.AVAILABLE_INGREDIENTS;
-        const btIngredients = FM.INGREDIENTS;
-
-        this.bindTargetAmountMemory = memoryIngredientBind(mb, this.path, this.id, "amount");
-        this.bindTargetUnitMemory = memoryIngredientBind(mb, this.path, this.id, "unit");
-        this.bindTargetNameMemory = memoryIngredientBind(mb, this.path, this.id, "name");
+        this.bindTargetAmountMemory = bindIngredientMemory(mb, this.path, this.id, "amount");
+        this.bindTargetUnitMemory = bindIngredientMemory(mb, this.path, this.id, "unit");
+        this.bindTargetNameMemory = bindIngredientMemory(mb, this.path, this.id, "name");
 
         mb.setMetadata(this.bindTargetAmountMemory, memoryAmount);
         mb.setMetadata(this.bindTargetUnitMemory, unit);
@@ -90,13 +63,13 @@ class IngredientInputRow {
             actions: [
                 {
                     type: "updateMetadata",
-                    bindTarget: btAvailable,
+                    bindTarget: FRONTMATTER.AVAILABLE_INGREDIENTS,
                     evaluate: true,
                     value: `x==null?["${this.name}"]:["${this.name}",...x]`,
                 },
                 {
                     type: "updateMetadata",
-                    bindTarget: btIngredients,
+                    bindTarget: FRONTMATTER.INGREDIENTS,
                     evaluate: true,
                     value: `(delete x["${this.id}"])?x:x`,
                 },
@@ -115,11 +88,14 @@ class IngredientInputRow {
             },
         };
 
-        this.deleteButtonOptions = { declaration: this.deleteButtonConfig, isPreview: false };
-        this.changeButtonOptions = { declaration: this.changeButtonConfig, isPreview: false };
-
-        this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonOptions);
-        this.changeButton = mb.createButtonMountable(this.path, this.changeButtonOptions);
+        this.deleteButton = mb.createButtonMountable(this.path, {
+            declaration: this.deleteButtonConfig,
+            isPreview: false,
+        });
+        this.changeButton = mb.createButtonMountable(this.path, {
+            declaration: this.changeButtonConfig,
+            isPreview: false,
+        });
         this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(memoryAmount));
         this.amountHiddenView = mb.createViewFieldMountable(this.path, {
             renderChildType: "inline",
@@ -192,15 +168,14 @@ export class IngredientInputTable {
         this.ingredientsSnapshot = ingredientsContentSignature(ingredients);
         this.rows = [];
         for (const id of listIngredientIds(ingredients)) {
-            const ingredient = ingredients[id] || {};
-            const row = new IngredientInputRow(this.path, id, ingredient.name || "ingredient");
-            row.render(mb, ingredient.amount ?? 0, ingredient.unit ?? "");
+            const rowData = ingredientEntry(ingredients, id);
+            const row = new IngredientInputRow(this.path, id, rowData.name);
+            row.render(mb, rowData.amount, rowData.unit);
             this.rows.push(row);
         }
         this.isGenerated = true;
     }
 
-    /** Drop cached rows when leaving edit mode so VIEW mountables are not rebuilt until needed. */
     discardMountables() {
         this.isGenerated = false;
         this.rows = [];

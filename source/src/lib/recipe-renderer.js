@@ -30,16 +30,9 @@ export class RecipeRenderer {
         this.tagsInput = new TagsInput(path);
         this.addIngredientButton = new AddIngredientButton(path);
         this.toggleButton = new ToggleButton(path);
-        /** @type {Record<string, unknown>} */
         this.metadata = {};
     }
 
-    /**
-     * Rebuild Meta Bind mountables from frontmatter-driven state.
-     * @param {unknown} mb
-     * @param {boolean} view
-     * @param {Record<string, unknown>} [metadata]
-     */
     generate(mb, view, metadata) {
         this.mb = mb;
         this.view = view;
@@ -54,15 +47,8 @@ export class RecipeRenderer {
         this.cookDuration.generate(mb, view, snap.cookSec);
         this.restDuration.generate(mb, view, snap.restSec);
 
-        // Only build mountables for the visible ingredients UI. The other mode’s hidden VIEWs
-        // (convert / convertBack) would still be constructed and can re-run on metadata churn.
-        if (view) {
-            this.ingredientInputTable.discardMountables();
-            this.ingredientViewTable.generate(mb, snap.ingredientsValue);
-        } else {
-            this.ingredientViewTable.discardMountables();
-            this.ingredientInputTable.generate(mb, snap.ingredientsValue);
-        }
+        this.#syncIngredientTables(mb, view, snap.ingredientsValue);
+
         this.noteInput.generate(mb, view, snap.noteValue);
         this.ovenInput.generate(mb, view, snap.ovenValue);
         this.personButton.generate(mb);
@@ -72,30 +58,23 @@ export class RecipeRenderer {
         this.toggleButton.generate(mb, view);
     }
 
-    /**
-     * @param {unknown} mb
-     * @param {HTMLElement} container
-     * @param {import("obsidian").Component} component
-     * @param {boolean} view
-     * @param {Record<string, unknown>} [metadata]
-     */
     render(mb, container, component, view, metadata) {
         container.empty();
         container.classList.add(UI_CLASSES.RECIPE_ROOT);
 
         this.generate(mb, view, metadata);
 
-        this._mountToggleBar(mb, component, container, view);
+        this.#mountToggleBar(mb, component, container, view);
 
         const ingredients =
             this.metadata[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
-        this._mountIngredients(mb, component, container, view, ingredients);
+        this.#mountIngredients(mb, component, container, view, ingredients);
 
-        this._mountPersonBar(mb, component, container, view);
-        this._mountSource(mb, component, container, view);
-        this._mountNote(mb, component, container, view);
-        this._mountDurations(mb, component, container, view);
-        this._mountOven(mb, component, container, view);
+        this.#mountPersonBar(mb, component, container, view);
+        this.#mountSource(mb, component, container, view);
+        this.#mountNote(mb, component, container, view);
+        this.#mountDurations(mb, component, container, view);
+        this.#mountOven(mb, component, container, view);
 
         const contentContainer = container.createEl("div", { cls: UI_CLASSES.CONTENT_CONTAINER });
         this.content.render(view, mb.mb.internal, contentContainer);
@@ -106,14 +85,24 @@ export class RecipeRenderer {
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, tagsContainer));
     }
 
-    _mountToggleBar(mb, component, container, view) {
+    #syncIngredientTables(mb, view, ingredientsValue) {
+        if (view) {
+            this.ingredientInputTable.discardMountables();
+            this.ingredientViewTable.generate(mb, ingredientsValue);
+        } else {
+            this.ingredientViewTable.discardMountables();
+            this.ingredientInputTable.generate(mb, ingredientsValue);
+        }
+    }
+
+    #mountToggleBar(mb, component, container, view) {
         const el = container.createEl("div", { cls: UI_CLASSES.RECIPE_TOGGLE_BAR });
         this.toggleButton
             .render(mb, view)
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, el));
     }
 
-    _mountIngredients(mb, component, container, view, ingredients) {
+    #mountIngredients(mb, component, container, view, ingredients) {
         const section = container.createEl("div", { cls: UI_CLASSES.INGREDIENTS_CONTAINER });
         section.createEl("h3", { text: UI_LABELS.INGREDIENTS });
 
@@ -133,19 +122,28 @@ export class RecipeRenderer {
         applyMdrcLayoutSteps(mb, component, this.addIngredientButton.layoutMDRC(mb, addRow));
     }
 
-    _mountPersonBar(mb, component, container, view) {
+    #mountPersonBar(mb, component, container, view) {
         const el = container.createEl("div", { cls: UI_CLASSES.PERSON_CONTAINER });
         this.personButton
             .render(mb, view)
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, el));
     }
 
-    _mountSource(mb, component, container, view) {
+    #mountSource(mb, component, container, view) {
         const el = container.createEl("div", { cls: UI_CLASSES.SOURCE_CONTAINER });
-        applyMdrcLayoutSteps(mb, component, this.sourceInput.layoutMDRC(mb, el, view));
+        applyMdrcLayoutSteps(
+            mb,
+            component,
+            this.sourceInput.layoutMDRC(
+                mb,
+                el,
+                view,
+                this.metadata[FRONTMATTER.SOURCE] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.SOURCE]
+            )
+        );
     }
 
-    _mountNote(mb, component, container, view) {
+    #mountNote(mb, component, container, view) {
         const el = container.createEl("div", { cls: UI_CLASSES.NOTE_CONTAINER });
         applyMdrcLayoutSteps(
             mb,
@@ -159,7 +157,7 @@ export class RecipeRenderer {
         );
     }
 
-    _mountDurations(mb, component, container, view) {
+    #mountDurations(mb, component, container, view) {
         const el = container.createEl("div", { cls: UI_CLASSES.DURATIONS_CONTAINER });
         const defaultSec = FRONTMATTER_DEFAULTS.DURATION;
         for (const duration of [this.cookDuration, this.restDuration, this.prepDuration]) {
@@ -168,7 +166,7 @@ export class RecipeRenderer {
         }
     }
 
-    _mountOven(mb, component, container, view) {
+    #mountOven(mb, component, container, view) {
         const el = container.createEl("div", { cls: UI_CLASSES.OVEN_CONTAINER });
         applyMdrcLayoutSteps(
             mb,

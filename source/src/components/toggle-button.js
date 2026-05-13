@@ -1,3 +1,5 @@
+import { FRONTMATTER } from "../shared/constants/recipe.js";
+
 export class ToggleButton {
     constructor(path) {
         this.path = path;
@@ -9,7 +11,7 @@ export class ToggleButton {
         this.mb = mb;
         this.isViewMode = isViewMode;
 
-        const btView = "view";
+        const bindKey = FRONTMATTER.VIEW;
 
         this.viewModeButtonConfig = {
             id: "switch-mode-view",
@@ -19,7 +21,7 @@ export class ToggleButton {
             hidden: false,
             action: {
                 type: "updateMetadata",
-                bindTarget: btView,
+                bindTarget: bindKey,
                 evaluate: true,
                 value: true,
             },
@@ -33,7 +35,7 @@ export class ToggleButton {
             hidden: false,
             action: {
                 type: "updateMetadata",
-                bindTarget: btView,
+                bindTarget: bindKey,
                 evaluate: true,
                 value: false,
             },

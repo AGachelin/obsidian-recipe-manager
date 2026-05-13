@@ -5,14 +5,16 @@ import { ViewConfig } from "./config/view-config.js";
 export class OvenInput extends InputConfig {
     constructor(path) {
         super("number", null);
-        this.generated = false;
         this.path = path;
+        this.isGenerated = false;
         this.lastView = null;
+        this.value = null;
     }
 
     generate(mb, view, value = null) {
-        this.generated = true;
+        this.isGenerated = true;
         this.lastView = view;
+        this.value = value;
         const btOven = mb.parseBindTarget("oven", this.path);
         this.bindTarget = btOven;
         const btOvenMem = mb.createBindTarget("memory", this.path, ["oven"], true);
@@ -33,14 +35,13 @@ export class OvenInput extends InputConfig {
         const viewDeclaration = "VIEW[bind({memory^oven}, 0, null)][math(hidden):oven]";
         this.bindViewConfig = new ViewConfig("math", btOven).render(viewDeclaration);
         this.bindView = mb.createViewFieldMountable(this.path, this.bindViewConfig);
-        this.value = value;
     }
 
     /**
      * @returns {Array<{ parent: HTMLElement, field: unknown }>}
      */
     layoutMDRC(mb, container, view, value = null) {
-        if (!this.generated || this.value !== value || this.lastView !== view) {
+        if (!this.isGenerated || this.value !== value || this.lastView !== view) {
             this.generate(mb, view, value);
         }
 

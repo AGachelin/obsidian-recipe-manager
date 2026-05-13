@@ -1,4 +1,8 @@
-import { ingredientsContentSignature, listIngredientIds } from "../../shared/ingredients-utils.js";
+import {
+    ingredientsContentSignature,
+    ingredientEntry,
+    listIngredientIds,
+} from "../../shared/ingredients-utils.js";
 import { ViewConfig } from "../config/view-config.js";
 
 class IngredientViewRow {
@@ -27,7 +31,6 @@ class IngredientViewRow {
             name: new ViewConfig("text", null).render(this.viewDeclaration.name),
         };
         this.isGenerated = false;
-        /** @type {unknown[]} */
         this.fields = [];
     }
 
@@ -60,9 +63,7 @@ export class IngredientViewTable {
     constructor(path) {
         this.path = path;
         this.isGenerated = false;
-        /** @type {unknown[][]} */
         this.fields = [];
-        /** @type {string} */
         this.ingredientsSnapshot = "";
     }
 
@@ -71,13 +72,13 @@ export class IngredientViewTable {
         this.ingredientsSnapshot = ingredientsContentSignature(ingredients);
         this.fields = [];
         for (const id of listIngredientIds(ingredients)) {
-            const ingredient = ingredients[id] || {};
+            const rowData = ingredientEntry(ingredients, id);
             const row = new IngredientViewRow(
                 this.path,
                 id,
-                ingredient.name || "ingredient",
-                ingredient.amount ?? 0,
-                ingredient.unit ?? ""
+                rowData.name,
+                rowData.amount,
+                rowData.unit
             );
             this.fields.push(row.render(mb));
         }

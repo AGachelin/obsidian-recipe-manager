@@ -90,9 +90,6 @@ export class PersonButton {
         this.personCountInput = mb.createInputFieldMountable(this.path, personInputConfig);
     }
 
-    /**
-     * @param {boolean} viewMode recipe "view" frontmatter (read-only layout), not Obsidian edit mode
-     */
     render(mb, viewMode) {
         if (!this.isGenerated) {
             this.generate(mb);

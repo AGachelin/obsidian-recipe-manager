@@ -22,7 +22,9 @@ class DurationSelect extends InputConfig {
             const n = Number(value);
             this.defaultValue = Number.isFinite(n) ? n : this.defaultValue;
         }
-        this.declaration_arguments = this.options.concat([{ name: "defaultValue", value: [`${this.defaultValue}`] }]);
+        this.declaration_arguments = this.options.concat([
+            { name: "defaultValue", value: [`${this.defaultValue}`] },
+        ]);
         return super.render();
     }
 
@@ -62,10 +64,10 @@ export class DurationInput {
         this.minuteSelect.setBindTarget(btMinute);
         this.secondSelect.setBindTarget(btSecond);
 
-        this.editView = `VIEW[number({memory^${key}["hour"]} h, s)+number({memory^${key}["minute"]} minute, s)+number({memory^${key}["second"]} s, s)][math(hidden):${key}]`;
+        this.editViewExpr = `VIEW[number({memory^${key}["hour"]} h, s)+number({memory^${key}["minute"]} minute, s)+number({memory^${key}["second"]} s, s)][math(hidden):${key}]`;
         this.editViewConfig = new ViewConfig("math", btTotal);
-        this.view = `VIEW[splitTime({${key}}, false)]`;
-        this.viewConfig = new ViewConfig("splitTime", btTotal);
+        this.readViewExpr = `VIEW[splitTime({${key}}, false)]`;
+        this.readViewConfig = new ViewConfig("splitTime", btTotal);
 
         if (!view) {
             const sec = Number(value) || 0;
@@ -78,15 +80,14 @@ export class DurationInput {
             this.hourSelectConfig = this.hourSelect.render(hourValue);
             this.minuteSelectConfig = this.minuteSelect.render(minuteValue);
             this.secondSelectConfig = this.secondSelect.render(secondValue);
-            this.editViewConfig_ = this.editViewConfig.render(this.editView);
-
+            const editDecl = this.editViewConfig.render(this.editViewExpr);
             this.hourSelectField = mb.createInputFieldMountable(this.path, this.hourSelectConfig);
             this.minuteSelectField = mb.createInputFieldMountable(this.path, this.minuteSelectConfig);
             this.secondSelectField = mb.createInputFieldMountable(this.path, this.secondSelectConfig);
-            this.editViewField = mb.createViewFieldMountable(this.path, this.editViewConfig_);
+            this.editViewField = mb.createViewFieldMountable(this.path, editDecl);
         } else {
-            this.viewConfig_ = this.viewConfig.render(this.view);
-            this.viewField = mb.createViewFieldMountable(this.path, this.viewConfig_);
+            const readDecl = this.readViewConfig.render(this.readViewExpr);
+            this.viewField = mb.createViewFieldMountable(this.path, readDecl);
         }
     }
 

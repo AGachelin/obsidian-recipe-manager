@@ -6,28 +6,30 @@ export class SourceInput extends InputConfig {
     constructor(path) {
         super("text", null);
         this.path = path;
+        this.isGenerated = false;
+        this.lastView = null;
+        this.lastValue = null;
     }
 
     generate(mb, view, value = null) {
+        this.isGenerated = true;
+        this.lastView = view;
+        this.lastValue = value;
         const btSource = mb.parseBindTarget("source", this.path);
         this.bindTarget = btSource;
         this.viewConfig = new ViewConfig("text", btSource).render("VIEW[{source}][text(renderMarkdown)]");
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
         this.declaration_arguments = [{ name: "placeholder", value: ["Enter source"] }];
-        if (value !== null) {
-            this.defaultValue = [`${value}`];
-            this.declaration_arguments.push({ name: "defaultValue", value: this.defaultValue });
+        if (value !== null && value !== undefined) {
+            this.declaration_arguments.push({ name: "defaultValue", value: [`${value}`] });
         }
         this.config = super.render();
         this.inputField = mb.createInputFieldMountable(this.path, this.config);
     }
 
-    /**
-     * @returns {Array<{ parent: HTMLElement, field: unknown }>}
-     */
-    layoutMDRC(mb, container, view) {
-        if (!this.inputField) {
-            this.generate(mb, view);
+    layoutMDRC(mb, container, view, value = null) {
+        if (!this.isGenerated || this.lastView !== view || this.lastValue !== value) {
+            this.generate(mb, view, value);
         }
         if (!view) {
             const inputWrapper = container.createEl("div", {

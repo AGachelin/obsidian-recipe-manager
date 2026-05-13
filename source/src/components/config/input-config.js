@@ -1,5 +1,5 @@
 export class InputConfig {
-    constructor(inputFieldType, bindTarget, renderChildType='inline', declaration_arguments=[]) {
+    constructor(inputFieldType, bindTarget, renderChildType = "inline", declaration_arguments = []) {
         this.bindTarget = bindTarget;
         this.renderChildType = renderChildType;
         this.inputFieldType = inputFieldType;
@@ -14,6 +14,6 @@ export class InputConfig {
                 inputFieldType: this.inputFieldType,
             },
             renderChildType: this.renderChildType,
-        }
+        };
     }
 }
