@@ -2,9 +2,9 @@ export const FRONTMATTER_LABELS = Object.freeze({
     NOTE: 'Note',
     OVEN: 'Oven temperature',
     PERSON: 'Nombre de personnes',
-    COOK: 'Cuisson :',
-    PREP: 'Préparation :',
-    REST: 'Repos :',
+    COOK: 'Cuisson',
+    PREP: 'Préparation',
+    REST: 'Repos',
 });
 
 export const FRONTMATTER = Object.freeze({

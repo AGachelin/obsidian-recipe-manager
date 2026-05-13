@@ -15,6 +15,20 @@ export function listIngredientIds(ingredients = {}) {
     return Object.keys(ingredients).filter((id) => id !== LAST_ID).sort(idSortKey);
 }
 
+export function listReadableIngredientIds(ingredients = {}) {
+    return listIngredientIds(ingredients).filter((id) => {
+        const ing = ingredients[id] || {};
+        const rawName = String(ing.name != null ? ing.name : "").trim();
+        const amt = Number(ing.amount);
+        const hasAmount = Number.isFinite(amt) && amt > 0;
+        return rawName.length > 0 || hasAmount;
+    });
+}
+
+export function hasReadableIngredients(ingredients = {}) {
+    return listReadableIngredientIds(ingredients).length > 0;
+}
+
 export function ingredientEntry(ingredients, id) {
     const ing = ingredients[id] || {};
     return {

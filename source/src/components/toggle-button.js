@@ -16,7 +16,7 @@ export class ToggleButton {
         this.viewModeButtonConfig = {
             id: "switch-mode-view",
             style: "default",
-            label: "View",
+            label: "Read",
             class: "edit",
             hidden: false,
             action: {

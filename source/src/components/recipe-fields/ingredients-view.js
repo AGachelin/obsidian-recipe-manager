@@ -1,7 +1,7 @@
 import {
     ingredientsContentSignature,
     ingredientEntry,
-    listIngredientIds,
+    listReadableIngredientIds,
 } from "../../shared/ingredients-utils.js";
 import { ViewConfig } from "../config/view-config.js";
 
@@ -65,13 +65,16 @@ export class IngredientViewTable {
         this.isGenerated = false;
         this.fields = [];
         this.ingredientsSnapshot = "";
+        this.readableOnly = false;
     }
 
-    generate(mb, ingredients) {
+    generate(mb, ingredients, readableOnly = false) {
         this.mb = mb;
+        this.readableOnly = readableOnly;
         this.ingredientsSnapshot = ingredientsContentSignature(ingredients);
         this.fields = [];
-        for (const id of listIngredientIds(ingredients)) {
+        const ids = readableOnly ? listReadableIngredientIds(ingredients) : listIngredientIds(ingredients);
+        for (const id of ids) {
             const rowData = ingredientEntry(ingredients, id);
             const row = new IngredientViewRow(
                 this.path,
@@ -89,12 +92,17 @@ export class IngredientViewTable {
         this.isGenerated = false;
         this.fields = [];
         this.ingredientsSnapshot = "";
+        this.readableOnly = false;
     }
 
-    render(mb, ingredients) {
+    render(mb, ingredients, readableOnly = false) {
         const nextSnapshot = ingredientsContentSignature(ingredients);
-        if (!this.isGenerated || this.ingredientsSnapshot !== nextSnapshot) {
-            this.generate(mb, ingredients);
+        if (
+            !this.isGenerated ||
+            this.ingredientsSnapshot !== nextSnapshot ||
+            this.readableOnly !== readableOnly
+        ) {
+            this.generate(mb, ingredients, readableOnly);
         }
         return this.fields;
     }

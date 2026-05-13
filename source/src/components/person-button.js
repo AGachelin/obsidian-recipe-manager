@@ -36,7 +36,7 @@ export class PersonButton {
                 type: "updateMetadata",
                 bindTarget: btPersonCurrentStr,
                 evaluate: true,
-                value: "Math.max(0, x - 1)",
+                value: "max(0, x - 1)",
             },
         };
         this.resetButtonConfig = {
