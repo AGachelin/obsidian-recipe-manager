@@ -54,8 +54,15 @@ export class RecipeRenderer {
         this.cookDuration.generate(mb, view, snap.cookSec);
         this.restDuration.generate(mb, view, snap.restSec);
 
-        this.ingredientInputTable.generate(mb, snap.ingredientsValue);
-        this.ingredientViewTable.generate(mb, snap.ingredientsValue);
+        // Only build mountables for the visible ingredients UI. The other mode’s hidden VIEWs
+        // (convert / convertBack) would still be constructed and can re-run on metadata churn.
+        if (view) {
+            this.ingredientInputTable.discardMountables();
+            this.ingredientViewTable.generate(mb, snap.ingredientsValue);
+        } else {
+            this.ingredientViewTable.discardMountables();
+            this.ingredientInputTable.generate(mb, snap.ingredientsValue);
+        }
         this.noteInput.generate(mb, view, snap.noteValue);
         this.ovenInput.generate(mb, view, snap.ovenValue);
         this.personButton.generate(mb);

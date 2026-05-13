@@ -46,8 +46,8 @@ function wireMetadataSubscriptions(mb, component, path, refresh) {
     };
 
     watch(parse(FRONTMATTER.VIEW));
-    watch(parse(FRONTMATTER.INGREDIENTS));
-    watch(mb.createBindTarget("frontmatter", path, [FRONTMATTER.PERSON.LABEL], true));
+    watch(mb.createBindTarget('frontmatter', path, ["ingredients"], false));
+    watch(parse(FRONTMATTER.PERSON.LABEL));
 }
 
 /**
