@@ -39,6 +39,10 @@ class IngredientInputRow {
             })),
         ];
         this.isGenerated = false;
+        /** Canonical numeric amount from frontmatter (change detection only). */
+        this._canonicalAmount = 0;
+        /** @type {string} */
+        this._unit = "";
     }
 
     /**
@@ -60,9 +64,12 @@ class IngredientInputRow {
     generate(mb, amount = 0, unit = "") {
         this.isGenerated = true;
         this.mb = mb;
-        this.amount = convertBackAmount(mb, unit, amount, this.name);
-        amount = this.amount;
-        this.unit = unit;
+        const raw = Number(amount);
+        this._canonicalAmount = Number.isFinite(raw) ? raw : 0;
+        this._unit = unit;
+
+        const display = convertBackAmount(mb, unit, this._canonicalAmount, this.name);
+        const memoryAmount = Number.isFinite(Number(display)) ? Number(display) : this._canonicalAmount;
 
         const btAvailable = FM.AVAILABLE_INGREDIENTS;
         const btIngredients = FM.INGREDIENTS;
@@ -71,7 +78,7 @@ class IngredientInputRow {
         this.bindTargetUnitMemory = memoryIngredientBind(mb, this.path, this.id, "unit");
         this.bindTargetNameMemory = memoryIngredientBind(mb, this.path, this.id, "name");
 
-        mb.setMetadata(this.bindTargetAmountMemory, Number(amount));
+        mb.setMetadata(this.bindTargetAmountMemory, memoryAmount);
         mb.setMetadata(this.bindTargetUnitMemory, unit);
         mb.setMetadata(this.bindTargetNameMemory, this.name);
 
@@ -113,7 +120,7 @@ class IngredientInputRow {
 
         this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonOptions);
         this.changeButton = mb.createButtonMountable(this.path, this.changeButtonOptions);
-        this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(amount));
+        this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(memoryAmount));
         this.amountHiddenView = mb.createViewFieldMountable(this.path, {
             renderChildType: "inline",
             declaration: this.amountCanonicalViewString(),
@@ -139,7 +146,9 @@ class IngredientInputRow {
     }
 
     render(mb, amount = 0, unit = "") {
-        if (!this.isGenerated || this.amount !== amount || this.unit !== unit) {
+        const raw = Number(amount);
+        const canonical = Number.isFinite(raw) ? raw : 0;
+        if (!this.isGenerated || this._canonicalAmount !== canonical || this._unit !== unit) {
             this.generate(mb, amount, unit);
         }
     }
@@ -185,7 +194,7 @@ export class IngredientInputTable {
         for (const id of listIngredientIds(ingredients)) {
             const ingredient = ingredients[id] || {};
             const row = new IngredientInputRow(this.path, id, ingredient.name || "ingredient");
-            row.render(mb, ingredient.amount || 0, ingredient.unit || "");
+            row.render(mb, ingredient.amount ?? 0, ingredient.unit ?? "");
             this.rows.push(row);
         }
         this.isGenerated = true;

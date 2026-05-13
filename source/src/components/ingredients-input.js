@@ -1,9 +1,14 @@
 function filterAvailable(available, current, excludeId = null) {
     const currentIds = Object.keys(current)
-        .filter(i => i !== "last_id" && i !== excludeId)
-        .map(i => current[i].name);
+        .filter((i) => i !== "last_id" && i !== excludeId)
+        .map((i) => current[i]?.name)
+        .filter(Boolean);
 
-    return available.filter(i => !currentIds.includes(i));
+    return available.filter((i) => !currentIds.includes(i));
+}
+
+function cloneIngredients(ingredients) {
+    return JSON.parse(JSON.stringify(ingredients));
 }
 
 function updateIngredients(oldIngredients, newIngredients, mode = 'add', ingredientId = null) {
@@ -37,7 +42,7 @@ async function run() {
         .children.filter(x => x instanceof tp.obsidian.TFile)
         .map(x => x.name);
 
-    const currentIngredients = context.metadata.frontmatter.ingredients;
+    const currentIngredients = context.metadata.frontmatter.ingredients ?? { last_id: 0 };
     const availableOptions = filterAvailable(
         availableIngredients,
         currentIngredients,
@@ -47,34 +52,37 @@ async function run() {
     let selectedIngredient;
     if (isChanging) {
         selectedIngredient = await tp.system.suggester(
-            ing => ing.split(".")[0],
+            (ing) => ing.split(".")[0],
             availableOptions
         );
         if (!selectedIngredient) return;
     } else {
         selectedIngredient = await tp.system.multi_suggester(
-            ing => ing.split(".")[0],
+            (ing) => ing.split(".")[0],
             availableOptions
         );
         if (!selectedIngredient || selectedIngredient.length === 0) return;
     }
 
-    const currentIngTarget = mb.createBindTarget('frontmatter', context.file.path, ["ingredients"], true);
-    const availableIngTarget = mb.createBindTarget('frontmatter', context.file.path, ["available_ingredients"], true);
-
-    const updateMode = isChanging ? 'change' : 'add';
+    const updateMode = isChanging ? "change" : "add";
     const updateId = isChanging ? context.args.id : null;
 
-    mb.updateMetadata(
-        currentIngTarget,
-        (old) => updateIngredients(old, selectedIngredient, updateMode, updateId)
+    const nextIngredients = updateIngredients(
+        cloneIngredients(currentIngredients),
+        selectedIngredient,
+        updateMode,
+        updateId
     );
 
-    mb.updateMetadata(
-        availableIngTarget,
-        (old) => filterAvailable(availableIngredients, currentIngredients, updateId)
-            .filter(i => !isChanging || i !== selectedIngredient)
-            .filter(i => !Array.isArray(selectedIngredient) || !selectedIngredient.includes(i))
+    const currentIngTarget = mb.createBindTarget("frontmatter", context.file.path, ["ingredients"], true);
+    const availableIngTarget = mb.createBindTarget("frontmatter", context.file.path, ["available_ingredients"], true);
+
+    mb.updateMetadata(currentIngTarget, () => nextIngredients);
+
+    mb.updateMetadata(availableIngTarget, () =>
+        filterAvailable(availableIngredients, nextIngredients, updateId)
+            .filter((i) => !isChanging || i !== selectedIngredient)
+            .filter((i) => !Array.isArray(selectedIngredient) || !selectedIngredient.includes(i))
     );
 }
 

@@ -2,15 +2,22 @@ import { FRONTMATTER } from "./constants/recipe.js";
 
 const LAST_ID = FRONTMATTER.INGREDIENTS_FIELDS.LAST_ID;
 
+function idSortKey(a, b) {
+    const na = Number(a);
+    const nb = Number(b);
+    if (Number.isFinite(na) && Number.isFinite(nb) && String(na) === a && String(nb) === b) {
+        return na - nb;
+    }
+    return a.localeCompare(b);
+}
+
 /**
  * Ingredient row ids in stable sort order (excludes `last_id`).
  * @param {Record<string, unknown>} [ingredients]
  * @returns {string[]}
  */
 export function listIngredientIds(ingredients = {}) {
-    return Object.keys(ingredients)
-        .filter((id) => id !== LAST_ID)
-        .sort();
+    return Object.keys(ingredients).filter((id) => id !== LAST_ID).sort(idSortKey);
 }
 
 /**
