@@ -98,6 +98,61 @@ function resetAdvancedFilters(mb, path) {
 }
 
 /**
+ * Makes a section collapsible by adding a toggle button and content wrapper
+ * @param {HTMLElement} section
+ * @param {string} title
+ * @param {boolean} [startOpen=true]
+ * @param {string} [contentClass]
+ */
+function makeCollapsibleSection(sideBar, title, startOpen = true, contentClass = "") {
+    const section = sideBar.createEl("section", { cls: "frontpage-live__section" });
+    const header = section.createEl("div", { cls: "frontpage-live__section-header" });
+    const h3 = header.createEl("h3", { cls: "frontpage-live__section-title frontpage-live__section-toggle", attr: { "aria-expanded": String(startOpen)}, text: title });
+
+    const content = section.createEl("div", { cls: `frontpage-live__section-content is-collapsed ${contentClass}` });
+    if (!startOpen) {
+        content.classList.add("is-collapsed");
+    }
+
+    h3.addEventListener("click", () => {
+        const isOpen = !content.classList.contains("is-collapsed");
+        content.classList.toggle("is-collapsed");
+        h3.setAttribute("aria-expanded", String(!isOpen));
+    });
+
+    return content;
+}
+
+/**
+ * Makes the sidebar itself collapsible
+ * @param {HTMLElement} sidebar
+ * @param {boolean} [startOpen=true]
+ */
+function makeCollapsibleSidebar(sidebar, title, startOpen = true) {
+    const header = sidebar.createEl("div", { cls: "frontpage-live__sidebar-header" });
+    const h2 = sidebar.createEl("h2", { 
+        cls: "frontpage-live__section-title frontpage-live__sidebar-toggle",
+        attr: { "aria-expanded": String(startOpen) }, 
+        text: title
+    });
+
+    // Create content wrapper for all sections (but not action buttons)
+    const content = sidebar.createEl("div", { cls: "frontpage-live__sidebar-content" });
+    if (!startOpen) {
+        content.classList.add("is-collapsed");
+    }
+
+    // Add toggle event listener
+    h2.addEventListener("click", () => {
+        const isOpen = !content.classList.contains("is-collapsed");
+        content.classList.toggle("is-collapsed");
+        h2.setAttribute("aria-expanded", String(!isOpen));
+    });
+
+    return content;
+}
+
+/**
  * Renders the full front page (filters + recipe list) inside the js-engine container.
  *
  * @param {*} engine
@@ -114,16 +169,16 @@ export async function setupFrontpageLive(engine, context, container, component) 
     container.classList.add("frontpage-live-root", "recipe-ui");
 
     const grid = container.createEl("div", { cls: "frontpage-live__grid" });
-    const sidebar = grid.createEl("aside", { cls: "frontpage-live__sidebar" });
+    const sidebar = grid.createEl("aside", { cls: "frontpage-live__sidebar is-collapsed" });
     const main = grid.createEl("div", { cls: "frontpage-live__main" });
 
-    sidebar.createEl("h2", { cls: "frontpage-live__sidebar-title", text: "Advanced search" });
+    const sidebarTitle = sidebar.createEl("h3", { cls: "frontpage-live__sidebar-title", text: "Advanced search" });
+    const sidebarContent = makeCollapsibleSidebar(sidebar, sidebarTitle, false);
 
     /** @type {any[]} */
     let appliedRecipes = [];
 
-    const secRating = sidebar.createEl("section", { cls: "frontpage-live__section" });
-    secRating.createEl("h3", { cls: "frontpage-live__section-title", text: "Rating" });
+    const secRating = makeCollapsibleSection(sidebarContent, "Rating", false);
     mountSlider(mb, component, secRating, path, "filter_note_min", "Min rating", {
         min: 0,
         max: 5,
@@ -135,8 +190,7 @@ export async function setupFrontpageLive(engine, context, container, component) 
         step: 0.1,
     });
 
-    const secDur = sidebar.createEl("section", { cls: "frontpage-live__section" });
-    secDur.createEl("h3", { cls: "frontpage-live__section-title", text: "Durations" });
+    const secDur = makeCollapsibleSection(sidebarContent, "Durations", false, "frontpage-live__duration-block");
     const readSec = (key) => {
         const bt = mb.parseBindTarget(key, path);
         const v = mb.getMetadata(bt);
@@ -151,16 +205,14 @@ export async function setupFrontpageLive(engine, context, container, component) 
         const durInput = new DurationInput(path, spec.field);
         durInput.label = spec.label;
         durInput.generate(mb, false, readSec(spec.field));
-        const block = secDur.createEl("div", { cls: "frontpage-live__duration-block" });
         applyMdrcLayoutSteps(
             mb,
             component,
-            durInput.layoutMDRC(mb, block, false, durInput.lastValue ?? DEFAULT_MAX_SEC)
+            durInput.layoutMDRC(mb, secDur, false, durInput.lastValue ?? DEFAULT_MAX_SEC)
         );
     }
 
-    const secTags = sidebar.createEl("section", { cls: "frontpage-live__section" });
-    secTags.createEl("h3", { cls: "frontpage-live__section-title", text: "Tags" });
+    const secTags = makeCollapsibleSection(sidebarContent, "Tags", false);
     secTags.createEl("p", {
         cls: "frontpage-live__hint",
         text: "Recipes must include every tag you pick here (empty = no tag filter).",
@@ -170,15 +222,12 @@ export async function setupFrontpageLive(engine, context, container, component) 
     tagsInput.generate(mb);
     tagsInput.render(mb).forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, tagsRow));
 
-    const secSrc = sidebar.createEl("section", { cls: "frontpage-live__section" });
-    secSrc.createEl("h3", { cls: "frontpage-live__section-title", text: "Source" });
+    const secSrc = makeCollapsibleSection(sidebarContent, "Source", false);
     mountText(mb, component, secSrc, path, "filter_source_substr", "Contains", "source contains…");
 
-    const secIng = sidebar.createEl("section", { cls: "frontpage-live__section" });
-    secIng.createEl("h3", { cls: "frontpage-live__section-title", text: "Ingredients" });
-    const ingWrap = secIng.createEl("div", { cls: "ingredient-filter-wrapper" });
+    const secIng = makeCollapsibleSection(sidebarContent, "Ingredients", false, "ingredient-filter-wrapper");
 
-    const btnRow = sidebar.createEl("div", { cls: "frontpage-live__sidebar-actions" });
+    const btnRow = sidebarContent.createEl("div", { cls: "frontpage-live__sidebar-actions" });
     const btnApply = btnRow.createEl("button", {
         cls: "mod-cta frontpage-live__btn-apply",
         text: "Apply advanced filters",
@@ -274,7 +323,7 @@ export async function setupFrontpageLive(engine, context, container, component) 
         await renderResultsTable();
     }
 
-    await ingredientFilter.mount(mb, component, ingWrap, {
+    await ingredientFilter.mount(mb, component, secIng, {
         onSearchChange: () => {
             void renderResultsTable();
         },

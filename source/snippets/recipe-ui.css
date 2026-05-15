@@ -35,7 +35,7 @@
 
 .frontpage-live__grid {
 	display: grid;
-	grid-template-columns: minmax(15rem, 22rem) minmax(0, 1fr);
+	grid-template-columns: auto minmax(0, 1fr);
 	gap: var(--recipe-space-xl);
 	align-items: start;
 	width: 100%;
@@ -55,6 +55,7 @@
 	position: sticky;
 	top: 0.5rem;
 	max-height: calc(100vh - 1rem);
+	max-width: 22rem; /*see if i want to keep it*/
 	overflow-y: auto;
 	padding-right: 0.25rem;
 	min-width: 0;
@@ -127,6 +128,109 @@
 .frontpage-live__btn-reset {
 	width: 100%;
 	justify-content: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Collapsible sidebar and sections                                            */
+/* -------------------------------------------------------------------------- */
+
+.frontpage-live__sidebar-header {
+	display: contents;
+	align-items: center;
+	width: 100%;
+}
+
+.frontpage-live__sidebar-toggle,
+.frontpage-live__section-toggle {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: none;
+	cursor: pointer;
+	text-align: left;
+	font-weight: inherit;
+	color: inherit;
+	font-size: inherit;
+	transition: color 0.12s ease;
+}
+
+.frontpage-live__sidebar-toggle:hover,
+.frontpage-live__section-toggle:hover {
+	color: var(--text-accent);
+}
+
+.frontpage-live__sidebar-toggle::before,
+.frontpage-live__section-toggle::before {
+	content: "▼";
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.25em;
+	height: 1.25em;
+	margin-right: var(--recipe-space-xs);
+	flex-shrink: 0;
+	transition: transform 0.2s ease;
+	font-size: 0.75em;
+	line-height: 1;
+}
+
+.frontpage-live__sidebar-toggle[aria-expanded="false"]::before,
+.frontpage-live__section-toggle[aria-expanded="false"]::before {
+	transform: rotate(-90deg);
+}
+
+.frontpage-live__sidebar-content,
+.frontpage-live__section-content {
+	display: block;
+	max-height: 9999px;
+	overflow: hidden;
+	transition: max-height 0.3s ease, opacity 0.3s ease;
+	opacity: 1;
+}
+
+.frontpage-live__sidebar-content.is-collapsed,
+.frontpage-live__section-content.is-collapsed {
+	display: none;
+}
+
+.frontpage-live__section {
+	border: var(--recipe-border);
+	border-radius: var(--recipe-radius);
+	background: var(--recipe-surface);
+	box-shadow: var(--recipe-shadow);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.frontpage-live__section-header {
+	display: flex;
+	align-items: center;
+	padding: var(--recipe-space-md) var(--recipe-space-lg);
+	border-bottom: var(--recipe-border);
+}
+
+.frontpage-live__section-content {
+	padding: var(--recipe-space-md) var(--recipe-space-lg);
+}
+
+.frontpage-live__section-title {
+	margin: 0;
+	font-size: 0.82rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--recipe-muted);
+}
+
+.frontpage-live__section-title[aria-expanded="false"] {
+	h3{
+		display: none;
+	}
+	display: contents;
 }
 
 .frontpage-live__actions {
