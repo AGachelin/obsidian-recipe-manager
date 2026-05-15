@@ -1,6 +1,7 @@
 import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom_units.js";
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 import { InputConfig } from "../config/input-config.js";
+import { ButtonConfig } from "../config/button-config.js";
 
 const FILTER_STATES = Object.freeze({
     ALLOWED: "allowed",
@@ -171,22 +172,9 @@ export class IngredientFilter {
             }, 80);
         });
 
-        const resetButtonConfig = {
-            id: "reset-ingredient-filter",
-            style: "default",
-            label: "Reset",
-            hidden: false,
-            action: {
-                type: "updateMetadata",
-                bindTarget: `filter_ingredients_state`,
-                value: "Object.create(null)",
-                evaluate: true,
-            },
-        };
-        const resetButton = mb.createButtonMountable(this.path, {
-            declaration: resetButtonConfig,
-            isPreview: false,
-        });
+        const resetButtonConfig = new ButtonConfig("reset-ingredient-filter", "Reset");
+        resetButtonConfig.addUpdateMetadataAction("filter_ingredients_state", "Object.create(null)");
+        const resetButton = mb.createButtonMountable(this.path, resetButtonConfig.render(false));
         const resetMount = headerEl.createEl("div", { cls: "ingredient-filter-reset" });
         mb.wrapInMDRC(resetButton, resetMount, component);
 
@@ -234,28 +222,17 @@ export class IngredientFilter {
         const rowEl = listEl.createEl("div", { cls: "ingredient-filter-row" });
 
         const buttonId = `filter-state-${ingredientName.replace(/[^a-z0-9]/gi, "-")}`;
-        const stateButtonConfig = {
-            id: buttonId,
-            style: "default",
-            label: STATE_LABELS[state] || state,
-            hidden: false,
-            action: {
-                type: "updateMetadata",
-                bindTarget: `filter_ingredients_state["${ingredientName}"]`,
-                evaluate: true,
-                value: `(() => {
+        const stateButtonConfig = new ButtonConfig(buttonId, STATE_LABELS[state] || state);
+        stateButtonConfig.addUpdateMetadataAction(
+            `filter_ingredients_state["${ingredientName}"]`,
+            `(() => {
                     const current = x || "${FILTER_STATES.ALLOWED}";
                     const states = ${JSON.stringify(STATE_CYCLE)};
                     const idx = states.indexOf(current);
                     return states[(idx + 1) % states.length];
-                })()`,
-            },
-        };
-
-        const stateButton = mb.createButtonMountable(this.path, {
-            declaration: stateButtonConfig,
-            isPreview: false,
-        });
+                })()`
+        );
+        const stateButton = mb.createButtonMountable(this.path, stateButtonConfig.render(false));
         const stateMount = rowEl.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });
         mb.wrapInMDRC(stateButton, stateMount, component);
 
