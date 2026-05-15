@@ -1,43 +1,23 @@
 import { UI_LABELS } from "../shared/constants/ui.js";
+import {ButtonConfig} from "./config/button-config.js"
 
 export class AddIngredientButton {
     constructor(path) {
         this.path = path;
-        this.newButtonConfig = {
-            id: "new-ingredient",
-            style: "default",
-            label: UI_LABELS.NEW_INGREDIENT,
-            hidden: true,
-            action: {
-                type: "templaterCreateNote",
-                templateFile: "source/templates/ingredient_template.md",
-                folderPath: "Ingredients",
-                fileName: "ing",
-            },
-        };
-        this.addButtonConfig = {
-            id: "add-ingredient",
-            style: "default",
-            label: UI_LABELS.ADD_INGREDIENT,
-            hidden: true,
-            action: {
-                type: "js",
-                file: "source/src/components/ingredients-input.js",
-            },
-        };
-
-        this.addButtonOptions = {
-            declaration: this.addButtonConfig,
-            isPreview: false,
-        };
-
-        this.newButtonOptions = {
-            declaration: this.newButtonConfig,
-            isPreview: false,
-        };
+        this.newButtonConfig = new ButtonConfig("new-ingredient", UI_LABELS.NEW_INGREDIENT);
+        this.newButtonConfig.addTemplaterCreateNoteAction(
+            "source/templates/ingredient_template.md",
+            "Ingredients",
+            "ing"
+        );
+        this.addButtonConfig = new ButtonConfig("add-ingredient", UI_LABELS.ADD_INGREDIENT);
+        this.addButtonConfig.addJsAction("source/src/components/ingredients-input.js");
+        
+        this.addButtonOptions = this.addButtonConfig.render();
+        this.newButtonOptions = this.newButtonConfig.render();
 
         this.buttonGroupOptions = {
-            declaration: { referencedButtonIds: ["add-ingredient", "new-ingredient"] },
+            declaration: {referencedButtonIds: [this.addButtonConfig.getId(), this.newButtonConfig.getId()]},
             renderChildType: "inline",
         };
         this.isGenerated = false;

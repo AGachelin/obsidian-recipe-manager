@@ -20,15 +20,10 @@ class IngredientViewRow {
         this.amount = amount;
         this.unit = unit;
         const ing = `ingredients["${this.id}"]`;
-        this.viewDeclaration = {
-            amount: `VIEW[convertBackDisplay({${ing}.unit}, {${ing}.amount}, {${ing}.name}, {person.current}/max(1, {person.raw}))]`,
-            unit: `VIEW[{${ing}.unit}]`,
-            name: `VIEW[{${ing}.name}]`,
-        };
         this.viewConfigs = {
-            amount: new ViewConfig("text", null).render(this.viewDeclaration.amount),
-            unit: new ViewConfig("text", null).render(this.viewDeclaration.unit),
-            name: new ViewConfig("text", null).render(this.viewDeclaration.name),
+            amount: new ViewConfig(`VIEW[convertBackDisplay({${ing}.unit}, {${ing}.amount}, {${ing}.name}, {person.current}/max(1, {person.raw}))]`).render(),
+            unit: new ViewConfig(`VIEW[{${ing}.unit}]`).render(),
+            name: new ViewConfig(`VIEW[{${ing}.name}]`).render(),
         };
         this.isGenerated = false;
         this.fields = [];

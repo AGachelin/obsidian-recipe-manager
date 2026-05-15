@@ -1,7 +1,7 @@
 import { FRONTMATTER } from "../shared/constants/recipe.js";
 import { InputConfig } from "./config/input-config.js";
 import { ViewConfig } from "./config/view-config.js";
-
+import { ButtonConfig } from "./config/button-config.js";
 export class PersonButton {
     constructor(path, raw) {
         this.path = path;
@@ -15,68 +15,29 @@ export class PersonButton {
         const btPersonCurrentStr = FRONTMATTER.PERSON.CURRENT;
         const btPersonCurrent = mb.parseBindTarget(btPersonCurrentStr, this.path);
 
-        this.incButtonConfig = {
-            label: "+1",
-            hidden: true,
-            id: "count-increment",
-            style: "default",
-            action: {
-                type: "updateMetadata",
-                bindTarget: btPersonCurrentStr,
-                evaluate: true,
-                value: "x + 1",
-            },
-        };
-        this.decButtonConfig = {
-            label: "-1",
-            hidden: true,
-            id: "count-decrement",
-            style: "default",
-            action: {
-                type: "updateMetadata",
-                bindTarget: btPersonCurrentStr,
-                evaluate: true,
-                value: "max(0, x - 1)",
-            },
-        };
-        this.resetButtonConfig = {
-            label: "Reset",
-            hidden: true,
-            id: "count-reset",
-            style: "default",
-            action: {
-                type: "updateMetadata",
-                bindTarget: btPersonCurrentStr,
-                evaluate: true,
-                value: this.raw,
-            },
-        };
-        this.incButtonOptions = {
-            declaration: this.incButtonConfig,
-            isPreview: false,
-        };
-        this.decButtonOptions = {
-            declaration: this.decButtonConfig,
-            isPreview: false,
-        };
-        this.resetButtonOptions = {
-            declaration: this.resetButtonConfig,
-            isPreview: false,
-        };
+        this.incButtonConfig = new ButtonConfig("count-increment", "+1");
+        this.incButtonConfig.addUpdateMetadataAction(btPersonCurrentStr, "x + 1");
+        this.decButtonConfig = new ButtonConfig("count-decrement", "-1");
+        this.decButtonConfig.addUpdateMetadataAction(btPersonCurrentStr, "max(0, x - 1)");
+        this.resetButtonConfig = new ButtonConfig("count-reset", "Reset");
+        this.resetButtonConfig.addUpdateMetadataAction(btPersonCurrentStr, this.raw);
+
+        this.incButtonOptions = this.incButtonConfig.render();
+        this.decButtonOptions = this.decButtonConfig.render();
+        this.resetButtonOptions = this.resetButtonConfig.render();
 
         this.buttonGroupOptions = {
-            declaration: { referencedButtonIds: ["count-decrement", "count-reset", "count-increment"] },
+            declaration: { referencedButtonIds: [this.incButtonConfig.getId(), this.resetButtonConfig.getId(), this.decButtonConfig.getId()] },
             renderChildType: "inline",
         };
 
-        this.viewDeclaration = "VIEW[{person.current} personnes][text]";
         this.IncButton = mb.createButtonMountable(this.path, this.incButtonOptions);
         this.DecButton = mb.createButtonMountable(this.path, this.decButtonOptions);
         this.ResetButton = mb.createButtonMountable(this.path, this.resetButtonOptions);
         this.ButtonGroup = mb.createButtonGroupMountable(this.path, this.buttonGroupOptions);
         this.PersonView = mb.createViewFieldMountable(
             this.path,
-            new ViewConfig("text", btPersonCurrent).render(this.viewDeclaration)
+            new ViewConfig("VIEW[{person.current} personnes][text]").render()
         );
 
         const personDefault = mb.getMetadata(btPersonCurrent);

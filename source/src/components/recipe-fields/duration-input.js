@@ -58,16 +58,15 @@ export class DurationInput {
         const btHour = mb.createBindTarget("memory", this.path, [key, "hour"], true);
         const btMinute = mb.createBindTarget("memory", this.path, [key, "minute"], true);
         const btSecond = mb.createBindTarget("memory", this.path, [key, "second"], true);
-        const btTotal = mb.parseBindTarget(key, this.path);
 
         this.hourSelect.setBindTarget(btHour);
         this.minuteSelect.setBindTarget(btMinute);
         this.secondSelect.setBindTarget(btSecond);
 
         this.editViewExpr = `VIEW[number({memory^${key}["hour"]} h, s)+number({memory^${key}["minute"]} minute, s)+number({memory^${key}["second"]} s, s)][math(hidden):${key}]`;
-        this.editViewConfig = new ViewConfig("math", btTotal);
+        this.editViewConfig = new ViewConfig(this.editViewExpr);
         this.readViewExpr = `VIEW[splitTime({${key}}, false)]`;
-        this.readViewConfig = new ViewConfig("splitTime", btTotal);
+        this.readViewConfig = new ViewConfig(this.readViewExpr);
 
         if (!view) {
             const sec = Number(value) || 0;
@@ -80,13 +79,13 @@ export class DurationInput {
             this.hourSelectConfig = this.hourSelect.render(hourValue);
             this.minuteSelectConfig = this.minuteSelect.render(minuteValue);
             this.secondSelectConfig = this.secondSelect.render(secondValue);
-            const editDecl = this.editViewConfig.render(this.editViewExpr);
+            const editDecl = this.editViewConfig.render();
             this.hourSelectField = mb.createInputFieldMountable(this.path, this.hourSelectConfig);
             this.minuteSelectField = mb.createInputFieldMountable(this.path, this.minuteSelectConfig);
             this.secondSelectField = mb.createInputFieldMountable(this.path, this.secondSelectConfig);
             this.editViewField = mb.createViewFieldMountable(this.path, editDecl);
         } else {
-            const readDecl = this.readViewConfig.render(this.readViewExpr);
+            const readDecl = this.readViewConfig.render();
             this.viewField = mb.createViewFieldMountable(this.path, readDecl);
         }
     }

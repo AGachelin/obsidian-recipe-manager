@@ -17,7 +17,7 @@ export class SourceInput extends InputConfig {
         this.lastValue = value;
         const btSource = mb.parseBindTarget("source", this.path);
         this.bindTarget = btSource;
-        this.viewConfig = new ViewConfig("text", btSource).render("VIEW[{source}][text(renderMarkdown)]");
+        this.viewConfig = new ViewConfig("VIEW[{source}][text(renderMarkdown)]").render();
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
         this.declaration_arguments = [{ name: "placeholder", value: ["Enter source"] }];
         if (value !== null && value !== undefined) {

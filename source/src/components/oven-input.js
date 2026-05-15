@@ -15,14 +15,12 @@ export class OvenInput extends InputConfig {
         this.isGenerated = true;
         this.lastView = view;
         this.value = value;
-        const btOven = mb.parseBindTarget("oven", this.path);
-        this.bindTarget = btOven;
         const btOvenMem = mb.createBindTarget("memory", this.path, ["oven"], true);
 
         const n = value != null && value !== "" ? Number(value) : 0;
         mb.setMetadata(btOvenMem, Number.isFinite(n) ? n : 0);
 
-        this.viewConfig = new ViewConfig("math", btOven).render("VIEW[{oven}]");
+        this.viewConfig = new ViewConfig("VIEW[{oven}]").render();
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
 
         const declArgs = [{ name: "placeholder", value: ["Enter oven temperature"] }];
@@ -33,7 +31,7 @@ export class OvenInput extends InputConfig {
         this.inputField = mb.createInputFieldMountable(this.path, inputConfig);
 
         const viewDeclaration = "VIEW[bind({memory^oven}, 0, null)][math(hidden):oven]";
-        this.bindViewConfig = new ViewConfig("math", btOven).render(viewDeclaration);
+        this.bindViewConfig = new ViewConfig(viewDeclaration).render();
         this.bindView = mb.createViewFieldMountable(this.path, this.bindViewConfig);
     }
 

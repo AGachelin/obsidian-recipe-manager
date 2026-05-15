@@ -14,13 +14,11 @@ export class NoteInput extends InputConfig {
         this.mb = mb;
         this.viewMode = view;
         this.value = value;
-
-        const btNote = mb.parseBindTarget("note", this.path);
-        this.bindTarget = btNote;
+        
         const btNoteMem = mb.createBindTarget("memory", this.path, ["note"], true);
 
         if (view) {
-            this.viewConfig = new ViewConfig("math", btNote).render("VIEW[{note}]");
+            this.viewConfig = new ViewConfig("VIEW[{note}]").render();
             this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
             this.inputField = null;
             this.clampView = null;
@@ -33,7 +31,7 @@ export class NoteInput extends InputConfig {
             this.inputField = mb.createInputFieldMountable(this.path, inputConfig);
 
             const viewDeclaration = "VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]";
-            this.clampViewConfig = new ViewConfig("math", btNote).render(viewDeclaration);
+            this.clampViewConfig = new ViewConfig(viewDeclaration).render();
             this.clampView = mb.createViewFieldMountable(this.path, this.clampViewConfig);
             this.view = null;
         }

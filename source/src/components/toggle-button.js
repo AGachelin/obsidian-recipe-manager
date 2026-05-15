@@ -1,4 +1,5 @@
 import { FRONTMATTER } from "../shared/constants/recipe.js";
+import { ButtonConfig } from "./config/button-config.js";
 
 export class ToggleButton {
     constructor(path) {
@@ -13,43 +14,14 @@ export class ToggleButton {
 
         const bindKey = FRONTMATTER.VIEW;
 
-        this.viewModeButtonConfig = {
-            id: "switch-mode-view",
-            style: "default",
-            label: "Read",
-            class: "edit",
-            hidden: false,
-            action: {
-                type: "updateMetadata",
-                bindTarget: bindKey,
-                evaluate: true,
-                value: true,
-            },
-        };
+        this.viewModeButtonConfig = new ButtonConfig("switch-mode-view", "Read", "edit", "default", false);
+        this.viewModeButtonConfig.addUpdateMetadataAction(bindKey, true)
 
-        this.editModeButtonConfig = {
-            id: "switch-mode-edit",
-            style: "default",
-            label: "Edit",
-            class: "edit",
-            hidden: false,
-            action: {
-                type: "updateMetadata",
-                bindTarget: bindKey,
-                evaluate: true,
-                value: false,
-            },
-        };
+        this.editModeButtonConfig = new ButtonConfig("switch-mode-edit", "Edit", "edit",  "default", false);
+        this.editModeButtonConfig.addUpdateMetadataAction(bindKey, false)
 
-        this.viewModeButtonOptions = {
-            declaration: this.viewModeButtonConfig,
-            isPreview: false,
-        };
-
-        this.editModeButtonOptions = {
-            declaration: this.editModeButtonConfig,
-            isPreview: false,
-        };
+        this.viewModeButtonOptions = this.viewModeButtonConfig.render();
+        this.editModeButtonOptions = this.editModeButtonConfig.render();
 
         const buttonOptions = isViewMode ? this.editModeButtonOptions : this.viewModeButtonOptions;
         this.toggleButton = mb.createButtonMountable(this.path, buttonOptions);
