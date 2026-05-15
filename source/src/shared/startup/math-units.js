@@ -35,6 +35,29 @@ export function convertBackAmount(mb, unit, value, name) {
     return numericValue(value);
 }
 
+export function convert(mb, unit, value, name) {
+    if (!name) {
+        return;
+    }
+    if (unit === "" || unit === CUSTOM_UNITS.SACHET) {
+        const c = ingredientCoeff(mb, INGREDIENT_NOTEBOOK.SPECIFIC_WEIGHT, name);
+        if (!Number.isFinite(c)) {
+            return value;
+        }
+        return value * c;
+    }
+    if (mb.mb.math.unit(unit).equalBase(mb.mb.math.unit("g"))) {
+        return mb.mb.math.unit(value, unit).toNumber("g");
+    }
+    if (mb.mb.math.unit(unit).equalBase(mb.mb.math.unit("ml"))) {
+        const c = ingredientCoeff(mb, INGREDIENT_NOTEBOOK.RHO, name);
+        if (!Number.isFinite(c)) {
+            return mb.mb.math.unit(value, unit).toNumber("ml");
+        }
+        return mb.mb.math.unit(value, unit).toNumber("ml") * c;
+    }
+}
+
 export function initializeMathUnits(mb) {
     return {
         clamp: (val, min, max) =>
