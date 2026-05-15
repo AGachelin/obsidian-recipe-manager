@@ -9,6 +9,7 @@ import {
 import { convertBackAmount } from "../../shared/startup/math-units.js";
 import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
 import { InputConfig } from "../config/input-config.js";
+import { ButtonConfig } from "../config/button-config.js"
 
 class IngredientInputRow {
     constructor(path, id, name) {
@@ -55,47 +56,15 @@ class IngredientInputRow {
         mb.setMetadata(this.bindTargetUnitMemory, unit);
         mb.setMetadata(this.bindTargetNameMemory, this.name);
 
-        this.deleteButtonConfig = {
-            id: `delete-${this.id}`,
-            style: "default",
-            label: UI_LABELS.DELETE,
-            hidden: false,
-            actions: [
-                {
-                    type: "updateMetadata",
-                    bindTarget: FRONTMATTER.AVAILABLE_INGREDIENTS,
-                    evaluate: true,
-                    value: `x==null?["${this.name}"]:["${this.name}",...x]`,
-                },
-                {
-                    type: "updateMetadata",
-                    bindTarget: FRONTMATTER.INGREDIENTS,
-                    evaluate: true,
-                    value: `(delete x["${this.id}"])?x:x`,
-                },
-            ],
-        };
+        this.deleteButtonConfig = new ButtonConfig(`delete-${this.id}`, UI_LABELS.DELETE);
+        this.deleteButtonConfig.addUpdateMetadataAction(FRONTMATTER.AVAILABLE_INGREDIENTS, `x==null?["${this.name}"]:["${this.name}",...x]`);
+        this.deleteButtonConfig.addUpdateMetadataAction(FRONTMATTER.INGREDIENTS, `(delete x["${this.id}"])?x:x`);
 
-        this.changeButtonConfig = {
-            id: `ingredient-${this.id}`,
-            style: "default",
-            label: `${this.name}`,
-            hidden: false,
-            action: {
-                type: "js",
-                file: "source/src/components/ingredients-input.js",
-                args: { id: this.id },
-            },
-        };
+        this.changeButtonConfig = new ButtonConfig(`ingredient-${this.id}`,`${this.name}`);
+        this.changeButtonConfig.addJsAction("source/src/components/ingredients-input.js", { id: this.id });
 
-        this.deleteButton = mb.createButtonMountable(this.path, {
-            declaration: this.deleteButtonConfig,
-            isPreview: false,
-        });
-        this.changeButton = mb.createButtonMountable(this.path, {
-            declaration: this.changeButtonConfig,
-            isPreview: false,
-        });
+        this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonConfig.render(false));
+        this.changeButton = mb.createButtonMountable(this.path, this.changeButtonConfig.render(false));
         this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(memoryAmount));
         this.amountHiddenView = mb.createViewFieldMountable(this.path, {
             renderChildType: "inline",

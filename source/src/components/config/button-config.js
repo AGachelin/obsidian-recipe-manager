@@ -1,9 +1,8 @@
 export class ButtonConfig {
-    constructor(id, label, cssclass=null, style="default", hidden=true, isPreview=false){
+    constructor(id, label, cssclass=null, style="default", isPreview=false){
         this.id =id;
         this.style = style;
         this.label = label;
-        this.hidden = hidden;
         this.actions = [];
         this.isPreview = isPreview;
         this.cssclass = cssclass;
@@ -20,11 +19,12 @@ export class ButtonConfig {
         }
         this.addAction(action);
     }
-    addJsAction(file){
+    addJsAction(file, args=null){
         const action = {
             type: "js",
             file: file,
         };
+        args ? action["args"] = args : null;
         this.addAction(action);
     }
     addUpdateMetadataAction(bindTarget, value, evaluate=true){
@@ -36,12 +36,12 @@ export class ButtonConfig {
         };
         this.addAction(action);
     }
-    render(){
+    render(hidden=true){
         const declaration = {
                         id: this.id,
                         style: this.style,
                         label: this.label,
-                        hidden: this.hidden
+                        hidden: hidden,
         }
         this.cssclass ? declaration["class"] = this.cssclass : null;
         if(this.actions.length == 1){

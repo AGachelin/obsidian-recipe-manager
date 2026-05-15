@@ -14,14 +14,14 @@ export class ToggleButton {
 
         const bindKey = FRONTMATTER.VIEW;
 
-        this.viewModeButtonConfig = new ButtonConfig("switch-mode-view", "Read", "edit", "default", false);
+        this.viewModeButtonConfig = new ButtonConfig("switch-mode-view", "Read", "edit");
         this.viewModeButtonConfig.addUpdateMetadataAction(bindKey, true)
 
-        this.editModeButtonConfig = new ButtonConfig("switch-mode-edit", "Edit", "edit",  "default", false);
+        this.editModeButtonConfig = new ButtonConfig("switch-mode-edit", "Edit", "edit");
         this.editModeButtonConfig.addUpdateMetadataAction(bindKey, false)
 
-        this.viewModeButtonOptions = this.viewModeButtonConfig.render();
-        this.editModeButtonOptions = this.editModeButtonConfig.render();
+        this.viewModeButtonOptions = this.viewModeButtonConfig.render(false);
+        this.editModeButtonOptions = this.editModeButtonConfig.render(false);
 
         const buttonOptions = isViewMode ? this.editModeButtonOptions : this.viewModeButtonOptions;
         this.toggleButton = mb.createButtonMountable(this.path, buttonOptions);
