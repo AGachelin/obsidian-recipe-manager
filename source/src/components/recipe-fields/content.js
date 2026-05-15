@@ -1,4 +1,4 @@
-import { UI_CLASSES } from "../shared/constants/ui.js";
+import { UI_CLASSES } from "../../shared/constants/ui.js";
 
 export class Content {
     constructor(path) {

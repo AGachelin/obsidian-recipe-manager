@@ -1,6 +1,6 @@
-import { UI_CLASSES } from "../shared/constants/ui.js";
-import { InputConfig } from "./config/input-config.js";
-import { ViewConfig } from "./config/view-config.js";
+import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { InputConfig } from "../config/input-config.js";
+import { ViewConfig } from "../config/view-config.js";
 
 export class SourceInput extends InputConfig {
     constructor(path) {

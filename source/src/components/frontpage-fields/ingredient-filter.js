@@ -95,13 +95,11 @@ export class IngredientFilter {
         const stateKey = `filter_ingredients_state["${ingredientName}"]`;
         const bt = mb.parseBindTarget(stateKey, this.path);
 
-        // Get current state
         let current = mb.getMetadata(bt) || FILTER_STATES.ALLOWED;
         if (!STATE_CYCLE.includes(current)) {
             current = FILTER_STATES.ALLOWED;
         }
 
-        // Cycle to next state
         const idx = STATE_CYCLE.indexOf(current);
         const next = STATE_CYCLE[(idx + 1) % STATE_CYCLE.length];
 
@@ -151,14 +149,10 @@ export class IngredientFilter {
             cls: "ingredient-filter-search-input",
             attr: { placeholder: "Filter ingredients…", spellcheck: "false" },
         });
-        try {
-            const searchBt = mb.parseBindTarget("filter_ingredients_search", this.path);
-            const v = mb.getMetadata(searchBt);
-            if (v != null && String(v).length > 0) {
-                this.searchInputEl.value = String(v);
-            }
-        } catch {
-            // optional legacy key
+        const searchBt = mb.parseBindTarget("filter_ingredients_search", this.path);
+        const v = mb.getMetadata(searchBt);
+        if (v != null && String(v).length > 0) {
+            this.searchInputEl.value = String(v);
         }
         this.searchInputEl.addEventListener("input", () => {
             window.clearTimeout(this._searchDebounce);
@@ -167,7 +161,6 @@ export class IngredientFilter {
                 try {
                     this._onSearchChange?.();
                 } catch {
-                    /* ignore */
                 }
             }, 80);
         });

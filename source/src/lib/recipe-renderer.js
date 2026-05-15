@@ -1,17 +1,17 @@
 import { FRONTMATTER, FRONTMATTER_DEFAULTS } from "../shared/constants/recipe.js";
 import { hasReadableIngredients } from "../shared/ingredients-utils.js";
 import { UI_CLASSES, UI_LABELS } from "../shared/constants/ui.js";
-import { Content } from "../components/content.js";
-import { DurationInput } from "../components/recipe-fields/duration-input.js";
+import { Content } from "../components/recipe-fields/content.js";
+import { DurationInput } from "../components/shared/duration-input.js";
 import { IngredientInputTable } from "../components/recipe-fields/ingredient-input-table.js";
 import { IngredientViewTable } from "../components/recipe-fields/ingredients-view.js";
-import { NoteInput } from "../components/note-input.js";
-import { OvenInput } from "../components/oven-input.js";
-import { PersonButton } from "../components/person-button.js";
-import { SourceInput } from "../components/source-input.js";
-import { TagsInput } from "../components/tags-input.js";
-import { AddIngredientButton } from "../components/add-ingredient-button-group.js";
-import { ToggleButton } from "../components/toggle-button.js";
+import { NoteInput } from "../components/recipe-fields/note-input.js";
+import { OvenInput } from "../components/recipe-fields/oven-input.js";
+import { PersonButton } from "../components/recipe-fields/person-button.js";
+import { SourceInput } from "../components/recipe-fields/source-input.js";
+import { TagsInput } from "../components/shared/tags-input.js";
+import { AddIngredientButton } from "../components/recipe-fields/add-ingredient-button-group.js";
+import { ToggleButton } from "../components/recipe-fields/toggle-button.js";
 import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "./meta-bind-layout.js";
 import { assignDurationLabels, buildRecipeBindSnapshot } from "./recipe-bind-sync.js";
 

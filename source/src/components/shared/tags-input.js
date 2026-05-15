@@ -1,5 +1,5 @@
-import { FRONTMATTER } from "../shared/constants/recipe.js";
-import { InputConfig } from "./config/input-config.js";
+import { FRONTMATTER } from "../../shared/constants/recipe.js";
+import { InputConfig } from "../config/input-config.js";
 
 export class TagsInput extends InputConfig {
     /**

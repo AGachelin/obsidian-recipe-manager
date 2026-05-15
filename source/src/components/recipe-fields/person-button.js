@@ -1,7 +1,7 @@
-import { FRONTMATTER } from "../shared/constants/recipe.js";
-import { InputConfig } from "./config/input-config.js";
-import { ViewConfig } from "./config/view-config.js";
-import { ButtonConfig } from "./config/button-config.js";
+import { FRONTMATTER } from "../../shared/constants/recipe.js";
+import { InputConfig } from "../config/input-config.js";
+import { ViewConfig } from "../config/view-config.js";
+import { ButtonConfig } from "../config/button-config.js";
 export class PersonButton {
     constructor(path, raw) {
         this.path = path;

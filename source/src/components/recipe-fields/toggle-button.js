@@ -1,5 +1,5 @@
-import { FRONTMATTER } from "../shared/constants/recipe.js";
-import { ButtonConfig } from "./config/button-config.js";
+import { FRONTMATTER } from "../../shared/constants/recipe.js";
+import { ButtonConfig } from "../config/button-config.js";
 
 export class ToggleButton {
     constructor(path) {

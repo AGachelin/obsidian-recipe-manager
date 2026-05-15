@@ -1,6 +1,6 @@
-import { DurationInput } from "../components/recipe-fields/duration-input.js";
-import { IngredientFilter } from "../components/recipe-fields/ingredient-filter.js";
-import { TagsInput } from "../components/tags-input.js";
+import { DurationInput } from "../components/shared/duration-input.js";
+import { IngredientFilter } from "../components/frontpage-fields/ingredient-filter.js";
+import { TagsInput } from "../components/shared/tags-input.js";
 import { InputConfig } from "../components/config/input-config.js";
 import { UI_CLASSES } from "../shared/constants/ui.js";
 import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "./meta-bind-layout.js";
