@@ -1,6 +1,6 @@
 export const CUSTOM_UNITS = Object.freeze({
-    SACHET: 'sachet',
-    PINCH: 'pinch',
+    SACHET: "sachet",
+    PINCH: "pinch",
 });
 
 export const UNIT_OPTIONS = Object.freeze([
@@ -21,7 +21,7 @@ export const UNIT_OPTIONS = Object.freeze([
     "quart",
     "gallon",
     "drop",
-    "pinch"
+    "pinch",
 ]);
 
 export const UNIT_LABELS = Object.freeze([
@@ -42,5 +42,5 @@ export const UNIT_LABELS = Object.freeze([
     "qt",
     "gal",
     "goutte",
-    "pincée"
+    "pincée",
 ]);

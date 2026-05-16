@@ -1,5 +1,5 @@
 const { initializeMathUnits } = await engine.importJs('source/src/shared/startup/math-units.js');
-const { CUSTOM_UNITS } = await engine.importJs('source/src/shared/constants/custom_units.js');
+const { CUSTOM_UNITS } = await engine.importJs('source/src/shared/constants/custom-units.js');
 
 const mb = engine.getPlugin('obsidian-meta-bind-plugin').api;
 

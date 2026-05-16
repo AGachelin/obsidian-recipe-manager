@@ -1,4 +1,5 @@
 import { FRONTMATTER } from "../shared/constants/recipe.js";
+import { createCoalescedScheduler } from "./coalesced-refresh.js";
 
 const LIVE_BIND_KEYS = [
     FRONTMATTER.VIEW,
@@ -27,15 +28,7 @@ export function isRecipeViewMode(meta) {
 }
 
 export function attachRecipeLiveSubscriptions(mb, component, path, refresh) {
-    let coalescing = false;
-    const schedule = () => {
-        if (coalescing) return;
-        coalescing = true;
-        queueMicrotask(() => {
-            coalescing = false;
-            void refresh();
-        });
-    };
+    const { schedule } = createCoalescedScheduler(refresh);
     const watch = (bindTarget) => mb.subscribeToMetadata(bindTarget, component, schedule);
     const at = (key) => mb.parseBindTarget(key, path);
     watch(at(FRONTMATTER.VIEW));

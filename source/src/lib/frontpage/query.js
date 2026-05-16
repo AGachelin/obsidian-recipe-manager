@@ -2,9 +2,8 @@
  * Recipe listing and filter logic for the front page (Dataview-equivalent pipeline).
  * Uses the Dataview plugin API when available (`api.pages`), otherwise falls back to the vault + metadata cache.
  */
-import { convert } from "../shared/startup/math-units.js";
-
-const DEFAULT_MAX_SEC = 604800;
+import { convert } from "../../shared/startup/math-units.js";
+import { FRONTPAGE_DEFAULT_MAX_DURATION_SEC } from "../../shared/constants/frontpage.js";
 
 /**
  * @param {*} mb
@@ -25,9 +24,9 @@ export function readFilterCriteria(mb, path) {
     return {
         nMin: Number.isFinite(noteMin) ? noteMin : 0,
         nMax: Number.isFinite(noteMax) ? noteMax : 5,
-        pMax: Number.isFinite(prepMax) ? prepMax : DEFAULT_MAX_SEC,
-        cMax: Number.isFinite(cookMax) ? cookMax : DEFAULT_MAX_SEC,
-        rMax: Number.isFinite(restMax) ? restMax : DEFAULT_MAX_SEC,
+        pMax: Number.isFinite(prepMax) ? prepMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
+        cMax: Number.isFinite(cookMax) ? cookMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
+        rMax: Number.isFinite(restMax) ? restMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
         srcQ: String(get("filter_source_substr") ?? "")
             .toLowerCase()
             .trim(),
@@ -85,12 +84,11 @@ function ingredientFilterPasses(ing, c, mb) {
             const minAmount = c.filterIngredientAmounts[ingName];
             const unit = c.filterIngredientUnits?.[ingName] ?? "";
             if (minAmount !== "" && minAmount != null) {
-                if(!ingRow.amount){
-                    return true
+                if (!ingRow.amount) {
+                    return true;
                 }
                 const recipeAmount = Number(ingRow.amount);
                 const filterAmount = convert(mb, unit, Number(minAmount), ingName);
-                console.log(recipeAmount, filterAmount);
                 if (Number.isFinite(recipeAmount) && Number.isFinite(filterAmount)) {
                     if (recipeAmount < filterAmount) return false;
                 }
@@ -114,15 +112,15 @@ function passesCriteria(p, c, mb) {
     const rest = Number(p.rest_duration);
     const ps = Number.isFinite(prep) ? prep : 0;
     const cs = Number.isFinite(cook) ? cook : 0;
-    const rs = Number.isFinite(rest) ? rest : 0;
-    if (ps > c.pMax || cs > c.cMax || rs > c.rMax) return false;
+    const rsRest = Number.isFinite(rest) ? rest : 0;
+    if (ps > c.pMax || cs > c.cMax || rsRest > c.rMax) return false;
 
     if (c.srcQ && !String(p.source ?? "").toLowerCase().includes(c.srcQ)) return false;
 
     if (c.normFilterTags.length > 0) {
-        const rs = recipeTagSet(p);
+        const recipeTags = recipeTagSet(p);
         for (const ft of c.normFilterTags) {
-            if (!rs.has(ft)) return false;
+            if (!recipeTags.has(ft)) return false;
         }
     }
 

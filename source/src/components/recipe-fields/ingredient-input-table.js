@@ -1,4 +1,4 @@
-import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom_units.js";
+import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom-units.js";
 import { FRONTMATTER } from "../../shared/constants/recipe.js";
 import {
     bindIngredientMemory,

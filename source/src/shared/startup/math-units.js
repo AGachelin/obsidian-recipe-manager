@@ -1,4 +1,4 @@
-import { CUSTOM_UNITS } from "../constants/custom_units.js";
+import { CUSTOM_UNITS } from "../constants/custom-units.js";
 import { INGREDIENT_NOTEBOOK } from "../constants/recipe.js";
 
 function numericValue(value) {

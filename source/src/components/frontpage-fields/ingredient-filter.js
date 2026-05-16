@@ -1,4 +1,4 @@
-import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom_units.js";
+import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom-units.js";
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ButtonConfig } from "../config/button-config.js";
