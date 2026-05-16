@@ -1,26 +1,26 @@
+import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
+
 /**
- * Builds a labelled section whose body can collapse.
- *
  * @param {HTMLElement} parent
  * @param {string} title
  * @param {boolean} [startOpen=true]
- * @param {string} [contentClass='']
+ * @param {string} [extraContentClasses='']
  */
-export function mountCollapsibleSection(parent, title, startOpen = true, contentClass = "") {
-    const section = parent.createEl("section", { cls: "frontpage-live__section" });
-    const header = section.createEl("div", { cls: "frontpage-live__section-header" });
+export function mountCollapsibleSection(parent, title, startOpen = true, extraContentClasses = "") {
+    const section = parent.createEl("section", { cls: FRONTPAGE_LAYOUT.section });
+    const header = section.createEl("div", { cls: FRONTPAGE_LAYOUT.sectionHeader });
     const toggleHeading = header.createEl("h3", {
-        cls: "frontpage-live__section-title frontpage-live__section-toggle",
+        cls: `${FRONTPAGE_LAYOUT.sectionTitle} ${FRONTPAGE_LAYOUT.sectionToggle}`,
         attr: { "aria-expanded": String(startOpen) },
         text: title,
     });
 
-    const baseClasses = ["frontpage-live__section-content"];
+    const baseClasses = [FRONTPAGE_LAYOUT.sectionContent];
     if (!startOpen) {
         baseClasses.push("is-collapsed");
     }
-    if (contentClass) {
-        baseClasses.push(contentClass);
+    if (extraContentClasses) {
+        baseClasses.push(extraContentClasses);
     }
     const content = section.createEl("div", { cls: baseClasses.join(" ") });
 
@@ -34,22 +34,20 @@ export function mountCollapsibleSection(parent, title, startOpen = true, content
 }
 
 /**
- * Wraps sidebar inner content behind a clickable title with collapse.
- *
  * @param {HTMLElement} sidebar
  * @param {string} titleText
  * @param {boolean} [startOpen=true]
- * @returns {HTMLElement} Wrapper for collapsible sidebar body
+ * @returns {HTMLElement}
  */
 export function mountCollapsibleSidebar(sidebar, titleText, startOpen = true) {
-    const header = sidebar.createEl("div", { cls: "frontpage-live__sidebar-header" });
+    const header = sidebar.createEl("div", { cls: FRONTPAGE_LAYOUT.sidebarHeader });
     const toggleHeading = header.createEl("h2", {
-        cls: "frontpage-live__sidebar-title frontpage-live__section-title frontpage-live__sidebar-toggle",
+        cls: `${FRONTPAGE_LAYOUT.sidebarTitle} ${FRONTPAGE_LAYOUT.sectionTitle} ${FRONTPAGE_LAYOUT.sidebarToggle}`,
         attr: { "aria-expanded": String(startOpen) },
         text: titleText,
     });
 
-    const content = sidebar.createEl("div", { cls: "frontpage-live__sidebar-content" });
+    const content = sidebar.createEl("div", { cls: FRONTPAGE_LAYOUT.sidebarContent });
     if (!startOpen) {
         content.classList.add("is-collapsed");
     }

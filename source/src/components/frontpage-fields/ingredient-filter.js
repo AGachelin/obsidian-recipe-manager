@@ -1,4 +1,11 @@
 import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom-units.js";
+import {
+    FrontpageFm,
+    ingredientFilterAmountBindKey,
+    ingredientFilterStateBindKey,
+    ingredientFilterUnitBindKey,
+} from "../../shared/constants/frontpage.js";
+import { INGREDIENT_FILTER_LAYOUT } from "../../shared/constants/frontpage-ui.js";
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ButtonConfig } from "../config/button-config.js";
@@ -40,7 +47,6 @@ export class IngredientFilter {
             const app = mb.mb.app;
             const allIngredients = new Set();
 
-            // Get all recipe files
             const recipeFolder = app.vault.getAbstractFileByPath("Recipes");
             if (!recipeFolder || !recipeFolder.children) return [];
 
@@ -48,10 +54,8 @@ export class IngredientFilter {
                 if (!folder.children) return;
                 for (const file of folder.children) {
                     if (file.children) {
-                        // It's a folder
                         iterateFolder(file);
                     } else if (file.extension === "md") {
-                        // It's a markdown file
                         const cache = app.metadataCache.getFileCache(file);
                         if (cache?.frontmatter?.ingredients) {
                             const ingredients = cache.frontmatter.ingredients;
@@ -81,8 +85,6 @@ export class IngredientFilter {
     async generate(mb) {
         this.isGenerated = true;
         this.mb = mb;
-
-        // Collect all ingredients from recipes
         this.allIngredients = await this.collectAllIngredients(mb);
     }
 
@@ -92,8 +94,7 @@ export class IngredientFilter {
      * @param {string} ingredientName
      */
     async cycleIngredientState(mb, ingredientName) {
-        const stateKey = `filter_ingredients_state["${ingredientName}"]`;
-        const bt = mb.parseBindTarget(stateKey, this.path);
+        const bt = mb.parseBindTarget(ingredientFilterStateBindKey(ingredientName), this.path);
 
         let current = mb.getMetadata(bt) || FILTER_STATES.ALLOWED;
         if (!STATE_CYCLE.includes(current)) {
@@ -114,8 +115,7 @@ export class IngredientFilter {
      */
     getIngredientState(mb, ingredientName) {
         try {
-            const stateKey = `filter_ingredients_state["${ingredientName}"]`;
-            const bt = mb.parseBindTarget(stateKey, this.path);
+            const bt = mb.parseBindTarget(ingredientFilterStateBindKey(ingredientName), this.path);
             const state = mb.getMetadata(bt) || FILTER_STATES.ALLOWED;
             return STATE_CYCLE.includes(state) ? state : FILTER_STATES.ALLOWED;
         } catch (e) {
@@ -138,18 +138,18 @@ export class IngredientFilter {
         this.mb = mb;
         this._onSearchChange = typeof options.onSearchChange === "function" ? options.onSearchChange : null;
         parent.empty();
-        const containerEl = parent.createEl("div", { cls: "ingredient-filter-container" });
+        const containerEl = parent.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.container });
         this.containerEl = containerEl;
 
-        const headerEl = containerEl.createEl("div", { cls: "ingredient-filter-header" });
+        const headerEl = containerEl.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.header });
 
-        const searchWrap = headerEl.createEl("div", { cls: "ingredient-filter-search" });
+        const searchWrap = headerEl.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.searchWrap });
         this.searchInputEl = searchWrap.createEl("input", {
             type: "text",
-            cls: "ingredient-filter-search-input",
+            cls: INGREDIENT_FILTER_LAYOUT.searchInput,
             attr: { placeholder: "Filter ingredients…", spellcheck: "false" },
         });
-        const searchBt = mb.parseBindTarget("filter_ingredients_search", this.path);
+        const searchBt = mb.parseBindTarget(FrontpageFm.FILTER_INGREDIENTS_SEARCH, this.path);
         const v = mb.getMetadata(searchBt);
         if (v != null && String(v).length > 0) {
             this.searchInputEl.value = String(v);
@@ -166,12 +166,12 @@ export class IngredientFilter {
         });
 
         const resetButtonConfig = new ButtonConfig("reset-ingredient-filter", "Reset");
-        resetButtonConfig.addUpdateMetadataAction("filter_ingredients_state", "Object.create(null)");
+        resetButtonConfig.addUpdateMetadataAction(FrontpageFm.FILTER_INGREDIENTS_STATE, "Object.create(null)");
         const resetButton = mb.createButtonMountable(this.path, resetButtonConfig.render(false));
-        const resetMount = headerEl.createEl("div", { cls: "ingredient-filter-reset" });
+        const resetMount = headerEl.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.resetWrap });
         mb.wrapInMDRC(resetButton, resetMount, component);
 
-        this.listEl = containerEl.createEl("div", { cls: "ingredient-filter-list" });
+        this.listEl = containerEl.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.list });
         await this.refreshList(mb, component);
     }
 
@@ -198,7 +198,7 @@ export class IngredientFilter {
         if (visibleIngredients.length === 0) {
             this.listEl.createEl("p", {
                 text: "No ingredients match your search.",
-                cls: "ingredient-filter-empty",
+                cls: INGREDIENT_FILTER_LAYOUT.empty,
             });
         }
     }
@@ -212,12 +212,12 @@ export class IngredientFilter {
      * @param {string} state
      */
     renderIngredientRow(mb, component, listEl, ingredientName, state) {
-        const rowEl = listEl.createEl("div", { cls: "ingredient-filter-row" });
+        const rowEl = listEl.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.row });
 
         const buttonId = `filter-state-${ingredientName.replace(/[^a-z0-9]/gi, "-")}`;
         const stateButtonConfig = new ButtonConfig(buttonId, STATE_LABELS[state] || state);
         stateButtonConfig.addUpdateMetadataAction(
-            `filter_ingredients_state["${ingredientName}"]`,
+            ingredientFilterStateBindKey(ingredientName),
             `(() => {
                     const current = x || "${FILTER_STATES.ALLOWED}";
                     const states = ${JSON.stringify(STATE_CYCLE)};
@@ -229,12 +229,12 @@ export class IngredientFilter {
         const stateMount = rowEl.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });
         mb.wrapInMDRC(stateButton, stateMount, component);
 
-        rowEl.createEl("span", { text: ingredientName, cls: "ingredient-filter-name" });
+        rowEl.createEl("span", { text: ingredientName, cls: INGREDIENT_FILTER_LAYOUT.name });
 
         if (state === FILTER_STATES.MUST_HAVE) {
             const amountConfig = new InputConfig(
                 "text",
-                mb.parseBindTarget(`filter_ingredients_amount["${ingredientName}"]`, this.path),
+                mb.parseBindTarget(ingredientFilterAmountBindKey(ingredientName), this.path),
                 "inline",
                 [{ name: "placeholder", value: ["min amount"] }]
             ).render();
@@ -251,7 +251,7 @@ export class IngredientFilter {
             ];
             const unitConfig = new InputConfig(
                 "inlineSelect",
-                mb.parseBindTarget(`filter_ingredients_unit["${ingredientName}"]`, this.path),
+                mb.parseBindTarget(ingredientFilterUnitBindKey(ingredientName), this.path),
                 "inline",
                 unitArgs
             ).render();

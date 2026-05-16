@@ -1,9 +1,18 @@
-import { attachRecipeLiveSubscriptions, isRecipeViewMode, readRecipeLiveMetadata } from "./recipe-metadata.js";
-
+/**
+ * Recipe note entry — same loading pattern as the front page: dynamic `importJs` of heavy modules.
+ *
+ * @see ./frontpage/bootstrap.js
+ */
 export async function setupRecipeLive(engine, context, container, component) {
-    const mb = engine.getPlugin("obsidian-meta-bind-plugin").api;
     const path = context.file.path;
-    const { RecipeRenderer } = await engine.importJs("source/src/lib/recipe-renderer.js");
+    const mb = engine.getPlugin("obsidian-meta-bind-plugin").api;
+
+    const [{ RecipeRenderer }, { readRecipeLiveMetadata, isRecipeViewMode, attachRecipeLiveSubscriptions }] =
+        await Promise.all([
+            engine.importJs("source/src/lib/recipe-renderer.js"),
+            engine.importJs("source/src/lib/recipe-metadata.js"),
+        ]);
+
     const renderer = new RecipeRenderer(path);
 
     function renderRecipe() {

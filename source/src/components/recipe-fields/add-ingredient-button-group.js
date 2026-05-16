@@ -11,7 +11,7 @@ export class AddIngredientButton {
             "ing"
         );
         this.addButtonConfig = new ButtonConfig("add-ingredient", UI_LABELS.ADD_INGREDIENT);
-        this.addButtonConfig.addJsAction("source/src/shared/scripts/ingredients-input.js");
+        this.addButtonConfig.addJsAction("source/src/templater/ingredients-input.js");
         
         this.addButtonOptions = this.addButtonConfig.render();
         this.newButtonOptions = this.newButtonConfig.render();

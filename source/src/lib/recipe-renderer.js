@@ -1,3 +1,7 @@
+/**
+ * Single-recipe editor / reader layout.
+ * @see ./frontpage/frontpage-renderer.js
+ */
 import { FRONTMATTER, FRONTMATTER_DEFAULTS } from "../shared/constants/recipe.js";
 import { hasReadableIngredients } from "../shared/ingredients-utils.js";
 import { UI_CLASSES, UI_LABELS } from "../shared/constants/ui.js";

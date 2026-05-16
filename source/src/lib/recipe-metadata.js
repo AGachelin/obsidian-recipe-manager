@@ -1,3 +1,7 @@
+/**
+ * Live metadata for recipe pages: read-through keys + which binds trigger a reactive re-render.
+ * Front-page equivalent: `FRONTPAGE_LIVE_SUBSCRIPTION_KEYS` in `shared/constants/frontpage.js`.
+ */
 import { FRONTMATTER } from "../shared/constants/recipe.js";
 import { createCoalescedScheduler } from "./coalesced-refresh.js";
 

@@ -61,7 +61,7 @@ class IngredientInputRow {
         this.deleteButtonConfig.addUpdateMetadataAction(FRONTMATTER.INGREDIENTS, `(delete x["${this.id}"])?x:x`);
 
         this.changeButtonConfig = new ButtonConfig(`ingredient-${this.id}`,`${this.name}`);
-        this.changeButtonConfig.addJsAction("source/src/shared/scripts/ingredients-input.js", { id: this.id });
+        this.changeButtonConfig.addJsAction("source/src/templater/ingredients-input.js", { id: this.id });
 
         this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonConfig.render(false));
         this.changeButton = mb.createButtonMountable(this.path, this.changeButtonConfig.render(false));

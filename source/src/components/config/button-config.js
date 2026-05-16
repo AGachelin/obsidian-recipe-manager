@@ -1,61 +1,75 @@
 export class ButtonConfig {
-    constructor(id, label, cssclass=null, style="default", isPreview=false){
-        this.id =id;
+    /**
+     * @param {string} id
+     * @param {string} label
+     * @param {string | null} [cssClass]
+     * @param {string} [style]
+     * @param {boolean} [isPreview]
+     */
+    constructor(id, label, cssClass = null, style = "default", isPreview = false) {
+        this.id = id;
         this.style = style;
         this.label = label;
         this.actions = [];
         this.isPreview = isPreview;
-        this.cssclass = cssclass;
+        this.cssClass = cssClass;
     }
-    addAction(action){
+
+    /** @param {Record<string, unknown>} action */
+    addAction(action) {
         this.actions.push(action);
     }
-    addTemplaterCreateNoteAction(templateFile, folderPath, fileName){
-        const action = {
+
+    addTemplaterCreateNoteAction(templateFile, folderPath, fileName) {
+        this.addAction({
             type: "templaterCreateNote",
-            templateFile: templateFile,
-            folderPath: folderPath,
-            fileName: fileName,
+            templateFile,
+            folderPath,
+            fileName,
+        });
+    }
+
+    /** @param {string} file */
+    addJsAction(file, args = null) {
+        const action = { type: "js", file };
+        if (args != null) {
+            action.args = args;
         }
         this.addAction(action);
     }
-    addJsAction(file, args=null){
-        const action = {
-            type: "js",
-            file: file,
-        };
-        args ? action["args"] = args : null;
-        this.addAction(action);
-    }
-    addUpdateMetadataAction(bindTarget, value, evaluate=true){
-        const action = {
+
+    addUpdateMetadataAction(bindTarget, value, evaluate = true) {
+        this.addAction({
             type: "updateMetadata",
-            bindTarget: bindTarget,
-            evaluate: evaluate,
-            value: value,
-        };
-        this.addAction(action);
+            bindTarget,
+            evaluate,
+            value,
+        });
     }
-    render(hidden=true){
+
+    /** @param {boolean} [hidden] */
+    render(hidden = true) {
         const declaration = {
-                        id: this.id,
-                        style: this.style,
-                        label: this.label,
-                        hidden: hidden,
+            id: this.id,
+            style: this.style,
+            label: this.label,
+            hidden,
+        };
+        if (this.cssClass) {
+            declaration.class = this.cssClass;
         }
-        this.cssclass ? declaration["class"] = this.cssclass : null;
-        if(this.actions.length == 1){
-            declaration["action"] = this.actions[0];
-        }
-        else {
-            declaration["actions"] = this.actions;
+        if (this.actions.length === 1) {
+            declaration.action = this.actions[0];
+        } else {
+            declaration.actions = this.actions;
         }
         return {
-            declaration: declaration,
-            isPreview: this.isPreview
-        }
+            declaration,
+            isPreview: this.isPreview,
+        };
     }
-    getId(){
+
+    getId() {
         return this.id;
     }
 }

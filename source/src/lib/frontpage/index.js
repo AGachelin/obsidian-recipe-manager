@@ -1,1 +1,2 @@
-export { setupFrontpageLive } from "./setup-frontpage-live.js";
+export { FrontpageRenderer } from "./frontpage-renderer.js";
+export { setupFrontpageLive } from "./bootstrap.js";

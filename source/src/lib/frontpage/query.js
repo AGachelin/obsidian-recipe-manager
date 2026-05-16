@@ -3,7 +3,7 @@
  * Uses the Dataview plugin API when available (`api.pages`), otherwise falls back to the vault + metadata cache.
  */
 import { convert } from "../../shared/startup/math-units.js";
-import { FRONTPAGE_DEFAULT_MAX_DURATION_SEC } from "../../shared/constants/frontpage.js";
+import { FRONTPAGE_DEFAULT_MAX_DURATION_SEC, FrontpageFm } from "../../shared/constants/frontpage.js";
 
 /**
  * @param {*} mb
@@ -13,13 +13,13 @@ export function readFilterCriteria(mb, path) {
     const at = (k) => mb.parseBindTarget(k, path);
     const get = (k) => mb.getMetadata(at(k));
 
-    const noteMin = Number(get("filter_note_min"));
-    const noteMax = Number(get("filter_note_max"));
-    const prepMax = Number(get("filter_prep_max_sec"));
-    const cookMax = Number(get("filter_cook_max_sec"));
-    const restMax = Number(get("filter_rest_max_sec"));
+    const noteMin = Number(get(FrontpageFm.FILTER_NOTE_MIN));
+    const noteMax = Number(get(FrontpageFm.FILTER_NOTE_MAX));
+    const prepMax = Number(get(FrontpageFm.FILTER_PREP_MAX_SEC));
+    const cookMax = Number(get(FrontpageFm.FILTER_COOK_MAX_SEC));
+    const restMax = Number(get(FrontpageFm.FILTER_REST_MAX_SEC));
 
-    const filterTags = Array.isArray(get("filter_tags")) ? get("filter_tags") : [];
+    const filterTags = Array.isArray(get(FrontpageFm.FILTER_TAGS)) ? get(FrontpageFm.FILTER_TAGS) : [];
 
     return {
         nMin: Number.isFinite(noteMin) ? noteMin : 0,
@@ -27,7 +27,7 @@ export function readFilterCriteria(mb, path) {
         pMax: Number.isFinite(prepMax) ? prepMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
         cMax: Number.isFinite(cookMax) ? cookMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
         rMax: Number.isFinite(restMax) ? restMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
-        srcQ: String(get("filter_source_substr") ?? "")
+        srcQ: String(get(FrontpageFm.FILTER_SOURCE_SUBSTR) ?? "")
             .toLowerCase()
             .trim(),
         normFilterTags: [
@@ -37,9 +37,9 @@ export function readFilterCriteria(mb, path) {
                     .filter(Boolean)
             ),
         ],
-        filterIngredientStates: Object.assign({}, get("filter_ingredients_state") ?? {}),
-        filterIngredientAmounts: Object.assign({}, get("filter_ingredients_amount") ?? {}),
-        filterIngredientUnits: Object.assign({}, get("filter_ingredients_unit") ?? {}),
+        filterIngredientStates: Object.assign({}, get(FrontpageFm.FILTER_INGREDIENTS_STATE) ?? {}),
+        filterIngredientAmounts: Object.assign({}, get(FrontpageFm.FILTER_INGREDIENTS_AMOUNT) ?? {}),
+        filterIngredientUnits: Object.assign({}, get(FrontpageFm.FILTER_INGREDIENTS_UNIT) ?? {}),
     };
 }
 

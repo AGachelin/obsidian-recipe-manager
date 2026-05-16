@@ -1,5 +1,6 @@
 import { InputConfig } from "../../components/config/input-config.js";
-import { FRONTPAGE_DEFAULT_MAX_DURATION_SEC } from "../../shared/constants/frontpage.js";
+import { FrontpageFm, FRONTPAGE_DEFAULT_MAX_DURATION_SEC } from "../../shared/constants/frontpage.js";
+import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 
 /**
@@ -7,14 +8,14 @@ import { UI_CLASSES } from "../../shared/constants/ui.js";
  * @param {import("obsidian").Component} component
  * @param {HTMLElement} parent
  * @param {string} path
- * @param {string} key
+ * @param {string} fmKey One of {@link FrontpageFm} string values
  * @param {string} label
  * @param {{ min: number; max: number; step: number }} spec
  */
-export function mountSliderField(mb, component, parent, path, key, label, spec) {
-    const bt = mb.parseBindTarget(key, path);
+export function mountSliderField(mb, component, parent, path, fmKey, label, spec) {
+    const bt = mb.parseBindTarget(fmKey, path);
     const cur = Number(mb.getMetadata(bt));
-    const fallback = key.includes("max") ? spec.max : spec.min;
+    const fallback = fmKey.includes("max") ? spec.max : spec.min;
     const def = Number.isFinite(cur) ? cur : fallback;
     const config = new InputConfig("slider", bt, "inline", [
         { name: "defaultValue", value: [String(def)] },
@@ -22,8 +23,8 @@ export function mountSliderField(mb, component, parent, path, key, label, spec) 
         { name: "maxValue", value: [String(spec.max)] },
         { name: "stepSize", value: [String(spec.step)] },
     ]).render();
-    const wrap = parent.createEl("div", { cls: "frontpage-live__field" });
-    wrap.createEl("label", { cls: "frontpage-live__label", text: label });
+    const wrap = parent.createEl("div", { cls: FRONTPAGE_LAYOUT.field });
+    wrap.createEl("label", { cls: FRONTPAGE_LAYOUT.label, text: label });
     const mount = wrap.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });
     const field = mb.createInputFieldMountable(path, config);
     mb.wrapInMDRC(field, mount, component);
@@ -34,19 +35,19 @@ export function mountSliderField(mb, component, parent, path, key, label, spec) 
  * @param {import("obsidian").Component} component
  * @param {HTMLElement} parent
  * @param {string} path
- * @param {string} key
+ * @param {string} fmKey
  * @param {string} label
  * @param {string} [placeholder]
  */
-export function mountTextField(mb, component, parent, path, key, label, placeholder) {
-    const bt = mb.parseBindTarget(key, path);
+export function mountTextField(mb, component, parent, path, fmKey, label, placeholder) {
+    const bt = mb.parseBindTarget(fmKey, path);
     const args = [];
     if (placeholder) {
         args.push({ name: "placeholder", value: [placeholder] });
     }
     const config = new InputConfig("text", bt, "inline", args).render();
-    const wrap = parent.createEl("div", { cls: "frontpage-live__field" });
-    wrap.createEl("label", { cls: "frontpage-live__label", text: label });
+    const wrap = parent.createEl("div", { cls: FRONTPAGE_LAYOUT.field });
+    wrap.createEl("label", { cls: FRONTPAGE_LAYOUT.label, text: label });
     const mount = wrap.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });
     const field = mb.createInputFieldMountable(path, config);
     mb.wrapInMDRC(field, mount, component);
@@ -61,14 +62,14 @@ export function resetAdvancedFilterMetadata(mb, path) {
     const set = (k, v) => mb.setMetadata(at(k), v);
     const maxDur = FRONTPAGE_DEFAULT_MAX_DURATION_SEC;
 
-    set("filter_note_min", 0);
-    set("filter_note_max", 5);
-    set("filter_prep_max_sec", maxDur);
-    set("filter_cook_max_sec", maxDur);
-    set("filter_rest_max_sec", maxDur);
-    set("filter_source_substr", "");
-    set("filter_tags", []);
-    set("filter_ingredients_state", {});
-    set("filter_ingredients_amount", {});
-    set("filter_ingredients_unit", {});
+    set(FrontpageFm.FILTER_NOTE_MIN, 0);
+    set(FrontpageFm.FILTER_NOTE_MAX, 5);
+    set(FrontpageFm.FILTER_PREP_MAX_SEC, maxDur);
+    set(FrontpageFm.FILTER_COOK_MAX_SEC, maxDur);
+    set(FrontpageFm.FILTER_REST_MAX_SEC, maxDur);
+    set(FrontpageFm.FILTER_SOURCE_SUBSTR, "");
+    set(FrontpageFm.FILTER_TAGS, []);
+    set(FrontpageFm.FILTER_INGREDIENTS_STATE, {});
+    set(FrontpageFm.FILTER_INGREDIENTS_AMOUNT, {});
+    set(FrontpageFm.FILTER_INGREDIENTS_UNIT, {});
 }

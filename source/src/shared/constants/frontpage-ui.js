@@ -1,0 +1,51 @@
+/**
+ * CSS hook classes for the front page (Recipe index) — pair with `snippets/recipe-ui.css`.
+ * Centralizing names makes layout refactors grep-friendly.
+ */
+export const FRONTPAGE_LAYOUT = Object.freeze({
+    root: "frontpage-live-root",
+    grid: "frontpage-live__grid",
+    sidebar: "frontpage-live__sidebar",
+    main: "frontpage-live__main",
+    sidebarHeader: "frontpage-live__sidebar-header",
+    sidebarTitle: "frontpage-live__sidebar-title",
+    sidebarToggle: "frontpage-live__sidebar-toggle",
+    sidebarContent: "frontpage-live__sidebar-content",
+    sidebarActions: "frontpage-live__sidebar-actions",
+    pageTitle: "frontpage-live__title",
+    indexHeading: "frontpage-live__index-heading",
+    actions: "frontpage-live__actions",
+    section: "frontpage-live__section",
+    sectionHeader: "frontpage-live__section-header",
+    sectionTitle: "frontpage-live__section-title",
+    sectionToggle: "frontpage-live__section-toggle",
+    sectionContent: "frontpage-live__section-content",
+    field: "frontpage-live__field",
+    label: "frontpage-live__label",
+    hint: "frontpage-live__hint",
+    durationBlock: "frontpage-live__duration-block",
+    ingredientSection: "ingredient-filter-wrapper",
+    btnApply: "mod-cta frontpage-live__btn-apply",
+    btnReset: "frontpage-live__btn-reset",
+    toolbar: "frontpage-live__toolbar",
+    toolbarLabel: "frontpage-live__toolbar-label",
+    recipeNameInput: "frontpage-live__recipe-name-input",
+    count: "frontpage-live__count",
+    tableHost: "frontpage-live__table-host",
+    empty: "frontpage-live__empty",
+    table: "frontpage-live__table",
+    cellName: "frontpage-live__cell-name",
+    cellRating: "frontpage-live__cell-rating",
+});
+
+export const INGREDIENT_FILTER_LAYOUT = Object.freeze({
+    container: "ingredient-filter-container",
+    header: "ingredient-filter-header",
+    searchWrap: "ingredient-filter-search",
+    searchInput: "ingredient-filter-search-input",
+    resetWrap: "ingredient-filter-reset",
+    list: "ingredient-filter-list",
+    empty: "ingredient-filter-empty",
+    row: "ingredient-filter-row",
+    name: "ingredient-filter-name",
+});
