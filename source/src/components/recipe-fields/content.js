@@ -1,4 +1,4 @@
-import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 
 export class Content {
     constructor(path) {
@@ -19,12 +19,12 @@ export class Content {
         }
         if (!view) {
             const inputWrapper = container.createEl("div", {
-                cls: `${UI_CLASSES.INPUT_FIELD} ${UI_CLASSES.CONTENT_INPUT}`,
+                cls: `${RECIPE_LAYOUT.inputField} ${RECIPE_LAYOUT.contentInput}`,
             });
             internal.renderMarkdown(this.edit, inputWrapper, this.path);
         } else {
             const viewWrapper = container.createEl("div", {
-                cls: `${UI_CLASSES.VIEW_FIELD} ${UI_CLASSES.CONTENT_VIEW}`,
+                cls: `${RECIPE_LAYOUT.viewField} ${RECIPE_LAYOUT.contentView}`,
             });
             internal.renderMarkdown(this.view, viewWrapper, this.path);
         }

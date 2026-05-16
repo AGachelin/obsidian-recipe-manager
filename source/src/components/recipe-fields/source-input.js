@@ -1,4 +1,4 @@
-import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
@@ -33,12 +33,12 @@ export class SourceInput extends InputConfig {
         }
         if (!view) {
             const inputWrapper = container.createEl("div", {
-                cls: `${UI_CLASSES.INPUT_FIELD} source-input`,
+                cls: `${RECIPE_LAYOUT.inputField} source-input`,
             });
             inputWrapper.createEl("label", { text: "Source: " });
             return [{ parent: inputWrapper, field: this.inputField }];
         }
-        const viewWrapper = container.createEl("div", { cls: `${UI_CLASSES.VIEW_FIELD} source-view` });
+        const viewWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.viewField} source-view` });
         viewWrapper.createEl("strong", { text: "Source: " });
         return [{ parent: viewWrapper, field: this.view }];
     }

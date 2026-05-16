@@ -1,4 +1,5 @@
 import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
@@ -45,7 +46,7 @@ export class OvenInput extends InputConfig {
 
         if (!view) {
             const inputWrapper = container.createEl("div", {
-                cls: `${UI_CLASSES.INPUT_FIELD} oven-input`,
+                cls: `${RECIPE_LAYOUT.inputField} oven-input`,
             });
             inputWrapper.createEl("label", { text: "Oven Temperature: " });
             return [
@@ -57,7 +58,7 @@ export class OvenInput extends InputConfig {
                 },
             ];
         }
-        const viewWrapper = container.createEl("div", { cls: `${UI_CLASSES.VIEW_FIELD} oven-view` });
+        const viewWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.viewField} oven-view` });
         viewWrapper.createEl("label", { text: "Oven: " });
         const mountSlot = viewWrapper.createEl("span", { cls: "oven-view-mdrc" });
         viewWrapper.createEl("span", { text: " °C" });

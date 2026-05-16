@@ -1,5 +1,6 @@
 import { FRONTMATTER_DEFAULTS } from "../../shared/constants/recipe.js";
 import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
@@ -99,9 +100,9 @@ export class DurationInput {
         }
 
         if (!view) {
-            const containerDiv = container.createEl("div", { cls: UI_CLASSES.DURATION_INPUT_GROUP });
+            const containerDiv = container.createEl("div", { cls: RECIPE_LAYOUT.durationInputGroup });
             containerDiv.createEl("label", { text: `${this.label}: ` });
-            const inputContainer = containerDiv.createEl("div", { cls: UI_CLASSES.DURATION_INPUTS });
+            const inputContainer = containerDiv.createEl("div", { cls: RECIPE_LAYOUT.durationInputs });
             return [
                 { parent: inputContainer, field: this.hourSelectField },
                 { parent: inputContainer, spanText: "h " },
@@ -116,7 +117,7 @@ export class DurationInput {
                 },
             ];
         }
-        const viewContainer = container.createEl("div", { cls: UI_CLASSES.DURATION_VIEW_GROUP });
+        const viewContainer = container.createEl("div", { cls: RECIPE_LAYOUT.durationViewGroup });
         viewContainer.createEl("strong", { text: `${this.label}: ` });
         return [{ parent: viewContainer, field: this.viewField }];
     }

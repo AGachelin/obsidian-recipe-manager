@@ -1,0 +1,38 @@
+/**
+ * CSS hook classes for single-recipe pages — pair with `snippets/recipe-ui.css`.
+ * Shared widgets (MDRC mount, tags row) stay on {@link UI_CLASSES} in `ui.js`.
+ */
+export const RECIPE_LAYOUT = Object.freeze({
+    root: "recipe-root",
+    layoutRead: "recipe-layout-read",
+    layoutEdit: "recipe-layout-edit",
+    toggleBar: "recipe-toggle-bar",
+    modeLabel: "recipe-mode-label",
+    toggleActions: "recipe-toggle-actions",
+    metaStrip: "recipe-meta-strip",
+    details: "recipe-details",
+    timingRow: "recipe-timing-row",
+    sectionHeading: "recipe-section-heading",
+    readSummary: "recipe-read-summary",
+    readTimes: "recipe-read-times",
+    readBody: "recipe-read-body",
+    readBodySolo: "recipe-read-body--solo",
+    readAside: "recipe-read-aside",
+    readMain: "recipe-read-main",
+    ingredientsContainer: "ingredients-container",
+    ingredientRow: "ingredient-row",
+    addIngredientContainer: "add-ingredient-container",
+    personContainer: "person-container",
+    durationsContainer: "durations-container",
+    durationInputGroup: "duration-input-group",
+    durationInputs: "duration-inputs",
+    durationViewGroup: "duration-view-group",
+    ovenContainer: "oven-container",
+    noteContainer: "note-container",
+    contentContainer: "content-container",
+    sourceContainer: "source-container",
+    inputField: "input-field",
+    viewField: "view-field",
+    contentInput: "content-input",
+    contentView: "content-view",
+});

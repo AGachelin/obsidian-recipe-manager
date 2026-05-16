@@ -1,4 +1,5 @@
 import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
@@ -45,10 +46,10 @@ export class NoteInput extends InputConfig {
             this.generate(mb, view, value);
         }
         if (view) {
-            const viewWrapper = container.createEl("div", { cls: `${UI_CLASSES.VIEW_FIELD} note-view` });
+            const viewWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.viewField} note-view` });
             return [{ parent: viewWrapper, field: this.view }];
         }
-        const inputWrapper = container.createEl("div", { cls: `${UI_CLASSES.INPUT_FIELD} note-input` });
+        const inputWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.inputField} note-input` });
         return [
             { parent: inputWrapper, field: this.inputField },
             {

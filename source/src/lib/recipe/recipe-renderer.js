@@ -5,6 +5,7 @@
 import { FRONTMATTER, FRONTMATTER_DEFAULTS } from "../../shared/constants/recipe.js";
 import { hasReadableIngredients } from "../../shared/ingredients-utils.js";
 import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
+import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { Content } from "../../components/recipe-fields/content.js";
 import { DurationInput } from "../../components/shared/duration-input.js";
 import { IngredientInputTable } from "../../components/recipe-fields/ingredient-input-table.js";
@@ -74,8 +75,8 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     render(mb, container, component, view, metadata) {
         container.empty();
         container.classList.add(
-            UI_CLASSES.RECIPE_ROOT,
-            view ? UI_CLASSES.RECIPE_LAYOUT_READ : UI_CLASSES.RECIPE_LAYOUT_EDIT
+            RECIPE_LAYOUT.root,
+            view ? RECIPE_LAYOUT.layoutRead : RECIPE_LAYOUT.layoutEdit
         );
 
         this.generate(mb, view, metadata);
@@ -93,7 +94,7 @@ export class RecipeRenderer extends MetaBindPageRenderer {
         }
 
         const contentParent = mainEl ?? container;
-        const contentContainer = contentParent.createEl("div", { cls: UI_CLASSES.CONTENT_CONTAINER });
+        const contentContainer = contentParent.createEl("div", { cls: RECIPE_LAYOUT.contentContainer });
         this.content.render(view, mb.mb.internal, contentContainer);
 
         if (!view || readMetaHasTags(this.metadata)) {
@@ -115,22 +116,22 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     }
 
     #mountToggleBar(mb, component, container, view) {
-        const el = container.createEl("div", { cls: UI_CLASSES.RECIPE_TOGGLE_BAR });
+        const el = container.createEl("div", { cls: RECIPE_LAYOUT.toggleBar });
         el.createEl("span", {
-            cls: UI_CLASSES.RECIPE_MODE_LABEL,
+            cls: RECIPE_LAYOUT.modeLabel,
             text: view ? UI_LABELS.MODE_READ : UI_LABELS.MODE_EDIT,
         });
-        const actions = el.createEl("div", { cls: UI_CLASSES.RECIPE_TOGGLE_ACTIONS });
+        const actions = el.createEl("div", { cls: RECIPE_LAYOUT.toggleActions });
         this.toggleButton
             .render(mb, view)
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, actions));
     }
 
     #mountReadBody(mb, component, container, view, ingredients) {
-        const summary = container.createEl("div", { cls: UI_CLASSES.RECIPE_READ_SUMMARY });
+        const summary = container.createEl("div", { cls: RECIPE_LAYOUT.readSummary });
         this.#mountPersonBar(mb, component, summary, view);
 
-        const times = summary.createEl("div", { cls: UI_CLASSES.RECIPE_READ_TIMES });
+        const times = summary.createEl("div", { cls: RECIPE_LAYOUT.readTimes });
         let anyTime = false;
         for (const d of [this.prepDuration, this.cookDuration, this.restDuration]) {
             if (durationHasDisplay(d)) {
@@ -152,16 +153,16 @@ export class RecipeRenderer extends MetaBindPageRenderer {
 
         const body = container.createEl("div", {
             cls: hasReadableIngredients(ingredients)
-                ? UI_CLASSES.RECIPE_READ_BODY
-                : `${UI_CLASSES.RECIPE_READ_BODY} ${UI_CLASSES.RECIPE_READ_BODY_SOLO}`,
+                ? RECIPE_LAYOUT.readBody
+                : `${RECIPE_LAYOUT.readBody} ${RECIPE_LAYOUT.readBodySolo}`,
         });
 
         if (hasReadableIngredients(ingredients)) {
-            const aside = body.createEl("aside", { cls: UI_CLASSES.RECIPE_READ_ASIDE });
+            const aside = body.createEl("aside", { cls: RECIPE_LAYOUT.readAside });
             this.#mountIngredients(mb, component, aside, view, ingredients, { readFiltered: true });
         }
 
-        const main = body.createEl("div", { cls: UI_CLASSES.RECIPE_READ_MAIN });
+        const main = body.createEl("div", { cls: RECIPE_LAYOUT.readMain });
 
         if (readMetaNonEmptySource(this.metadata)) {
             this.#mountSource(mb, component, main, view);
@@ -172,34 +173,34 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     #mountEditBody(mb, component, container, view, ingredients) {
         this.#mountIngredients(mb, component, container, view, ingredients, { readFiltered: false });
 
-        const metaStrip = container.createEl("div", { cls: UI_CLASSES.RECIPE_META_STRIP });
+        const metaStrip = container.createEl("div", { cls: RECIPE_LAYOUT.metaStrip });
         this.#mountPersonBar(mb, component, metaStrip, view);
         this.#mountSource(mb, component, metaStrip, view);
 
-        const details = container.createEl("div", { cls: UI_CLASSES.RECIPE_DETAILS });
+        const details = container.createEl("div", { cls: RECIPE_LAYOUT.details });
         this.#mountNote(mb, component, details, view);
-        const timingRow = details.createEl("div", { cls: UI_CLASSES.RECIPE_TIMING_ROW });
+        const timingRow = details.createEl("div", { cls: RECIPE_LAYOUT.timingRow });
         this.#mountAllDurations(mb, component, timingRow, view);
         this.#mountOven(mb, component, timingRow, view);
     }
 
     #mountIngredients(mb, component, parent, view, ingredients, { readFiltered = false } = {}) {
-        const section = parent.createEl("div", { cls: UI_CLASSES.INGREDIENTS_CONTAINER });
-        section.createEl("h3", { cls: UI_CLASSES.RECIPE_SECTION_HEADING, text: UI_LABELS.INGREDIENTS });
+        const section = parent.createEl("div", { cls: RECIPE_LAYOUT.ingredientsContainer });
+        section.createEl("h3", { cls: RECIPE_LAYOUT.sectionHeading, text: UI_LABELS.INGREDIENTS });
 
         if (view) {
             this.ingredientViewTable.render(mb, ingredients, readFiltered).forEach((row) => {
-                const rowEl = section.createEl("div", { cls: UI_CLASSES.INGREDIENT_ROW });
+                const rowEl = section.createEl("div", { cls: RECIPE_LAYOUT.ingredientRow });
                 row.forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, rowEl));
             });
             return;
         }
 
         this.ingredientInputTable.render(mb, ingredients).forEach((row) => {
-            const rowEl = section.createEl("div", { cls: UI_CLASSES.INGREDIENT_ROW });
+            const rowEl = section.createEl("div", { cls: RECIPE_LAYOUT.ingredientRow });
             applyMdrcLayoutSteps(mb, component, row.layoutSteps(rowEl));
         });
-        const addRow = section.createEl("div", { cls: UI_CLASSES.ADD_INGREDIENT_CONTAINER });
+        const addRow = section.createEl("div", { cls: RECIPE_LAYOUT.addIngredientContainer });
         applyMdrcLayoutSteps(mb, component, this.addIngredientButton.layoutMDRC(mb, addRow));
     }
 
@@ -215,7 +216,7 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     }
 
     #mountAllDurations(mb, component, parent, view) {
-        const el = parent.createEl("div", { cls: UI_CLASSES.DURATIONS_CONTAINER });
+        const el = parent.createEl("div", { cls: RECIPE_LAYOUT.durationsContainer });
         const defaultSec = FRONTMATTER_DEFAULTS.DURATION;
         for (const duration of [this.cookDuration, this.restDuration, this.prepDuration]) {
             const steps = duration.layoutMDRC(mb, el, view, duration.lastValue ?? defaultSec);
@@ -224,14 +225,14 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     }
 
     #mountPersonBar(mb, component, container, view) {
-        const el = container.createEl("div", { cls: UI_CLASSES.PERSON_CONTAINER });
+        const el = container.createEl("div", { cls: RECIPE_LAYOUT.personContainer });
         this.personButton
             .render(mb, view)
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, el));
     }
 
     #mountSource(mb, component, container, view) {
-        const el = container.createEl("div", { cls: UI_CLASSES.SOURCE_CONTAINER });
+        const el = container.createEl("div", { cls: RECIPE_LAYOUT.sourceContainer });
         applyMdrcLayoutSteps(
             mb,
             component,
@@ -245,7 +246,7 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     }
 
     #mountNote(mb, component, container, view) {
-        const el = container.createEl("div", { cls: UI_CLASSES.NOTE_CONTAINER });
+        const el = container.createEl("div", { cls: RECIPE_LAYOUT.noteContainer });
         applyMdrcLayoutSteps(
             mb,
             component,
@@ -259,7 +260,7 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     }
 
     #mountOven(mb, component, container, view) {
-        const el = container.createEl("div", { cls: UI_CLASSES.OVEN_CONTAINER });
+        const el = container.createEl("div", { cls: RECIPE_LAYOUT.ovenContainer });
         applyMdrcLayoutSteps(
             mb,
             component,

@@ -1,3 +1,7 @@
+/**
+ * Cross-page UI tokens (vault cssclass, Meta Bind mount hosts, widgets reused on recipe + index).
+ * Recipe page regions: {@link RECIPE_LAYOUT}. Index page regions: {@link FRONTPAGE_LAYOUT}.
+ */
 export const UI_LABELS = Object.freeze({
     INGREDIENTS: "Ingredients",
     ADD_INGREDIENT: "Add ingredient",
@@ -8,40 +12,12 @@ export const UI_LABELS = Object.freeze({
 });
 
 export const UI_CLASSES = Object.freeze({
+    /** Applied via note frontmatter `cssclasses` on recipe + front page templates */
     RECIPE_UI: "recipe-ui",
-    RECIPE_ROOT: "recipe-root",
-    RECIPE_LAYOUT_READ: "recipe-layout-read",
-    RECIPE_LAYOUT_EDIT: "recipe-layout-edit",
-    RECIPE_TOGGLE_BAR: "recipe-toggle-bar",
-    RECIPE_MODE_LABEL: "recipe-mode-label",
-    RECIPE_TOGGLE_ACTIONS: "recipe-toggle-actions",
-    RECIPE_META_STRIP: "recipe-meta-strip",
-    RECIPE_DETAILS: "recipe-details",
-    RECIPE_TIMING_ROW: "recipe-timing-row",
-    RECIPE_SECTION_HEADING: "recipe-section-heading",
-    RECIPE_READ_SUMMARY: "recipe-read-summary",
-    RECIPE_READ_TIMES: "recipe-read-times",
-    RECIPE_READ_BODY: "recipe-read-body",
-    RECIPE_READ_BODY_SOLO: "recipe-read-body--solo",
-    RECIPE_READ_ASIDE: "recipe-read-aside",
-    RECIPE_READ_MAIN: "recipe-read-main",
-    INGREDIENTS_CONTAINER: "ingredients-container",
-    INGREDIENT_ROW: "ingredient-row",
-    ADD_INGREDIENT_CONTAINER: "add-ingredient-container",
-    PERSON_CONTAINER: "person-container",
-    DURATIONS_CONTAINER: "durations-container",
-    DURATION_INPUT_GROUP: "duration-input-group",
-    DURATION_INPUTS: "duration-inputs",
-    DURATION_VIEW_GROUP: "duration-view-group",
-    OVEN_CONTAINER: "oven-container",
-    NOTE_CONTAINER: "note-container",
-    CONTENT_CONTAINER: "content-container",
-    SOURCE_CONTAINER: "source-container",
-    TAGS_CONTAINER: "tags-container",
-    INPUT_FIELD: "input-field",
-    VIEW_FIELD: "view-field",
-    HIDDEN_VIEW_FIELD: "hidden-view-field",
+    /** Meta Bind `wrapInMDRC` host — one mount node per field */
     MDRC_MOUNT: "mdrc-mount",
-    CONTENT_INPUT: "content-input",
-    CONTENT_VIEW: "content-view",
+    /** Hidden VIEW sync fields (durations, oven, note, ingredient table) */
+    HIDDEN_VIEW_FIELD: "hidden-view-field",
+    /** Tag suggester row (recipe body + front page filter) */
+    TAGS_CONTAINER: "tags-container",
 });
