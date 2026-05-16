@@ -1,9 +1,9 @@
 export class ViewConfig {
-    constructor(declaration=null, viewFieldType="", bindTarget = null, renderChildType = "inline", declaration_arguments = []) {
+    constructor(declaration=null, viewFieldType="", bindTarget = null, renderChildType = "inline", declarationArguments = []) {
         this.bindTarget = bindTarget;
         this.renderChildType = renderChildType;
         this.viewFieldType = viewFieldType;
-        this.declaration_arguments = declaration_arguments;
+        this.declarationArguments = declarationArguments;
         this.declaration = declaration;
     }
 
@@ -12,7 +12,7 @@ export class ViewConfig {
             declaration:
                 this.declaration ||
                 {
-                    arguments: this.declaration_arguments,
+                    arguments: this.declarationArguments,
                     writeToBindTarget: this.bindTarget,
                     viewFieldType: this.viewFieldType,
                 },

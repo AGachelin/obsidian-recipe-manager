@@ -1,15 +1,15 @@
 export class InputConfig {
-    constructor(inputFieldType, bindTarget, renderChildType = "inline", declaration_arguments = []) {
+    constructor(inputFieldType, bindTarget, renderChildType = "inline", declarationArguments = []) {
         this.bindTarget = bindTarget;
         this.renderChildType = renderChildType;
         this.inputFieldType = inputFieldType;
-        this.declaration_arguments = declaration_arguments;
+        this.declarationArguments = declarationArguments;
     }
 
     render() {
         return {
             declaration: {
-                arguments: this.declaration_arguments,
+                arguments: this.declarationArguments,
                 bindTarget: this.bindTarget,
                 inputFieldType: this.inputFieldType,
             },

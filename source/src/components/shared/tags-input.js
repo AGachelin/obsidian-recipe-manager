@@ -20,7 +20,7 @@ export class TagsInput extends InputConfig {
         this.mb = mb;
         const btTags = mb.parseBindTarget(this.bindKey, this.path);
         this.bindTarget = btTags;
-        this.declaration_arguments = Object.keys(mb.mb.app.metadataCache.getTags())
+        this.declarationArguments = Object.keys(mb.mb.app.metadataCache.getTags())
             .map((x) => ({
                 name: "option",
                 value: [x.toString()],

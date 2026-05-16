@@ -22,7 +22,7 @@ class DurationSelect extends InputConfig {
             const n = Number(value);
             this.defaultValue = Number.isFinite(n) ? n : this.defaultValue;
         }
-        this.declaration_arguments = this.options.concat([
+        this.declarationArguments = this.options.concat([
             { name: "defaultValue", value: [`${this.defaultValue}`] },
         ]);
         return super.render();

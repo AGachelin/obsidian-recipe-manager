@@ -19,9 +19,9 @@ export class SourceInput extends InputConfig {
         this.bindTarget = btSource;
         this.viewConfig = new ViewConfig("VIEW[{source}][text(renderMarkdown)]").render();
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
-        this.declaration_arguments = [{ name: "placeholder", value: ["Enter source"] }];
+        this.declarationArguments = [{ name: "placeholder", value: ["Enter source"] }];
         if (value !== null && value !== undefined) {
-            this.declaration_arguments.push({ name: "defaultValue", value: [`${value}`] });
+            this.declarationArguments.push({ name: "defaultValue", value: [`${value}`] });
         }
         this.config = super.render();
         this.inputField = mb.createInputFieldMountable(this.path, this.config);
