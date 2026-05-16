@@ -1,6 +1,5 @@
 /**
- * Helpers for `wrapInMDRC` layout pipelines (recipe + front page widgets).
- * Used by `RecipeRenderer` and `FrontpageRenderer`.
+ * Helpers for `wrapInMDRC` layout pipelines ({@link recipe/renderer.js RecipeRenderer}, {@link frontpage/frontpage-renderer.js FrontpageRenderer}).
  */
 import { UI_CLASSES } from "../shared/constants/ui.js";
 

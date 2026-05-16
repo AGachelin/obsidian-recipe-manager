@@ -8,5 +8,5 @@
  */
 export async function setupFrontpageLive(engine, context, container, component) {
     const { FrontpageRenderer } = await engine.importJs("source/src/lib/frontpage/frontpage-renderer.js");
-    return new FrontpageRenderer(context.file.path).mount(engine, context, container, component);
+    return new FrontpageRenderer(context.file.path).render(engine, context, container, component);
 }

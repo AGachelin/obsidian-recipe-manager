@@ -1,59 +1,35 @@
 /**
- * Single-recipe editor / reader layout.
- * @see ./frontpage/frontpage-renderer.js
+ * Single-recipe editor / reader layout (extends {@link ../render/meta-bind-page-renderer.js MetaBindPageRenderer}).
+ * @see ../frontpage/frontpage-renderer.js
  */
-import { FRONTMATTER, FRONTMATTER_DEFAULTS } from "../shared/constants/recipe.js";
-import { hasReadableIngredients } from "../shared/ingredients-utils.js";
-import { UI_CLASSES, UI_LABELS } from "../shared/constants/ui.js";
-import { Content } from "../components/recipe-fields/content.js";
-import { DurationInput } from "../components/shared/duration-input.js";
-import { IngredientInputTable } from "../components/recipe-fields/ingredient-input-table.js";
-import { IngredientViewTable } from "../components/recipe-fields/ingredients-view.js";
-import { NoteInput } from "../components/recipe-fields/note-input.js";
-import { OvenInput } from "../components/recipe-fields/oven-input.js";
-import { PersonButton } from "../components/recipe-fields/person-button.js";
-import { SourceInput } from "../components/recipe-fields/source-input.js";
-import { TagsInput } from "../components/shared/tags-input.js";
-import { AddIngredientButton } from "../components/recipe-fields/add-ingredient-button-group.js";
-import { ToggleButton } from "../components/recipe-fields/toggle-button.js";
-import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "./meta-bind-layout.js";
-import { assignDurationLabels, buildRecipeBindSnapshot } from "./recipe-bind-sync.js";
+import { FRONTMATTER, FRONTMATTER_DEFAULTS } from "../../shared/constants/recipe.js";
+import { hasReadableIngredients } from "../../shared/ingredients-utils.js";
+import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
+import { Content } from "../../components/recipe-fields/content.js";
+import { DurationInput } from "../../components/shared/duration-input.js";
+import { IngredientInputTable } from "../../components/recipe-fields/ingredient-input-table.js";
+import { IngredientViewTable } from "../../components/recipe-fields/ingredients-view.js";
+import { NoteInput } from "../../components/recipe-fields/note-input.js";
+import { OvenInput } from "../../components/recipe-fields/oven-input.js";
+import { PersonButton } from "../../components/recipe-fields/person-button.js";
+import { SourceInput } from "../../components/recipe-fields/source-input.js";
+import { TagsInput } from "../../components/shared/tags-input.js";
+import { AddIngredientButton } from "../../components/recipe-fields/add-ingredient-button-group.js";
+import { ToggleButton } from "../../components/recipe-fields/toggle-button.js";
+import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "../meta-bind-layout.js";
+import { MetaBindPageRenderer } from "../render/meta-bind-page-renderer.js";
+import { assignDurationLabels, buildRecipeBindSnapshot } from "./bind-sync.js";
+import {
+    durationHasDisplay,
+    readMetaHasTags,
+    readMetaNonEmptyNote,
+    readMetaNonEmptyOven,
+    readMetaNonEmptySource,
+} from "./meta-readers.js";
 
-function trimmedString(v) {
-    return v == null ? "" : String(v).trim();
-}
-
-function readMetaNonEmptyNote(meta) {
-    const n = meta[FRONTMATTER.NOTE];
-    if (n == null || n === "") return false;
-    const num = Number(n);
-    return Number.isFinite(num) && num > 0;
-}
-
-function readMetaNonEmptySource(meta) {
-    return trimmedString(meta[FRONTMATTER.SOURCE]).length > 0;
-}
-
-function readMetaNonEmptyOven(meta) {
-    const o = meta[FRONTMATTER.OVEN];
-    if (o == null || o === "") return false;
-    const num = Number(o);
-    return Number.isFinite(num) && num > 0;
-}
-
-function readMetaHasTags(meta) {
-    const t = meta[FRONTMATTER.TAGS];
-    if (!Array.isArray(t) || t.length === 0) return false;
-    return t.some((x) => trimmedString(x).length > 0);
-}
-
-function durationHasDisplay(durationInput) {
-    return Number(durationInput.lastValue) > 0;
-}
-
-export class RecipeRenderer {
+export class RecipeRenderer extends MetaBindPageRenderer {
     constructor(path) {
-        this.path = path;
+        super(path);
         this.content = new Content(path);
         this.prepDuration = new DurationInput(path, FRONTMATTER.PREP_DURATION);
         this.cookDuration = new DurationInput(path, FRONTMATTER.COOK_DURATION);
