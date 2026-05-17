@@ -1,5 +1,5 @@
 /**
- * Single-recipe editor / reader layout (extends {@link ../render/meta-bind-page-renderer.js MetaBindPageRenderer}).
+ * Single-recipe editor / reader layout.
  * @see ../frontpage/frontpage-renderer.js
  */
 import { FRONTMATTER, FRONTMATTER_DEFAULTS, RECIPE_LIVE_READ_KEYS } from "../../shared/constants/recipe.js";
@@ -18,7 +18,6 @@ import { TagsInput } from "../../components/shared/tags-input.js";
 import { AddIngredientButton } from "../../components/recipe-fields/add-ingredient-button-group.js";
 import { ToggleButton } from "../../components/recipe-fields/toggle-button.js";
 import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "../render/mdrc-layout.js";
-import { MetaBindPageRenderer } from "../render/meta-bind-page-renderer.js";
 import { assignDurationLabels, buildRecipeBindSnapshot } from "./bind-sync.js";
 import {
     durationHasDisplay,
@@ -28,9 +27,9 @@ import {
     readMetaNonEmptySource,
 } from "./meta-readers.js";
 
-export class RecipeRenderer extends MetaBindPageRenderer {
+export class RecipeRenderer {
     constructor(path) {
-        super(path);
+        this.path = path;
         this.content = new Content(path);
         this.prepDuration = new DurationInput(path, FRONTMATTER.PREP_DURATION);
         this.cookDuration = new DurationInput(path, FRONTMATTER.COOK_DURATION);

@@ -4,7 +4,6 @@
  *
  * Unlike single-recipe preview, `render` is async (ingredient corpus + filtered query pipeline).
  */
-import { MetaBindPageRenderer } from "../render/meta-bind-page-renderer.js";
 import { createFrontpageChrome } from "../../components/frontpage/frontpage-layout-shell.js";
 import { FrontpageAdvancedSidebar } from "../../components/frontpage/frontpage-advanced-sidebar.js";
 import { FrontpageRecipeIndexChrome } from "../../components/frontpage/frontpage-index-main.js";
@@ -14,9 +13,9 @@ import { FRONTPAGE_LIVE_SUBSCRIPTION_KEYS } from "../../shared/constants/frontpa
 import { subscribeToFrontmatterKeys } from "../render/subscribe-metadata.js";
 import { createCoalescedScheduler } from "../coalesced-refresh.js";
 
-export class FrontpageRenderer extends MetaBindPageRenderer {
+export class FrontpageRenderer {
     constructor(path) {
-        super(path);
+        this.path = path;
         this.sidebar = new FrontpageAdvancedSidebar(this.path);
         this.indexChrome = new FrontpageRecipeIndexChrome(this.path);
         this.results = new FrontpageRecipeResultsPanel(this.path);
@@ -35,7 +34,7 @@ export class FrontpageRenderer extends MetaBindPageRenderer {
      * @returns {Promise<null>}
      */
     async render(engine, context, container, component) {
-        const mb = MetaBindPageRenderer.metaBind(engine);
+        const mb = engine.getPlugin("obsidian-meta-bind-plugin").api;
         const app = engine.app;
 
         this.generate(mb);
