@@ -67,6 +67,8 @@ export function resetAdvancedFilterMetadata(mb, path) {
     set(FrontpageFm.FILTER_PREP_MAX_SEC, maxDur);
     set(FrontpageFm.FILTER_COOK_MAX_SEC, maxDur);
     set(FrontpageFm.FILTER_REST_MAX_SEC, maxDur);
+    set(FrontpageFm.FILTER_COOL_MAX_SEC, maxDur);
+    set(FrontpageFm.FILTER_FREEZE_MAX_SEC, maxDur);
     set(FrontpageFm.FILTER_SOURCE_SUBSTR, "");
     set(FrontpageFm.FILTER_TAGS, []);
     set(FrontpageFm.FILTER_INGREDIENTS_STATE, {});

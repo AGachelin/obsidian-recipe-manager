@@ -12,6 +12,8 @@ filter_ingredients_state: {}
 filter_ingredients_amount: {}
 filter_ingredients_unit: {}
 filter_ingredients_search: ""
+filter_cool_max_sec: 21600
+filter_freeze_max_sec: 604800
 ---
 
 ```js-engine

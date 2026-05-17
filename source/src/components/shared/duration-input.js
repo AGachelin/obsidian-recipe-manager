@@ -35,7 +35,7 @@ class DurationSelect extends InputConfig {
 }
 
 /**
- * @param {string} durationField Frontmatter key (prep_duration, cook_duration, rest_duration).
+ * @param {string} durationField Frontmatter key (prep_duration, cook_duration, rest_duration, cool_duration, freeze_duration).
  */
 export class DurationInput {
     constructor(path, durationField) {

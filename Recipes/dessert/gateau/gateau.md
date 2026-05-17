@@ -15,6 +15,8 @@ person:
 tags: []
 cssclasses:
   - recipe-ui
+cool_duration: 54000
+freeze_duration: 0
 ---
 ```js-engine
 return (await engine.importJs("source/src/lib/recipe-live.js")).setupRecipeLive(

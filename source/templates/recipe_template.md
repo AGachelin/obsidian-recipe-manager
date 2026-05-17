@@ -1,10 +1,3 @@
----
-note: 0
-cook_duration: 0
-rest_duration: 0
-prep_duration: 0
-oven:
----
 <%*
 const fill_in = await tp.system.suggester(["Oui", "Non"], [true, false], false, "Fill-in automatically ?");
 let note = "";
@@ -23,6 +16,8 @@ available_ingredients: []
 prep_duration: 0
 cook_duration: 0
 rest_duration: 0
+cool_duration: 0
+freeze_duration: 0
 oven: 0
 source: ""
 person:

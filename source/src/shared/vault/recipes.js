@@ -78,6 +78,8 @@ export function recipePageFromFile(app, file) {
         prep_duration: fm.prep_duration,
         cook_duration: fm.cook_duration,
         rest_duration: fm.rest_duration,
+        cool_duration: fm.cool_duration,
+        freeze_duration: fm.freeze_duration,
         source: fm.source,
         tags: fm.tags,
         ingredients: fm.ingredients,

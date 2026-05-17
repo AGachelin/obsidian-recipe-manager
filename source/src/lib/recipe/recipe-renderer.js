@@ -34,6 +34,8 @@ export class RecipeRenderer {
         this.prepDuration = new DurationInput(path, FRONTMATTER.PREP_DURATION);
         this.cookDuration = new DurationInput(path, FRONTMATTER.COOK_DURATION);
         this.restDuration = new DurationInput(path, FRONTMATTER.REST_DURATION);
+        this.coolDuration = new DurationInput(path, FRONTMATTER.COOL_DURATION);
+        this.freezeDuration = new DurationInput(path, FRONTMATTER.FREEZE_DURATION);
         this.ingredientInputTable = new IngredientInputTable(path);
         this.ingredientViewTable = new IngredientViewTable(path);
         this.noteInput = new NoteInput(path);
@@ -63,6 +65,8 @@ export class RecipeRenderer {
         this.prepDuration.generate(mb, view, snap.prepSec);
         this.cookDuration.generate(mb, view, snap.cookSec);
         this.restDuration.generate(mb, view, snap.restSec);
+        this.coolDuration.generate(mb, view, snap.coolSec);
+        this.freezeDuration.generate(mb, view, snap.freezeSec);
 
         this.#syncIngredientTables(mb, view, snap.ingredientsValue);
 
@@ -193,7 +197,7 @@ export class RecipeRenderer {
 
         const times = summary.createEl("div", { cls: RECIPE_LAYOUT.readTimes });
         let anyTime = false;
-        for (const d of [this.prepDuration, this.cookDuration, this.restDuration]) {
+        for (const d of [this.prepDuration, this.cookDuration, this.restDuration, this.coolDuration, this.freezeDuration]) {
             if (durationHasDisplay(d)) {
                 anyTime = true;
                 this.#mountSingleDuration(mb, component, times, d, view);
@@ -283,7 +287,7 @@ export class RecipeRenderer {
     #mountAllDurations(mb, component, parent, view) {
         const el = parent.createEl("div", { cls: RECIPE_LAYOUT.durationsContainer });
         const defaultSec = FRONTMATTER_DEFAULTS.DURATION;
-        for (const duration of [this.cookDuration, this.restDuration, this.prepDuration]) {
+        for (const duration of [this.cookDuration, this.restDuration, this.prepDuration, this.coolDuration, this.freezeDuration]) {
             const steps = duration.layoutMDRC(mb, el, view, duration.lastValue ?? defaultSec);
             applyMdrcLayoutSteps(mb, component, steps);
         }

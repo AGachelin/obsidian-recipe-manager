@@ -11,6 +11,8 @@ export const FrontpageFm = Object.freeze({
     FILTER_PREP_MAX_SEC: "filter_prep_max_sec",
     FILTER_COOK_MAX_SEC: "filter_cook_max_sec",
     FILTER_REST_MAX_SEC: "filter_rest_max_sec",
+    FILTER_COOL_MAX_SEC: "filter_cool_max_sec",
+    FILTER_FREEZE_MAX_SEC: "filter_freeze_max_sec",
     FILTER_SOURCE_SUBSTR: "filter_source_substr",
     FILTER_TAGS: "filter_tags",
     FILTER_INGREDIENTS_STATE: "filter_ingredients_state",

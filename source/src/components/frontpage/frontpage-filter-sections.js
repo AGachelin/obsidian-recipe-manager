@@ -39,6 +39,8 @@ export class FrontpageDurationFilterSection {
             [FrontpageFm.FILTER_PREP_MAX_SEC, "Max preparation"],
             [FrontpageFm.FILTER_COOK_MAX_SEC, "Max cooking"],
             [FrontpageFm.FILTER_REST_MAX_SEC, "Max rest"],
+            [FrontpageFm.FILTER_COOL_MAX_SEC, "Max cool"],
+            [FrontpageFm.FILTER_FREEZE_MAX_SEC, "Max freeze"]
         ];
         /** @type {DurationInput[]} */
         this.inputs = specs.map(([field, label]) => {

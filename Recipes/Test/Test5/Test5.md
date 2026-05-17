@@ -16,6 +16,8 @@ tags:
   - "#test"
 cssclasses:
   - recipe-ui
+cool_duration: 0
+freeze_duration: 0
 ---
 ```js-engine
 return (await engine.importJs("source/src/lib/recipe-live.js")).setupRecipeLive(

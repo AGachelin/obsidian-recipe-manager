@@ -5,6 +5,8 @@ export const FRONTMATTER_LABELS = Object.freeze({
     COOK: 'Cuisson',
     PREP: 'Préparation',
     REST: 'Repos',
+    COOL: 'Frigo',
+    FREEZE: 'Congélateur'
 });
 
 export const FRONTMATTER = Object.freeze({
@@ -28,6 +30,8 @@ export const FRONTMATTER = Object.freeze({
     },
     PREP_DURATION: 'prep_duration',
     REST_DURATION: 'rest_duration',
+    COOL_DURATION: 'cool_duration',
+    FREEZE_DURATION: 'freeze_duration',
     SOURCE: 'source',
     TAGS: 'tags',
     THUMBNAIL: 'thumbnail',
@@ -51,6 +55,8 @@ export const RECIPE_LIVE_READ_KEYS = Object.freeze([
     FRONTMATTER.PREP_DURATION,
     FRONTMATTER.COOK_DURATION,
     FRONTMATTER.REST_DURATION,
+    FRONTMATTER.COOL_DURATION,
+    FRONTMATTER.FREEZE_DURATION,
     FRONTMATTER.OVEN,
     FRONTMATTER.NOTE,
     FRONTMATTER.SOURCE,
@@ -62,9 +68,9 @@ export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.INGREDIENTS]: {
         [FRONTMATTER.INGREDIENTS_FIELDS.LAST_ID]: 0,
     },
-    [FRONTMATTER.PERSON.CURRENT]: 1,
+    [FRONTMATTER.PERSON.CURRENT]: 4,
     DURATION: 0,
-    [FRONTMATTER.PERSON.RAW]: 1,
+    [FRONTMATTER.PERSON.RAW]: 4,
     [FRONTMATTER.VIEW]: false,
     [FRONTMATTER.TAGS]: [],
     [FRONTMATTER.OVEN]: 0,

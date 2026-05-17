@@ -23,6 +23,8 @@ export function readFilterCriteria(mb, path) {
     const prepMax = Number(get(FrontpageFm.FILTER_PREP_MAX_SEC));
     const cookMax = Number(get(FrontpageFm.FILTER_COOK_MAX_SEC));
     const restMax = Number(get(FrontpageFm.FILTER_REST_MAX_SEC));
+    const coolMax = Number(get(FrontpageFm.FILTER_COOL_MAX_SEC));
+    const freezeMax = Number(get(FrontpageFm.FILTER_FREEZE_MAX_SEC));
 
     const filterTags = Array.isArray(get(FrontpageFm.FILTER_TAGS)) ? get(FrontpageFm.FILTER_TAGS) : [];
 
@@ -32,6 +34,8 @@ export function readFilterCriteria(mb, path) {
         pMax: Number.isFinite(prepMax) ? prepMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
         cMax: Number.isFinite(cookMax) ? cookMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
         rMax: Number.isFinite(restMax) ? restMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
+        coMax: Number.isFinite(coolMax) ? coolMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
+        fMax: Number.isFinite(freezeMax) ? freezeMax : FRONTPAGE_DEFAULT_MAX_DURATION_SEC,
         srcQ: String(get(FrontpageFm.FILTER_SOURCE_SUBSTR) ?? "")
             .toLowerCase()
             .trim(),
@@ -107,10 +111,14 @@ function passesCriteria(p, c, mb) {
     const prep = Number(p.prep_duration);
     const cook = Number(p.cook_duration);
     const rest = Number(p.rest_duration);
+    const cool = Number(p.cool_duration);
+    const freeze = Number(p.freeze_duration);
     const ps = Number.isFinite(prep) ? prep : 0;
     const cs = Number.isFinite(cook) ? cook : 0;
     const rsRest = Number.isFinite(rest) ? rest : 0;
-    if (ps > c.pMax || cs > c.cMax || rsRest > c.rMax) return false;
+    const rsCool = Number.isFinite(cool) ? cool : 0;
+    const rsFreeze = Number.isFinite(freeze) ? freeze : 0;
+    if (ps > c.pMax || cs > c.cMax || rsRest > c.rMax || rsCool > c.coMax || rsFreeze > c.fMax) return false;
 
     if (c.srcQ && !String(p.source ?? "").toLowerCase().includes(c.srcQ)) return false;
 
