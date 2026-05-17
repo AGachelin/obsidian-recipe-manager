@@ -56,7 +56,7 @@ export class PersonButton {
             this.generate(mb);
         }
         if (viewMode) {
-            return [this.IncButton, this.DecButton, this.ResetButton, this.ButtonGroup, this.PersonView];
+            return [this.IncButton, this.DecButton, this.ResetButton, this.PersonView, this.ButtonGroup];
         }
         return [this.personCountInput, this.PersonView];
     }

@@ -26,7 +26,7 @@ rest_duration: 0
 oven:
 source: " njk hji "
 person:
-  current: 1
+  current: 4
   raw: 1
 tags:
   - "#example-note"

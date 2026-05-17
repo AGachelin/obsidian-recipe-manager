@@ -193,7 +193,6 @@ export class RecipeRenderer {
 
     #mountReadBody(mb, component, container, view, ingredients) {
         const summary = container.createEl("div", { cls: RECIPE_LAYOUT.readSummary });
-        this.#mountPersonBar(mb, component, summary, view);
 
         const times = summary.createEl("div", { cls: RECIPE_LAYOUT.readTimes });
         let anyTime = false;
@@ -223,6 +222,7 @@ export class RecipeRenderer {
 
         if (hasReadableIngredients(ingredients)) {
             const aside = body.createEl("aside", { cls: RECIPE_LAYOUT.readAside });
+            this.#mountPersonBar(mb, component, aside, view);
             this.#mountIngredients(mb, component, aside, view, ingredients, { readFiltered: true });
         }
 
