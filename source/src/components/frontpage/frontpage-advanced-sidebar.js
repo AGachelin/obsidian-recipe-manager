@@ -1,6 +1,6 @@
 import { IngredientFilter } from "./ingredient-filter.js";
 import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
-import { mountCollapsibleSection } from "../../lib/frontpage/collapsible-sections.js";
+import { mountCollapsibleSection } from "./collapsible-sections.js";
 import {
     FrontpageRatingFilterSection,
     FrontpageDurationFilterSection,

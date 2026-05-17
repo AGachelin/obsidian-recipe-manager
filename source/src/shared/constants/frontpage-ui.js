@@ -24,6 +24,7 @@ export const FRONTPAGE_LAYOUT = Object.freeze({
     label: "frontpage-live__label",
     hint: "frontpage-live__hint",
     durationBlock: "frontpage-live__duration-block",
+    tagsContainer: "tags-container",
     ingredientSection: "ingredient-filter-wrapper",
     btnApply: "mod-cta frontpage-live__btn-apply",
     btnReset: "frontpage-live__btn-reset",

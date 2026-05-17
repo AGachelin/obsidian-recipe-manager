@@ -1,4 +1,9 @@
-import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom-units.js";
+import { buildUnitSelectDeclarationArguments } from "../../shared/constants/custom-units.js";
+import {
+    attachIngredientNameIndexInvalidation,
+    getCachedIngredientNames,
+    refreshIngredientNames,
+} from "../../shared/vault/ingredient-name-index.js";
 import {
     FrontpageFm,
     ingredientFilterAmountBindKey,
@@ -38,73 +43,19 @@ export class IngredientFilter {
     }
 
     /**
-     * Collects all unique ingredient names from all recipe files in the vault.
-     * @param {*} mb
-     * @returns {Promise<string[]>}
-     */
-    async collectAllIngredients(mb) {
-        try {
-            const app = mb.mb.app;
-            const allIngredients = new Set();
-
-            const recipeFolder = app.vault.getAbstractFileByPath("Recipes");
-            if (!recipeFolder || !recipeFolder.children) return [];
-
-            const iterateFolder = (folder) => {
-                if (!folder.children) return;
-                for (const file of folder.children) {
-                    if (file.children) {
-                        iterateFolder(file);
-                    } else if (file.extension === "md") {
-                        const cache = app.metadataCache.getFileCache(file);
-                        if (cache?.frontmatter?.ingredients) {
-                            const ingredients = cache.frontmatter.ingredients;
-                            if (typeof ingredients === "object") {
-                                for (const [id, ing] of Object.entries(ingredients)) {
-                                    if (id !== "last_id" && ing && ing.name) {
-                                        allIngredients.add(String(ing.name).trim());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            iterateFolder(recipeFolder);
-            return Array.from(allIngredients).sort((a, b) => a.localeCompare(b));
-        } catch (e) {
-            console.error("Error collecting ingredients:", e);
-            return [];
-        }
-    }
-
-    /**
      * @param {*} mb
      */
     async generate(mb) {
         this.isGenerated = true;
         this.mb = mb;
-        this.allIngredients = await this.collectAllIngredients(mb);
+        const app = mb.mb.app;
+        attachIngredientNameIndexInvalidation(app);
+        this.allIngredients = await getCachedIngredientNames(app);
     }
 
-    /**
-     * Cycles the state of an ingredient filter
-     * @param {*} mb
-     * @param {string} ingredientName
-     */
-    async cycleIngredientState(mb, ingredientName) {
-        const bt = mb.parseBindTarget(ingredientFilterStateBindKey(ingredientName), this.path);
-
-        let current = mb.getMetadata(bt) || FILTER_STATES.ALLOWED;
-        if (!STATE_CYCLE.includes(current)) {
-            current = FILTER_STATES.ALLOWED;
-        }
-
-        const idx = STATE_CYCLE.indexOf(current);
-        const next = STATE_CYCLE[(idx + 1) % STATE_CYCLE.length];
-
-        mb.setMetadata(bt, next);
+    /** Force-refresh name list after vault changes (e.g. reset filters). */
+    async reloadIngredientNames(mb) {
+        this.allIngredients = await refreshIngredientNames(mb.mb.app);
     }
 
     /**
@@ -242,18 +193,11 @@ export class IngredientFilter {
             const amountMount = rowEl.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });
             mb.wrapInMDRC(amountInput, amountMount, component);
 
-            const unitArgs = [
-                { name: "option", value: [""] },
-                ...UNIT_OPTIONS.map((unit, index) => ({
-                    name: "option",
-                    value: [unit, UNIT_LABELS[index]],
-                })),
-            ];
             const unitConfig = new InputConfig(
                 "inlineSelect",
                 mb.parseBindTarget(ingredientFilterUnitBindKey(ingredientName), this.path),
                 "inline",
-                unitArgs
+                buildUnitSelectDeclarationArguments()
             ).render();
             const unitSelect = mb.createInputFieldMountable(this.path, unitConfig);
             const unitMount = rowEl.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });

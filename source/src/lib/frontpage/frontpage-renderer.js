@@ -1,5 +1,5 @@
 /**
- * Recipe index page renderer — analogous to `RecipeRenderer` in `recipe/renderer.js`: parts are wired in the
+ * Recipe index page renderer — analogous to `RecipeRenderer` in `recipe/recipe-renderer.js`: parts are wired in the
  * `constructor`, Meta Bind mounts in `generate`, and `render` + `#mount*` place everything on the DOM.
  *
  * Unlike single-recipe preview, `render` is async (ingredient corpus + filtered query pipeline).
@@ -9,8 +9,9 @@ import { createFrontpageChrome } from "../../components/frontpage/frontpage-layo
 import { FrontpageAdvancedSidebar } from "../../components/frontpage/frontpage-advanced-sidebar.js";
 import { FrontpageRecipeIndexChrome } from "../../components/frontpage/frontpage-index-main.js";
 import { FrontpageRecipeResultsPanel } from "../../components/frontpage/frontpage-results-panel.js";
-import { resetAdvancedFilterMetadata } from "./advanced-filter-fields.js";
+import { resetAdvancedFilterMetadata } from "../../components/frontpage/filter-field-mounts.js";
 import { FRONTPAGE_LIVE_SUBSCRIPTION_KEYS } from "../../shared/constants/frontpage.js";
+import { subscribeToFrontmatterKeys } from "../render/subscribe-metadata.js";
 import { createCoalescedScheduler } from "../coalesced-refresh.js";
 
 export class FrontpageRenderer extends MetaBindPageRenderer {
@@ -60,13 +61,15 @@ export class FrontpageRenderer extends MetaBindPageRenderer {
 
         btnReset.addEventListener("click", () => {
             resetAdvancedFilterMetadata(mb, this.path);
+            void this.sidebar.ingredientFilter.reloadIngredientNames(mb);
             void this.sidebar.ingredientFilter.refreshList(mb, component);
             void this.results.runAdvancedQuery(mb, app);
         });
 
-        this.#attachFrontpageSubscriptions(mb, component, () =>
-            this.sidebar.ingredientFilter.refreshList(mb, component)
-        );
+        const { schedule: scheduleIngredientListRefresh } = createCoalescedScheduler(() => {
+            void this.sidebar.ingredientFilter.refreshList(mb, component);
+        });
+        this.#attachFrontpageSubscriptions(mb, component, scheduleIngredientListRefresh);
 
         await this.results.runAdvancedQuery(mb, app);
         return null;
@@ -100,11 +103,6 @@ export class FrontpageRenderer extends MetaBindPageRenderer {
      * @param {() => void} onRefresh
      */
     #attachFrontpageSubscriptions(mb, component, onRefresh) {
-        const { schedule } = createCoalescedScheduler(onRefresh);
-        const watch = (bindTarget) => mb.subscribeToMetadata(bindTarget, component, schedule);
-        const at = (key) => mb.parseBindTarget(key, this.path);
-        for (const key of FRONTPAGE_LIVE_SUBSCRIPTION_KEYS) {
-            watch(at(key));
-        }
+        subscribeToFrontmatterKeys(mb, component, this.path, FRONTPAGE_LIVE_SUBSCRIPTION_KEYS, onRefresh);
     }
 }

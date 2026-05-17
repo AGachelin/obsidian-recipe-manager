@@ -18,6 +18,4 @@ export const UI_CLASSES = Object.freeze({
     MDRC_MOUNT: "mdrc-mount",
     /** Hidden VIEW sync fields (durations, oven, note, ingredient table) */
     HIDDEN_VIEW_FIELD: "hidden-view-field",
-    /** Tag suggester row (recipe body + front page filter) */
-    TAGS_CONTAINER: "tags-container",
 });

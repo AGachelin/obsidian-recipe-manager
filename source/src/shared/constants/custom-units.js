@@ -44,3 +44,14 @@ export const UNIT_LABELS = Object.freeze([
     "goutte",
     "pincée",
 ]);
+
+/** Meta Bind `inlineSelect` option arguments for ingredient unit pickers. */
+export function buildUnitSelectDeclarationArguments() {
+    return [
+        { name: "option", value: [""] },
+        ...UNIT_OPTIONS.map((unit, index) => ({
+            name: "option",
+            value: [unit, UNIT_LABELS[index]],
+        })),
+    ];
+}

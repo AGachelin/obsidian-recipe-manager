@@ -1,6 +1,6 @@
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
-import { mountCollapsibleSidebar } from "../../lib/frontpage/collapsible-sections.js";
+import { mountCollapsibleSidebar } from "./collapsible-sections.js";
 
 /**
  * Top-level chrome: root classes, grid shell, collapsible sidebar host.

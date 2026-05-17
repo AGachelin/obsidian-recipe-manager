@@ -2,13 +2,9 @@ import { DurationInput } from "../shared/duration-input.js";
 import { TagsInput } from "../shared/tags-input.js";
 import { FrontpageFm, FRONTPAGE_DEFAULT_MAX_DURATION_SEC } from "../../shared/constants/frontpage.js";
 import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
-import { mountCollapsibleSection } from "../../lib/frontpage/collapsible-sections.js";
-import {
-    mountSliderField,
-    mountTextField,
-} from "../../lib/frontpage/advanced-filter-fields.js";
-import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "../../lib/meta-bind-layout.js";
-import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { mountCollapsibleSection } from "./collapsible-sections.js";
+import { mountSliderField, mountTextField } from "./filter-field-mounts.js";
+import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "../../lib/render/mdrc-layout.js";
 
 export class FrontpageRatingFilterSection {
     /**
@@ -107,7 +103,7 @@ export class FrontpageTagsFilterSection {
             cls: FRONTPAGE_LAYOUT.hint,
             text: "Recipes must include every tag you pick here (empty = no tag filter).",
         });
-        const tagsRow = secTags.createEl("div", { cls: UI_CLASSES.TAGS_CONTAINER });
+        const tagsRow = secTags.createEl("div", { cls: FRONTPAGE_LAYOUT.tagsContainer });
         this.tagsInput
             .render(mb)
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, tagsRow));

@@ -5,7 +5,7 @@ export async function setupRecipeLive(engine, context, container, component) {
     const [{ RecipeRenderer }, { readRecipeLiveMetadata, isRecipeViewMode, attachRecipeLiveSubscriptions }] =
         await Promise.all([
             engine.importJs("source/src/lib/recipe/recipe-renderer.js"),
-            engine.importJs("source/src/lib/recipe-metadata.js"),
+            engine.importJs("source/src/lib/recipe/metadata.js"),
         ]);
 
     const renderer = new RecipeRenderer(path);

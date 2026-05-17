@@ -1,4 +1,4 @@
-import { UNIT_OPTIONS, UNIT_LABELS } from "../../shared/constants/custom-units.js";
+import { buildUnitSelectDeclarationArguments } from "../../shared/constants/custom-units.js";
 import { FRONTMATTER } from "../../shared/constants/recipe.js";
 import {
     bindIngredientMemory,
@@ -9,20 +9,14 @@ import {
 import { convertBackAmount } from "../../shared/startup/math-units.js";
 import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
 import { InputConfig } from "../config/input-config.js";
-import { ButtonConfig } from "../config/button-config.js"
+import { ButtonConfig } from "../config/button-config.js";
 
 class IngredientInputRow {
     constructor(path, id, name) {
         this.path = path;
         this.id = id;
         this.name = name;
-        this.unitOptionArguments = [
-            { name: "option", value: [""] },
-            ...UNIT_OPTIONS.map((unit, index) => ({
-                name: "option",
-                value: [unit, UNIT_LABELS[index]],
-            })),
-        ];
+        this.unitOptionArguments = buildUnitSelectDeclarationArguments();
         this.isGenerated = false;
         this._canonicalAmount = 0;
         this._unit = "";

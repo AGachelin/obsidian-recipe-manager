@@ -18,7 +18,7 @@ export class PersonButton {
         this.incButtonConfig = new ButtonConfig("count-increment", "+1");
         this.incButtonConfig.addUpdateMetadataAction(btPersonCurrentStr, "x + 1");
         this.decButtonConfig = new ButtonConfig("count-decrement", "-1");
-        this.decButtonConfig.addUpdateMetadataAction(btPersonCurrentStr, "max(0, x - 1)");
+        this.decButtonConfig.addUpdateMetadataAction(btPersonCurrentStr, "Math.max(0, x - 1)");
         this.resetButtonConfig = new ButtonConfig("count-reset", "Reset");
         this.resetButtonConfig.addUpdateMetadataAction(btPersonCurrentStr, this.raw);
 

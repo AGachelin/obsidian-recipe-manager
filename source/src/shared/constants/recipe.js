@@ -39,6 +39,24 @@ export const INGREDIENT_NOTEBOOK = Object.freeze({
     SPECIFIC_WEIGHT: "single",
 });
 
+/** Frontmatter keys that trigger a full recipe live re-render when changed. */
+export const RECIPE_LIVE_SUBSCRIPTION_KEYS = Object.freeze([
+    FRONTMATTER.VIEW
+]);
+
+/** Keys read into the metadata snapshot passed to {@link RecipeRenderer#render}. */
+export const RECIPE_LIVE_READ_KEYS = Object.freeze([
+    FRONTMATTER.VIEW,
+    FRONTMATTER.INGREDIENTS,
+    FRONTMATTER.PREP_DURATION,
+    FRONTMATTER.COOK_DURATION,
+    FRONTMATTER.REST_DURATION,
+    FRONTMATTER.OVEN,
+    FRONTMATTER.NOTE,
+    FRONTMATTER.SOURCE,
+    FRONTMATTER.TAGS,
+]);
+
 export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.AVAILABLE_INGREDIENTS]: [],
     [FRONTMATTER.INGREDIENTS]: {

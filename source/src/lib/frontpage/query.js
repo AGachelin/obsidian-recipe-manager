@@ -1,9 +1,14 @@
 /**
  * Recipe listing and filter logic for the front page (Dataview-equivalent pipeline).
- * Uses the Dataview plugin API when available (`api.pages`), otherwise falls back to the vault + metadata cache.
  */
 import { convert } from "../../shared/startup/math-units.js";
 import { FRONTPAGE_DEFAULT_MAX_DURATION_SEC, FrontpageFm } from "../../shared/constants/frontpage.js";
+import {
+    RECIPES_FOLDER,
+    iterIngredientRows,
+    listRecipeMarkdownFiles,
+    recipePageFromFile,
+} from "../../shared/vault/recipes.js";
 
 /**
  * @param {*} mb
@@ -55,14 +60,6 @@ function recipeTagSet(p) {
     return set;
 }
 
-function iterIngredientRows(ing) {
-    if (!ing || typeof ing !== "object") return [];
-    return Object.entries(ing)
-        .filter(([k]) => k !== "last_id")
-        .map(([, row]) => row)
-        .filter((row) => row && typeof row === "object");
-}
-
 function findIngredientByName(ing, name) {
     const nameLC = String(name).toLowerCase();
     for (const row of iterIngredientRows(ing)) {
@@ -85,7 +82,7 @@ function ingredientFilterPasses(ing, c, mb) {
             const unit = c.filterIngredientUnits?.[ingName] ?? "";
             if (minAmount !== "" && minAmount != null) {
                 if (!ingRow.amount) {
-                    return true;
+                    continue;
                 }
                 const recipeAmount = Number(ingRow.amount);
                 const filterAmount = convert(mb, unit, Number(minAmount), ingName);
@@ -130,37 +127,6 @@ function passesCriteria(p, c, mb) {
 
 /**
  * @param {import("obsidian").App} app
- * @returns {import("obsidian").TFile[]}
- */
-function listRecipeFiles(app) {
-    return app.vault.getMarkdownFiles().filter(
-        (f) => f.path.startsWith("Recipes/") && f.name.toLowerCase() !== "content.md"
-    );
-}
-
-/**
- * Build a Dataview-shaped page object from cache (fallback path).
- * @param {import("obsidian").App} app
- * @param {import("obsidian").TFile} file
- */
-function pageFromFile(app, file) {
-    const fm = app.metadataCache.getCache(file)?.frontmatter ?? {};
-    return {
-        file,
-        note: fm.note,
-        prep_duration: fm.prep_duration,
-        cook_duration: fm.cook_duration,
-        rest_duration: fm.rest_duration,
-        source: fm.source,
-        tags: fm.tags,
-        ingredients: fm.ingredients,
-    };
-}
-
-/**
- * Query recipes equivalent to Dataview `dv.pages('"Recipes"').where(...)`.
- *
- * @param {import("obsidian").App} app
  * @param {*} mb
  * @param {string} path
  * @returns {Promise<any[]>}
@@ -177,8 +143,8 @@ export async function queryFilteredRecipes(app, mb, path) {
     if (api?.pages) {
         try {
             const pages = api
-                .pages('"Recipes"')
-                .where((p) => p.file.path.startsWith("Recipes"))
+                .pages(`"${RECIPES_FOLDER}"`)
+                .where((p) => p.file.path.startsWith(RECIPES_FOLDER))
                 .where((p) => p.file.name.toLowerCase() !== "content.md")
                 .where((p) => p.ingredients != null);
             candidates = Array.from(pages);
@@ -189,7 +155,7 @@ export async function queryFilteredRecipes(app, mb, path) {
     }
 
     if (!usedDv) {
-        candidates = listRecipeFiles(app).map((f) => pageFromFile(app, f));
+        candidates = listRecipeMarkdownFiles(app).map((f) => recipePageFromFile(app, f));
     }
 
     const out = [];
@@ -213,8 +179,6 @@ export function recipeDisplayName(p) {
 }
 
 /**
- * Client-side filter: recipe basename + optional substring match on any ingredient name.
- *
  * @param {any[]} recipes
  * @param {string} recipeNameNeedle
  * @param {string} ingredientNeedle

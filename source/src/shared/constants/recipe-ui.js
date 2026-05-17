@@ -31,6 +31,7 @@ export const RECIPE_LAYOUT = Object.freeze({
     noteContainer: "note-container",
     contentContainer: "content-container",
     sourceContainer: "source-container",
+    tagsContainer: "tags-container",
     inputField: "input-field",
     viewField: "view-field",
     contentInput: "content-input",

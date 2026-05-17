@@ -2,8 +2,8 @@
  * Single-recipe editor / reader layout (extends {@link ../render/meta-bind-page-renderer.js MetaBindPageRenderer}).
  * @see ../frontpage/frontpage-renderer.js
  */
-import { FRONTMATTER, FRONTMATTER_DEFAULTS } from "../../shared/constants/recipe.js";
-import { hasReadableIngredients } from "../../shared/ingredients-utils.js";
+import { FRONTMATTER, FRONTMATTER_DEFAULTS, RECIPE_LIVE_READ_KEYS } from "../../shared/constants/recipe.js";
+import { hasReadableIngredients, ingredientsContentSignature } from "../../shared/ingredients-utils.js";
 import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
 import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { Content } from "../../components/recipe-fields/content.js";
@@ -17,7 +17,7 @@ import { SourceInput } from "../../components/recipe-fields/source-input.js";
 import { TagsInput } from "../../components/shared/tags-input.js";
 import { AddIngredientButton } from "../../components/recipe-fields/add-ingredient-button-group.js";
 import { ToggleButton } from "../../components/recipe-fields/toggle-button.js";
-import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "../meta-bind-layout.js";
+import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "../render/mdrc-layout.js";
 import { MetaBindPageRenderer } from "../render/meta-bind-page-renderer.js";
 import { assignDurationLabels, buildRecipeBindSnapshot } from "./bind-sync.js";
 import {
@@ -45,6 +45,10 @@ export class RecipeRenderer extends MetaBindPageRenderer {
         this.addIngredientButton = new AddIngredientButton(path);
         this.toggleButton = new ToggleButton(path);
         this.metadata = {};
+        /** @type {{ view: boolean; ingSig: string; rest: string } | null} */
+        this._lastFingerprint = null;
+        /** @type {{ section: HTMLElement; readFiltered: boolean } | null} */
+        this._ingredientsMount = null;
     }
 
     generate(mb, view, metadata) {
@@ -73,13 +77,20 @@ export class RecipeRenderer extends MetaBindPageRenderer {
     }
 
     render(mb, container, component, view, metadata) {
+        const meta = metadata ?? {};
+        const fingerprint = this.#renderFingerprint(meta, view);
+
+        if (this.#tryPartialIngredientsRefresh(mb, container, component, view, meta, fingerprint)) {
+            return;
+        }
+
         container.empty();
         container.classList.add(
             RECIPE_LAYOUT.root,
             view ? RECIPE_LAYOUT.layoutRead : RECIPE_LAYOUT.layoutEdit
         );
 
-        this.generate(mb, view, metadata);
+        this.generate(mb, view, meta);
 
         const ingredients =
             this.metadata[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
@@ -98,11 +109,61 @@ export class RecipeRenderer extends MetaBindPageRenderer {
         this.content.render(view, mb.mb.internal, contentContainer);
 
         if (!view || readMetaHasTags(this.metadata)) {
-            const tagsContainer = contentParent.createEl("div", { cls: UI_CLASSES.TAGS_CONTAINER });
+            const tagsContainer = contentParent.createEl("div", { cls: RECIPE_LAYOUT.tagsContainer });
             this.tagsInput
                 .render(mb)
                 .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, tagsContainer));
         }
+
+        this._lastFingerprint = fingerprint;
+    }
+
+    #renderFingerprint(meta, view) {
+        const ing =
+            meta[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
+        const rest = {};
+        for (const key of RECIPE_LIVE_READ_KEYS) {
+            if (key !== FRONTMATTER.INGREDIENTS) {
+                rest[key] = meta[key];
+            }
+        }
+        return {
+            view,
+            ingSig: ingredientsContentSignature(ing),
+            rest: JSON.stringify(rest),
+        };
+    }
+
+    #tryPartialIngredientsRefresh(mb, container, component, view, meta, fingerprint) {
+        const prev = this._lastFingerprint;
+        const mount = this._ingredientsMount;
+        if (
+            !prev ||
+            !mount ||
+            prev.view !== fingerprint.view ||
+            prev.rest !== fingerprint.rest ||
+            prev.ingSig === fingerprint.ingSig
+        ) {
+            return false;
+        }
+
+        this.metadata = meta;
+        this.view = view;
+        this.generate(mb, view, meta);
+
+        const ingredients =
+            meta[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
+        mount.section.empty();
+        this.#fillIngredientsSection(
+            mb,
+            component,
+            mount.section,
+            view,
+            ingredients,
+            mount.readFiltered
+        );
+        this._lastFingerprint = fingerprint;
+        return true;
     }
 
     #syncIngredientTables(mb, view, ingredientsValue) {
@@ -186,6 +247,11 @@ export class RecipeRenderer extends MetaBindPageRenderer {
 
     #mountIngredients(mb, component, parent, view, ingredients, { readFiltered = false } = {}) {
         const section = parent.createEl("div", { cls: RECIPE_LAYOUT.ingredientsContainer });
+        this._ingredientsMount = { section, readFiltered };
+        this.#fillIngredientsSection(mb, component, section, view, ingredients, readFiltered);
+    }
+
+    #fillIngredientsSection(mb, component, section, view, ingredients, readFiltered) {
         section.createEl("h3", { cls: RECIPE_LAYOUT.sectionHeading, text: UI_LABELS.INGREDIENTS });
 
         if (view) {

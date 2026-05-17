@@ -1,41 +1,6 @@
-/**
- * Live metadata for recipe pages: read-through keys + which binds trigger a reactive re-render.
- * Front-page equivalent: `FRONTPAGE_LIVE_SUBSCRIPTION_KEYS` in `shared/constants/frontpage.js`.
- */
-import { FRONTMATTER } from "../shared/constants/recipe.js";
-import { createCoalescedScheduler } from "./coalesced-refresh.js";
-
-const LIVE_BIND_KEYS = [
-    FRONTMATTER.VIEW,
-    FRONTMATTER.INGREDIENTS,
-    FRONTMATTER.PREP_DURATION,
-    FRONTMATTER.COOK_DURATION,
-    FRONTMATTER.REST_DURATION,
-    FRONTMATTER.OVEN,
-    FRONTMATTER.NOTE,
-    FRONTMATTER.SOURCE,
-    FRONTMATTER.TAGS,
-];
-
-export function readRecipeLiveMetadata(mb, path) {
-    const at = (key) => mb.parseBindTarget(key, path);
-    const meta = {};
-    for (const key of LIVE_BIND_KEYS) {
-        meta[key] = mb.getMetadata(at(key));
-    }
-    return meta;
-}
-
-export function isRecipeViewMode(meta) {
-    const v = meta[FRONTMATTER.VIEW];
-    return v === true || v === "true";
-}
-
-export function attachRecipeLiveSubscriptions(mb, component, path, refresh) {
-    const { schedule } = createCoalescedScheduler(refresh);
-    const watch = (bindTarget) => mb.subscribeToMetadata(bindTarget, component, schedule);
-    const at = (key) => mb.parseBindTarget(key, path);
-    watch(at(FRONTMATTER.VIEW));
-    watch(mb.createBindTarget("frontmatter", path, ["ingredients"], false));
-    watch(at(FRONTMATTER.PERSON.LABEL));
-}
+/** Stable `importJs` URL — implementation in `./recipe/metadata.js`. */
+export {
+    readRecipeLiveMetadata,
+    isRecipeViewMode,
+    attachRecipeLiveSubscriptions,
+} from "./recipe/metadata.js";

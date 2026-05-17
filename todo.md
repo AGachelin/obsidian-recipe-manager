@@ -16,3 +16,8 @@ bandeau côte à côte pour les durées
 
 
 réinitialiser le nombre de personnes à la fermeture
+
+display research results by default
+
+
+markdown cheatsheet

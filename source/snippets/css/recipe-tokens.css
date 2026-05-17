@@ -1,0 +1,22 @@
+/*
+ * Recipe UI CSS
+ */
+
+.recipe-ui {
+	--recipe-space-xs: 0.35rem;
+	--recipe-space-sm: 0.55rem;
+	--recipe-space-md: 0.75rem;
+	--recipe-space-lg: 1.1rem;
+	--recipe-space-xl: 1.5rem;
+	--recipe-radius: var(--radius-m, 10px);
+	--recipe-radius-sm: var(--radius-s, 6px);
+	--recipe-pad: 0.65rem 0.9rem;
+	--recipe-surface: var(--background-secondary, rgba(120, 120, 120, 0.08));
+	--recipe-surface-raised: var(--background-primary, var(--background-primary));
+	--recipe-border: 1px solid var(--background-modifier-border, rgba(120, 120, 120, 0.22));
+	--recipe-border-strong: 1px solid var(--background-modifier-border-hover, rgba(120, 120, 120, 0.35));
+	--recipe-muted: var(--text-muted);
+	--recipe-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+	--recipe-accent: var(--interactive-accent, var(--color-accent));
+	--recipe-chip-bg: var(--background-modifier-hover, rgba(120, 120, 120, 0.1));
+}
