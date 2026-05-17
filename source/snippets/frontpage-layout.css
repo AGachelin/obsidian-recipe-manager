@@ -1,8 +1,9 @@
+@scope(.frontpage-ui){
 /* -------------------------------------------------------------------------- */
 /* Frontpage (js-engine): full layout + results                                 */
 /* -------------------------------------------------------------------------- */
 
-.frontpage-live-root {
+.live-root {
 	width: 100%;
 	max-width: none;
 	margin: 0;
@@ -10,7 +11,7 @@
 	box-sizing: border-box;
 }
 
-.frontpage-live__grid {
+.live__grid {
 	display: grid;
 	grid-template-columns: auto minmax(0, 1fr);
 	gap: var(--recipe-space-xl);
@@ -20,12 +21,12 @@
 }
 
 @media (max-width: 900px) {
-	.frontpage-live__grid {
+	.live__grid {
 		grid-template-columns: 1fr;
 	}
 }
 
-.frontpage-live__sidebar {
+.live__sidebar {
 	display: flex;
 	flex-direction: column;
 	gap: var(--recipe-space-md);
@@ -38,31 +39,31 @@
 	min-width: 0;
 }
 
-.frontpage-live__sidebar-title {
+.live__sidebar-title {
 	margin: 0 0 var(--recipe-space-sm) 0;
 	font-size: 1rem;
 	font-weight: 700;
 }
 
-.frontpage-live__main {
+.live__main {
 	min-width: 0;
 	display: flex;
 	flex-direction: column;
 	gap: var(--recipe-space-md);
 }
 
-.frontpage-live__title {
+.live__title {
 	margin: 0;
 	font-size: 1.75em;
 }
 
-.frontpage-live__index-heading {
+.live__index-heading {
 	margin: 0;
 	font-size: 1.1rem;
 	font-weight: 600;
 }
 
-.frontpage-live__section {
+.live__section {
 	border: var(--recipe-border);
 	border-radius: var(--recipe-radius);
 	background: var(--recipe-surface);
@@ -70,7 +71,7 @@
 	padding: var(--recipe-space-md) var(--recipe-space-lg);
 }
 
-.frontpage-live__section-title {
+.live__section-title {
 	margin: 0 0 var(--recipe-space-sm) 0;
 	font-size: 0.82rem;
 	font-weight: 600;
@@ -79,30 +80,30 @@
 	color: var(--recipe-muted);
 }
 
-.frontpage-live__field {
+.live__field {
 	margin-top: var(--recipe-space-sm);
 }
 
-.frontpage-live__field:first-of-type {
+.live__field:first-of-type {
 	margin-top: 0;
 }
 
-.frontpage-live__label {
+.live__label {
 	display: block;
 	margin-bottom: var(--recipe-space-xs);
 	font-size: 0.82em;
 	color: var(--recipe-muted);
 }
 
-.frontpage-live__sidebar-actions {
+.live__sidebar-actions {
 	display: flex;
 	flex-direction: column;
 	gap: var(--recipe-space-sm);
 	margin-top: var(--recipe-space-sm);
 }
 
-.frontpage-live__btn-apply,
-.frontpage-live__btn-reset {
+.live__btn-apply,
+.live__btn-reset {
 	width: 100%;
 	justify-content: center;
 }
@@ -111,14 +112,14 @@
 /* Collapsible sidebar and sections                                            */
 /* -------------------------------------------------------------------------- */
 
-.frontpage-live__sidebar-header {
+.live__sidebar-header {
 	display: contents;
 	align-items: center;
 	width: 100%;
 }
 
-.frontpage-live__sidebar-toggle,
-.frontpage-live__section-toggle {
+.live__sidebar-toggle,
+.live__section-toggle {
 	display: flex;
 	align-items: center;
 	width: 100%;
@@ -134,13 +135,13 @@
 	transition: color 0.12s ease;
 }
 
-.frontpage-live__sidebar-toggle:hover,
-.frontpage-live__section-toggle:hover {
+.live__sidebar-toggle:hover,
+.live__section-toggle:hover {
 	color: var(--text-accent);
 }
 
-.frontpage-live__sidebar-toggle::before,
-.frontpage-live__section-toggle::before {
+.live__sidebar-toggle::before,
+.live__section-toggle::before {
 	content: "▼";
 	display: inline-flex;
 	align-items: center;
@@ -154,13 +155,13 @@
 	line-height: 1;
 }
 
-.frontpage-live__sidebar-toggle[aria-expanded="false"]::before,
-.frontpage-live__section-toggle[aria-expanded="false"]::before {
+.live__sidebar-toggle[aria-expanded="false"]::before,
+.live__section-toggle[aria-expanded="false"]::before {
 	transform: rotate(-90deg);
 }
 
-.frontpage-live__sidebar-content,
-.frontpage-live__section-content {
+.live__sidebar-content,
+.live__section-content {
 	display: block;
 	max-height: 9999px;
 	overflow: hidden;
@@ -168,12 +169,12 @@
 	opacity: 1;
 }
 
-.frontpage-live__sidebar-content.is-collapsed,
-.frontpage-live__section-content.is-collapsed {
+.live__sidebar-content.is-collapsed,
+.live__section-content.is-collapsed {
 	display: none;
 }
 
-.frontpage-live__section {
+.live__section {
 	border: var(--recipe-border);
 	border-radius: var(--recipe-radius);
 	background: var(--recipe-surface);
@@ -183,18 +184,18 @@
 	flex-direction: column;
 }
 
-.frontpage-live__section-header {
+.live__section-header {
 	display: flex;
 	align-items: center;
 	padding: var(--recipe-space-md) var(--recipe-space-lg);
 	border-bottom: var(--recipe-border);
 }
 
-.frontpage-live__section-content {
+.live__section-content {
 	padding: var(--recipe-space-md) var(--recipe-space-lg);
 }
 
-.frontpage-live__section-title {
+.live__section-title {
 	margin: 0;
 	font-size: 0.82rem;
 	font-weight: 600;
@@ -203,33 +204,33 @@
 	color: var(--recipe-muted);
 }
 
-.frontpage-live__section-title[aria-expanded="false"] {
+.live__section-title[aria-expanded="false"] {
 	h3{
 		display: none;
 	}
 	display: contents;
 }
 
-.frontpage-live__actions {
+.live__actions {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--recipe-space-sm);
 	align-items: center;
 }
 
-.frontpage-live__toolbar {
+.live__toolbar {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--recipe-space-md);
 }
 
-.frontpage-live__toolbar-label {
+.live__toolbar-label {
 	font-size: 0.85em;
 	color: var(--recipe-muted);
 }
 
-.frontpage-live__recipe-name-input {
+.live__recipe-name-input {
 	flex: 1 1 12rem;
 	min-width: 0;
 	box-sizing: border-box;
@@ -241,44 +242,45 @@
 	min-height: 2rem;
 }
 
-.frontpage-live__count {
+.live__count {
 	font-size: 0.85em;
 	color: var(--recipe-muted);
 	white-space: nowrap;
 }
 
-.frontpage-live__table-host {
+.live__table-host {
 	width: 100%;
 	overflow-x: auto;
 }
 
-.frontpage-live__table {
+.live__table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 0.95rem;
 }
 
-.frontpage-live__table th,
-.frontpage-live__table td {
+.live__table th,
+.live__table td {
 	padding: 0.5rem 0.65rem;
 	border-bottom: 1px solid var(--background-modifier-border, rgba(120, 120, 120, 0.2));
 	text-align: left;
 	vertical-align: middle;
 }
 
-.frontpage-live__table th {
+.live__table th {
 	font-weight: 600;
 	color: var(--recipe-muted);
 	font-size: 0.82em;
 }
 
-.frontpage-live__cell-rating {
+.live__cell-rating {
 	white-space: nowrap;
 	width: 5rem;
 }
 
-.frontpage-live__empty {
+.live__empty {
 	margin: 0.5rem 0 0;
 	color: var(--recipe-muted);
 	font-size: 0.92em;
+}
 }
