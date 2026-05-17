@@ -1,6 +1,6 @@
 ---
 cssclasses:
-  - recipe-ui
+  - frontpage-ui
 filter_note_min: 0
 filter_note_max: 5
 filter_prep_max_sec: 604800

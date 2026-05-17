@@ -1,27 +1,31 @@
 ---
-view: false
-note: 0
+view: true
+note: 4
 ingredients:
   "1":
     id: 1
     name: f.md
-    amount: 20
+    amount: 2
     unit: ""
-  last_id: 1
+  "2":
+    id: 2
+    name: test.md
+    amount:
+    unit: ""
+  last_id: 3
 available_ingredients:
   - b.md
   - R.md
-  - test.md
-prep_duration: 0
+prep_duration: 900
 cook_duration: 0
-rest_duration: 0
-oven:
-source: ""
+rest_duration: 40385
+oven: 100
+source: fezfrzfzrez
 person:
   current: 1
   raw: 1
 tags:
-  - "#test"
+  - test5
 cssclasses:
   - recipe-ui
 ---
