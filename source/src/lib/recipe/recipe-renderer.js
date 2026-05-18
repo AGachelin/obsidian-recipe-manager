@@ -27,6 +27,7 @@ import {
     readMetaNonEmptyOven,
     readMetaNonEmptySource,
 } from "./meta-readers.js";
+import {disableScrollToChange} from "../disable-scroll-change.js";
 
 export class RecipeRenderer {
     constructor(path) {
@@ -95,6 +96,8 @@ export class RecipeRenderer {
             RECIPE_LAYOUT.root,
             view ? RECIPE_LAYOUT.layoutRead : RECIPE_LAYOUT.layoutEdit
         );
+
+        disableScrollToChange(container);
 
         this.generate(mb, view, meta);
 

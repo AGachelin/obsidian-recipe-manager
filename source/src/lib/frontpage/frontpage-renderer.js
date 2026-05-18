@@ -12,6 +12,7 @@ import { resetAdvancedFilterMetadata } from "../../components/frontpage/filter-f
 import { FRONTPAGE_LIVE_SUBSCRIPTION_KEYS } from "../../shared/constants/frontpage.js";
 import { subscribeToFrontmatterKeys } from "../render/subscribe-metadata.js";
 import { createCoalescedScheduler } from "../coalesced-refresh.js";
+import { disableScrollToChange } from "../disable-scroll-change.js";
 
 export class FrontpageRenderer {
     constructor(path) {
@@ -38,6 +39,8 @@ export class FrontpageRenderer {
         const app = engine.app;
 
         this.generate(mb);
+
+        disableScrollToChange(container);
 
         const { sidebarContent, main } = createFrontpageChrome(container);
 
