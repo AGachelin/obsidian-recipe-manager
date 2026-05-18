@@ -124,6 +124,10 @@ export class RecipeRenderer {
                 .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, tagsContainer));
         }
 
+        if (view && readMetaNonEmptySource(this.metadata)) {
+            this.#mountSource(mb, component, contentParent, view);
+        }
+
         this._lastFingerprint = fingerprint;
     }
 
@@ -234,9 +238,6 @@ export class RecipeRenderer {
 
         const main = body.createEl("div", { cls: RECIPE_LAYOUT.readMain });
 
-        if (readMetaNonEmptySource(this.metadata)) {
-            this.#mountSource(mb, component, main, view);
-        }
         return main;
     }
 
