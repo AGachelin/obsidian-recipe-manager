@@ -36,7 +36,9 @@ export const FRONTPAGE_LAYOUT = Object.freeze({
     empty: "live__empty",
     table: "live__table",
     cellName: "live__cell-name",
+    cellThumb: "live__cell-thumb",
     cellRating: "live__cell-rating",
+    resultsGroups: "live__results-groups",
 });
 
 export const INGREDIENT_FILTER_LAYOUT = Object.freeze({

@@ -233,6 +233,28 @@
 	white-space: nowrap;
 }
 
+.live__results-groups {
+	display: flex;
+	flex-direction: column;
+	gap: var(--recipe-space-md);
+}
+
+.live__cell-thumb {
+	width: 3rem;
+	padding: 0.35rem 0.5rem;
+	vertical-align: middle;
+}
+
+.live__thumb-img {
+	display: block;
+	width: 2.5rem;
+	height: 2.5rem;
+	object-fit: cover;
+	border-radius: var(--recipe-radius-sm);
+	border: var(--recipe-border);
+	background: var(--recipe-surface-2, var(--background-secondary));
+}
+
 .live__table-host {
 	width: 100%;
 	overflow-x: auto;
@@ -260,7 +282,7 @@
 
 .live__cell-rating {
 	white-space: nowrap;
-	width: 5rem;
+	width: 7rem;
 }
 
 .live__empty {

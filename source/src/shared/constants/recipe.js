@@ -25,7 +25,6 @@ export const FRONTMATTER = Object.freeze({
     OVEN: 'oven',
     PERSON: {
         LABEL: 'person',
-        CURRENT: 'person.current',
         RAW: 'person.raw'
     },
     PREP_DURATION: 'prep_duration',
@@ -61,6 +60,8 @@ export const RECIPE_LIVE_READ_KEYS = Object.freeze([
     FRONTMATTER.NOTE,
     FRONTMATTER.SOURCE,
     FRONTMATTER.TAGS,
+    FRONTMATTER.THUMBNAIL,
+    FRONTMATTER.PERSON.RAW,
 ]);
 
 export const FRONTMATTER_DEFAULTS = Object.freeze({
@@ -68,7 +69,6 @@ export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.INGREDIENTS]: {
         [FRONTMATTER.INGREDIENTS_FIELDS.LAST_ID]: 0,
     },
-    [FRONTMATTER.PERSON.CURRENT]: 4,
     DURATION: 0,
     [FRONTMATTER.PERSON.RAW]: 4,
     [FRONTMATTER.VIEW]: false,
@@ -76,6 +76,7 @@ export const FRONTMATTER_DEFAULTS = Object.freeze({
     [FRONTMATTER.OVEN]: 0,
     [FRONTMATTER.NOTE]: 0,
     [FRONTMATTER.SOURCE]: '',
+    [FRONTMATTER.THUMBNAIL]: '',
     [FRONTMATTER.CSS_CLASSES]: 'recipe-ui',
     [INGREDIENT_NOTEBOOK.RHO]: 1,
     [INGREDIENT_NOTEBOOK.SPECIFIC_WEIGHT]: 1,

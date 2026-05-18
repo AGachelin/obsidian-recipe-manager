@@ -1,5 +1,8 @@
 import { queryFilteredRecipes, filterRecipesInstant, recipeDisplayName } from "../../lib/frontpage/query.js";
 import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
+import { mountCollapsibleSection } from "./collapsible-sections.js";
+import { mountStarRating } from "../shared/star-rating.js";
+import { recipeResultsGroupLabel, resolveRecipeThumbnailUrl } from "../../shared/vault/recipes.js";
 
 /**
  * Stateless table paint + asynchronous server-side filter query (Dataview/cache).
@@ -10,6 +13,8 @@ export class FrontpageRecipeResultsPanel {
      */
     constructor(path) {
         this.path = path;
+        /** @type {import("obsidian").App | null} */
+        this.app = null;
         /** @type {HTMLElement | null} */
         this.tableHost = null;
         /** @type {HTMLInputElement | null} */
@@ -31,6 +36,11 @@ export class FrontpageRecipeResultsPanel {
         this.countEl = refs.countEl;
     }
 
+    /** @param {import("obsidian").App} app */
+    setApp(app) {
+        this.app = app;
+    }
+
     /** @param {() => string} supplier */
     setIngredientNeedleSupplier(supplier) {
         this.getIngredientNeedle = supplier;
@@ -43,6 +53,7 @@ export class FrontpageRecipeResultsPanel {
 
     /** @returns {Promise<void>} */
     async runAdvancedQuery(mb, app) {
+        this.setApp(app);
         this.appliedRecipes = await queryFilteredRecipes(app, mb, this.path);
         await this.paint(mb);
     }
@@ -71,21 +82,52 @@ export class FrontpageRecipeResultsPanel {
             return;
         }
 
-        const table = this.tableHost.createEl("table", { cls: FRONTPAGE_LAYOUT.table });
-        const trh = table.createEl("thead").createEl("tr");
-        trh.createEl("th", { text: "Recipe" });
-        trh.createEl("th", { text: "Rating" });
-        const tbody = table.createEl("tbody");
+        const groups = new Map();
+        for (const page of filtered) {
+            const label = recipeResultsGroupLabel(page, recipeDisplayName);
+            if (!groups.has(label)) {
+                groups.set(label, []);
+            }
+            groups.get(label).push(page);
+        }
 
+        const sortedLabels = [...groups.keys()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+        const host = this.tableHost.createDiv({ cls: FRONTPAGE_LAYOUT.resultsGroups });
         const pathCtx = this.path;
-        for (const p of filtered) {
-            const tr = tbody.createEl("tr");
-            const tdName = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellName });
-            const tdRate = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellRating });
-            const file = p.file;
-            const n = p.note;
-            tdRate.textContent = Number.isFinite(Number(n)) ? String(n) : "—";
-            mb.mb.internal.renderMarkdown(`[[${file.path}|${recipeDisplayName(p)}]]`, tdName, pathCtx);
+        const app = this.app;
+
+        for (const label of sortedLabels) {
+            const pages = groups.get(label).slice().sort((a, b) =>
+                recipeDisplayName(a).localeCompare(recipeDisplayName(b), undefined, { sensitivity: "base" })
+            );
+            const content = mountCollapsibleSection(host, label, true);
+            const table = content.createEl("table", { cls: FRONTPAGE_LAYOUT.table });
+            const trh = table.createEl("thead").createEl("tr");
+            trh.createEl("th", { text: "" });
+            trh.createEl("th", { text: "Recipe" });
+            trh.createEl("th", { text: "Rating" });
+            const tbody = table.createEl("tbody");
+
+            for (const p of pages) {
+                const tr = tbody.createEl("tr");
+                const tdThumb = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellThumb });
+                const tdName = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellName });
+                const tdRate = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellRating });
+                const file = p.file;
+
+                if (app) {
+                    const thumbUrl = resolveRecipeThumbnailUrl(app, pathCtx, p.thumbnail);
+                    if (thumbUrl) {
+                        tdThumb.createEl("img", {
+                            cls: "live__thumb-img",
+                            attr: { src: thumbUrl, alt: "", loading: "lazy" },
+                        });
+                    }
+                }
+
+                mountStarRating(tdRate, p.note);
+                mb.mb.internal.renderMarkdown(`[[${file.path}|${recipeDisplayName(p)}]]`, tdName, pathCtx);
+            }
         }
     }
 }

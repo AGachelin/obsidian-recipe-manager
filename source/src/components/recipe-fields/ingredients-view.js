@@ -21,7 +21,7 @@ class IngredientViewRow {
         this.unit = unit;
         const ing = `ingredients["${this.id}"]`;
         this.viewConfigs = {
-            amount: new ViewConfig(`VIEW[convertBackDisplay({${ing}.unit}, {${ing}.amount}, {${ing}.name}, {person.current}/max(1, {person.raw}))]`).render(),
+            amount: new ViewConfig(`VIEW[convertBackDisplay({${ing}.unit}, {${ing}.amount}, {${ing}.name}, {memory^person["current"]}/max(1, {person.raw}))]`).render(),
             unit: new ViewConfig(`VIEW[{${ing}.unit}]`).render(),
             name: new ViewConfig(`VIEW[{${ing}.name}]`).render(),
         };

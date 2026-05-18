@@ -82,6 +82,57 @@ export function recipePageFromFile(app, file) {
         freeze_duration: fm.freeze_duration,
         source: fm.source,
         tags: fm.tags,
+        thumbnail: fm.thumbnail,
         ingredients: fm.ingredients,
     };
+}
+
+/**
+ * Folder label for grouping index results (relative to `Recipes/`, skipping a trailing
+ * folder whose name matches the recipe title).
+ * @param {{ file: import("obsidian").TFile }} page
+ * @param {(page: { file: import("obsidian").TFile }) => string} [displayName]
+ */
+export function recipeResultsGroupLabel(page, displayName) {
+    const file = page.file;
+    const name = displayName ? displayName(page) : file.basename;
+    const prefix = `${RECIPES_FOLDER}/`;
+    const rel = file.path.startsWith(prefix) ? file.path.slice(prefix.length) : file.path;
+    const dirParts = rel.split("/").slice(0, -1);
+    if (dirParts.length === 0) {
+        return "Recipes";
+    }
+    const parts = [...dirParts];
+    while (parts.length > 0 && parts[parts.length - 1].toLowerCase() === name.toLowerCase()) {
+        parts.pop();
+    }
+    if (parts.length === 0) {
+        return "Recipes";
+    }
+    return parts.join(" / ");
+}
+
+/**
+ * @param {import("obsidian").App} app
+ * @param {string} pathCtx Note path for wikilink resolution
+ * @param {unknown} thumbnail
+ * @returns {string | null}
+ */
+export function resolveRecipeThumbnailUrl(app, pathCtx, thumbnail) {
+    const raw = thumbnail == null ? "" : String(thumbnail).trim();
+    if (!raw) return null;
+
+    let linkPath = raw;
+    const wiki = raw.match(/^\[\[([^\]|]+)(?:\|[^\]]+)?\]\]$/);
+    if (wiki) {
+        linkPath = wiki[1].trim();
+    }
+
+    const dest =
+        app.metadataCache.getFirstLinkpathDest(linkPath, pathCtx) ??
+        app.vault.getAbstractFileByPath(linkPath);
+    if (!dest || !("extension" in dest)) {
+        return null;
+    }
+    return app.vault.getResourcePath(/** @type {import("obsidian").TFile} */ (dest));
 }

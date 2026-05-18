@@ -572,4 +572,48 @@
 	font-size: 0.95rem;
 	line-height: 1.45;
 }
+
+/* Star rating (read mode note + index) */
+.recipe-star-rating {
+	display: inline-flex;
+	gap: 0.15em;
+	align-items: center;
+	line-height: 1;
+}
+
+.recipe-star {
+	position: relative;
+	display: inline-block;
+	width: 1.15em;
+	height: 1.15em;
+	font-size: 1.15em;
+	color: var(--recipe-muted, #c4c4c4);
+}
+
+.recipe-star::before,
+.recipe-star::after {
+	content: "★";
+	position: absolute;
+	left: 0;
+	top: 0;
+	line-height: 1;
+}
+
+.recipe-star::after {
+	color: #e6b800;
+	width: calc(var(--star-fill, 0) * 1em);
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.note-container .view-field.note-view {
+	justify-content: flex-start;
+}
+
+.thumbnail-container label {
+	color: var(--recipe-muted);
+	font-weight: 600;
+	font-size: 0.85em;
+	margin-right: var(--recipe-space-sm);
+}
 }

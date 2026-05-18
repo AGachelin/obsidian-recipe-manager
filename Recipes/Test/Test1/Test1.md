@@ -1,5 +1,5 @@
 ---
-view: false
+view: true
 note: 0
 ingredients:
   "4":
@@ -27,13 +27,14 @@ oven:
 source: " njk hji "
 person:
   current: 1
-  raw: 1
+  raw: 4
 tags:
   - "#example-note"
 cssclasses:
   - recipe-ui
 cool_duration: 57600
 freeze_duration: 0
+thumbnail: fond.jpg
 ---
 ```js-engine
 return (await engine.importJs("source/src/lib/recipe-live.js")).setupRecipeLive(

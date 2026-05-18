@@ -1,5 +1,6 @@
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
+import { mountStarRating } from "../shared/star-rating.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
@@ -15,27 +16,25 @@ export class NoteInput extends InputConfig {
         this.mb = mb;
         this.viewMode = view;
         this.value = value;
-        
-        const btNoteMem = mb.createBindTarget("memory", this.path, ["note"], true);
 
         if (view) {
-            this.viewConfig = new ViewConfig("VIEW[{note}]").render();
-            this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
             this.inputField = null;
             this.clampView = null;
-        } else {
-            const n = value != null && value !== "" ? Number(value) : 0;
-            mb.setMetadata(btNoteMem, Number.isFinite(n) ? n : 0);
-            const inputConfig = new InputConfig("number", btNoteMem, "inline", [
-                { name: "defaultValue", value: [`${Number.isFinite(n) ? n : 0}`] },
-            ]).render();
-            this.inputField = mb.createInputFieldMountable(this.path, inputConfig);
-
-            const viewDeclaration = "VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]";
-            this.clampViewConfig = new ViewConfig(viewDeclaration).render();
-            this.clampView = mb.createViewFieldMountable(this.path, this.clampViewConfig);
-            this.view = null;
+            return;
         }
+
+        const btNoteMem = mb.createBindTarget("memory", this.path, ["note"], true);
+
+        const n = value != null && value !== "" ? Number(value) : 0;
+        mb.setMetadata(btNoteMem, Number.isFinite(n) ? n : 0);
+        const inputConfig = new InputConfig("number", btNoteMem, "inline", [
+            { name: "defaultValue", value: [`${Number.isFinite(n) ? n : 0}`] },
+        ]).render();
+        this.inputField = mb.createInputFieldMountable(this.path, inputConfig);
+
+        const viewDeclaration = "VIEW[clamp({memory^note}, 0, 5)][math(hidden):note]";
+        this.clampViewConfig = new ViewConfig(viewDeclaration).render();
+        this.clampView = mb.createViewFieldMountable(this.path, this.clampViewConfig);
     }
 
     /**
@@ -46,10 +45,11 @@ export class NoteInput extends InputConfig {
             this.generate(mb, view, value);
         }
         if (view) {
-            const viewWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.viewField} note-view` });
-            return [{ parent: viewWrapper, field: this.view }];
+            const viewWrapper = container.createDiv({ cls: `${RECIPE_LAYOUT.viewField} note-view` });
+            mountStarRating(viewWrapper, value);
+            return [];
         }
-        const inputWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.inputField} note-input` });
+        const inputWrapper = container.createDiv({ cls: `${RECIPE_LAYOUT.inputField} note-input` });
         return [
             { parent: inputWrapper, field: this.inputField },
             {

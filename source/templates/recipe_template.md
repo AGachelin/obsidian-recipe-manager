@@ -20,8 +20,8 @@ cool_duration: 0
 freeze_duration: 0
 oven: 0
 source: ""
+thumbnail: ""
 person:
-  current: 1
   raw: 1
 tags: []
 cssclasses:

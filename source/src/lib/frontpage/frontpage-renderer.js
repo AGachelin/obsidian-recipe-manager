@@ -46,6 +46,7 @@ export class FrontpageRenderer {
         const mainRefs = this.#mountRecipeIndex(mb, main, component);
 
         this.results.attachDom(mainRefs);
+        this.results.setApp(app);
         this.results.setIngredientNeedleSupplier(
             () => this.sidebar.ingredientFilter.searchInputEl?.value ?? ""
         );

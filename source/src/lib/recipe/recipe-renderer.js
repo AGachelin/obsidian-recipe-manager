@@ -14,6 +14,7 @@ import { NoteInput } from "../../components/recipe-fields/note-input.js";
 import { OvenInput } from "../../components/recipe-fields/oven-input.js";
 import { PersonButton } from "../../components/recipe-fields/person-button.js";
 import { SourceInput } from "../../components/recipe-fields/source-input.js";
+import { ThumbnailInput } from "../../components/recipe-fields/thumbnail-input.js";
 import { TagsInput } from "../../components/shared/tags-input.js";
 import { AddIngredientButton } from "../../components/recipe-fields/add-ingredient-button-group.js";
 import { ToggleButton } from "../../components/recipe-fields/toggle-button.js";
@@ -40,8 +41,9 @@ export class RecipeRenderer {
         this.ingredientViewTable = new IngredientViewTable(path);
         this.noteInput = new NoteInput(path);
         this.ovenInput = new OvenInput(path);
-        this.personButton = new PersonButton(path, FRONTMATTER_DEFAULTS[FRONTMATTER.PERSON.RAW]);
+        this.personButton = new PersonButton(path);
         this.sourceInput = new SourceInput(path);
+        this.thumbnailInput = new ThumbnailInput(path);
         this.tagsInput = new TagsInput(path);
         this.addIngredientButton = new AddIngredientButton(path);
         this.toggleButton = new ToggleButton(path);
@@ -72,8 +74,9 @@ export class RecipeRenderer {
 
         this.noteInput.generate(mb, view, snap.noteValue);
         this.ovenInput.generate(mb, view, snap.ovenValue);
-        this.personButton.generate(mb);
+        this.personButton.generate(mb, view);
         this.sourceInput.generate(mb, view, snap.sourceValue);
+        this.thumbnailInput.generate(mb, view, snap.thumbnailValue);
         this.tagsInput.generate(mb);
         this.addIngredientButton.generate(mb);
         this.toggleButton.generate(mb, view);
@@ -240,8 +243,9 @@ export class RecipeRenderer {
         const metaStrip = container.createEl("div", { cls: RECIPE_LAYOUT.metaStrip });
         this.#mountPersonBar(mb, component, metaStrip, view);
         this.#mountSource(mb, component, metaStrip, view);
+        this.#mountThumbnail(mb, component, metaStrip, view);
 
-        const details = container.createEl("div", { cls: RECIPE_LAYOUT.details });
+        const details = container.createDiv({ cls: RECIPE_LAYOUT.details });
         this.#mountNote(mb, component, details, view);
         const timingRow = details.createEl("div", { cls: RECIPE_LAYOUT.timingRow });
         this.#mountAllDurations(mb, component, timingRow, view);
@@ -328,8 +332,23 @@ export class RecipeRenderer {
         );
     }
 
+    #mountThumbnail(mb, component, container, view) {
+        if (view) return;
+        const el = container.createDiv({ cls: RECIPE_LAYOUT.thumbnailContainer });
+        applyMdrcLayoutSteps(
+            mb,
+            component,
+            this.thumbnailInput.layoutMDRC(
+                mb,
+                el,
+                view,
+                this.metadata[FRONTMATTER.THUMBNAIL] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.THUMBNAIL]
+            )
+        );
+    }
+
     #mountOven(mb, component, container, view) {
-        const el = container.createEl("div", { cls: RECIPE_LAYOUT.ovenContainer });
+        const el = container.createDiv({ cls: RECIPE_LAYOUT.ovenContainer });
         applyMdrcLayoutSteps(
             mb,
             component,
