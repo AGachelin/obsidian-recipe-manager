@@ -182,12 +182,12 @@ export class IngredientFilter {
 
         rowEl.createEl("span", { text: ingredientName, cls: INGREDIENT_FILTER_LAYOUT.name });
 
-        if (state === FILTER_STATES.MUST_HAVE) {
+        if (state !== FILTER_STATES.MUST_NOT_HAVE) {
             const amountConfig = new InputConfig(
                 "text",
                 mb.parseBindTarget(ingredientFilterAmountBindKey(ingredientName), this.path),
                 "inline",
-                [{ name: "placeholder", value: ["min amount"] }]
+                [{ name: "placeholder", value: ["max amount"] }]
             ).render();
             const amountInput = mb.createInputFieldMountable(this.path, amountConfig);
             const amountMount = rowEl.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });

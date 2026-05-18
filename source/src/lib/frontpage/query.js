@@ -74,26 +74,30 @@ function findIngredientByName(ing, name) {
     return null;
 }
 
-function ingredientFilterPasses(ing, c, mb) {
+function checkIngredientAmount(c, mb, ingRow, ingName){
+    if (!ingRow.amount) return true;
+    const maxAmount = c.filterIngredientAmounts[ingName];
+    const unit = c.filterIngredientUnits?.[ingName] ?? "";
+    if (maxAmount !== "" && maxAmount != null) {
+        const recipeAmount = Number(ingRow.amount);
+        const filterAmount = convert(mb, unit, Number(maxAmount), ingName);
+        if (Number.isFinite(recipeAmount) && Number.isFinite(filterAmount)) {
+            if (recipeAmount > filterAmount) return false;
+        }
+    }
+    return true;
+}
+
+function ingredientFilterPasses(ing, c, mb, ingName) {
     for (const [ingName, state] of Object.entries(c.filterIngredientStates)) {
-        if (!state || state === "allowed") continue;
-
         const ingRow = findIngredientByName(ing, ingName);
-
+        if (!state || state === "allowed"){
+            if(ingRow && !checkIngredientAmount(c, mb, ingRow, ingName)) return false;
+            continue;
+        };
         if (state === "must_have") {
-            if (!ingRow) return false;
-            const minAmount = c.filterIngredientAmounts[ingName];
-            const unit = c.filterIngredientUnits?.[ingName] ?? "";
-            if (minAmount !== "" && minAmount != null) {
-                if (!ingRow.amount) {
-                    continue;
-                }
-                const recipeAmount = Number(ingRow.amount);
-                const filterAmount = convert(mb, unit, Number(minAmount), ingName);
-                if (Number.isFinite(recipeAmount) && Number.isFinite(filterAmount)) {
-                    if (recipeAmount < filterAmount) return false;
-                }
-            }
+            if (!ingRow || !checkIngredientAmount(c, mb, ingRow, ingName)) return false;
+            continue;
         } else if (state === "must_not_have") {
             if (ingRow) return false;
         }
