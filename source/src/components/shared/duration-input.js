@@ -44,7 +44,6 @@ export class DurationInput {
         this.label = "";
         this.hourSelect = new DurationSelect(24);
         this.minuteSelect = new DurationSelect(60);
-        this.secondSelect = new DurationSelect(60);
         this.isGenerated = false;
         this.lastView = null;
         this.lastValue = null;
@@ -58,13 +57,11 @@ export class DurationInput {
         const key = this.durationField;
         const btHour = mb.createBindTarget("memory", this.path, [key, "hour"], true);
         const btMinute = mb.createBindTarget("memory", this.path, [key, "minute"], true);
-        const btSecond = mb.createBindTarget("memory", this.path, [key, "second"], true);
 
         this.hourSelect.setBindTarget(btHour);
         this.minuteSelect.setBindTarget(btMinute);
-        this.secondSelect.setBindTarget(btSecond);
 
-        this.editViewExpr = `VIEW[number({memory^${key}["hour"]} h, s)+number({memory^${key}["minute"]} minute, s)+number({memory^${key}["second"]} s, s)][math(hidden):${key}]`;
+        this.editViewExpr = `VIEW[number({memory^${key}["hour"]} h, s)+number({memory^${key}["minute"]} minute, s)][math(hidden):${key}]`;
         this.editViewConfig = new ViewConfig(this.editViewExpr);
         this.readViewExpr = `VIEW[splitTime({${key}}, false)]`;
         this.readViewConfig = new ViewConfig(this.readViewExpr);
@@ -75,15 +72,11 @@ export class DurationInput {
             mb.setMetadata(btHour, hourValue);
             const minuteValue = Math.floor((sec % 3600) / 60);
             mb.setMetadata(btMinute, minuteValue);
-            const secondValue = sec % 60;
-            mb.setMetadata(btSecond, secondValue);
             this.hourSelectConfig = this.hourSelect.render(hourValue);
             this.minuteSelectConfig = this.minuteSelect.render(minuteValue);
-            this.secondSelectConfig = this.secondSelect.render(secondValue);
             const editDecl = this.editViewConfig.render();
             this.hourSelectField = mb.createInputFieldMountable(this.path, this.hourSelectConfig);
             this.minuteSelectField = mb.createInputFieldMountable(this.path, this.minuteSelectConfig);
-            this.secondSelectField = mb.createInputFieldMountable(this.path, this.secondSelectConfig);
             this.editViewField = mb.createViewFieldMountable(this.path, editDecl);
         } else {
             const readDecl = this.readViewConfig.render();
@@ -108,8 +101,6 @@ export class DurationInput {
                 { parent: inputContainer, spanText: "h " },
                 { parent: inputContainer, field: this.minuteSelectField },
                 { parent: inputContainer, spanText: "min " },
-                { parent: inputContainer, field: this.secondSelectField },
-                { parent: inputContainer, spanText: "s" },
                 {
                     parent: containerDiv,
                     wrapperCls: UI_CLASSES.HIDDEN_VIEW_FIELD,
