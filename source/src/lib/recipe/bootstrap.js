@@ -1,8 +1,9 @@
 import { resetPersonCurrentFromRaw } from "./person-memory.js";
+import { waitForMetaBind } from "../render/wait-for-plugins.js";
 
 export async function setupRecipeLive(engine, context, container, component) {
     const path = context.file.path;
-    const mb = engine.getPlugin("obsidian-meta-bind-plugin").api;
+    const mb = await waitForMetaBind(engine);
     resetPersonCurrentFromRaw(mb, path);
 
     const [{ RecipeRenderer }, { readRecipeLiveMetadata, isRecipeViewMode, attachRecipeLiveSubscriptions }] =
