@@ -35,9 +35,11 @@ export class PersonButton {
         this.incButtonConfig = new ButtonConfig("count-increment", "+1");
         this.incButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, "x + 1");
         this.decButtonConfig = new ButtonConfig("count-decrement", "-1");
-        this.decButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, "Math.max(0, x - 1)");
+        this.decButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, "Math.max(1, x - 1)");
         this.resetButtonConfig = new ButtonConfig("count-reset", "Reset");
-        this.resetButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, "{person.raw}");
+        const rawTarget = mb.parseBindTarget(FRONTMATTER.PERSON.RAW, this.path);
+        const raw = mb.getMetadata(rawTarget);
+        this.resetButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, raw);
 
         this.incButtonOptions = this.incButtonConfig.render();
         this.decButtonOptions = this.decButtonConfig.render();
@@ -46,9 +48,9 @@ export class PersonButton {
         this.buttonGroupOptions = {
             declaration: {
                 referencedButtonIds: [
-                    this.incButtonConfig.getId(),
-                    this.resetButtonConfig.getId(),
                     this.decButtonConfig.getId(),
+                    this.resetButtonConfig.getId(),
+                    this.incButtonConfig.getId(),
                 ],
             },
             renderChildType: "inline",
@@ -90,6 +92,6 @@ export class PersonButton {
         if (viewMode) {
             return [this.IncButton, this.DecButton, this.ResetButton, this.PersonView, this.ButtonGroup];
         }
-        return [this.personCountInput, this.PersonView];
+        return [this.personCountInput];
     }
 }

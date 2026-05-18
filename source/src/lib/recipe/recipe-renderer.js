@@ -302,6 +302,9 @@ export class RecipeRenderer {
 
     #mountPersonBar(mb, component, container, view) {
         const el = container.createEl("div", { cls: RECIPE_LAYOUT.personContainer });
+        if(!view){
+            el.createEl("label", { text: "Nombre de personnes : " })
+        }
         this.personButton
             .render(mb, view)
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, el));
