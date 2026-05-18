@@ -187,7 +187,6 @@
 	gap: var(--recipe-space-md);
 	margin-top: var(--recipe-space-md);
 	padding-top: var(--recipe-space-md);
-	border-top: var(--recipe-border);
 }
 
 /* -------------------------------------------------------------------------- */
