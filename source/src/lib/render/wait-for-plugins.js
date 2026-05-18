@@ -8,11 +8,12 @@ export const META_BIND_PLUGIN_ID = "obsidian-meta-bind-plugin";
  * @param {string} pluginId
  * @param {{ intervalMs?: number; timeoutMs?: number }} [options]
  */
-export async function waitForPluginApi(app, pluginId, { intervalMs = 50, timeoutMs = 30000 } = {}) {
+export async function waitForPluginApi(engine, pluginId, { intervalMs = 50, timeoutMs = 30000 } = {}) {
     const deadline = Date.now() + timeoutMs;
+    const app = engine.app;
     while (Date.now() < deadline) {
         const plugin = app?.plugins?.plugins?.[pluginId];
-        if (plugin?.api && plugin?.api.mb?.initiated) {
+        if (plugin?.api && engine?.plugin?.initiated) {
             return plugin.api;
         }
         await new Promise((resolve) => setTimeout(resolve, intervalMs));
@@ -24,5 +25,5 @@ export async function waitForPluginApi(app, pluginId, { intervalMs = 50, timeout
  * @param {*} engine js-engine `engine` (needs `engine.app`).
  */
 export async function waitForMetaBind(engine) {
-    return waitForPluginApi(engine.app, META_BIND_PLUGIN_ID);
+    return waitForPluginApi(engine, META_BIND_PLUGIN_ID);
 }

@@ -8,4 +8,4 @@ mb.mb.math.createUnit(CUSTOM_UNITS.PINCH, { definition: "0.0625 teaspoon", alias
 
 const mathUnits = initializeMathUnits(mb);
 await mb.mathJSImport(mathUnits);
-mb.mb.initiated = true;
+engine.plugin.initiated = true;
