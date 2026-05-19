@@ -1,17 +1,12 @@
-photo, thumbnail
+photo
+changer input thumbnail
 export en pdf
 
 ingredient groups
-corriger affichage tags
-source en bas
-
-saison
-
-réinitialiser le nombre de personnes à la fermeture
+corriger affichage tags ?
 
 display research results by default
 limit search results
 
-fix math imports
-
 markdown cheatsheet
+saison

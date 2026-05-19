@@ -1,16 +1,17 @@
-import { UI_LABELS } from "../../shared/constants/ui.js";
+import { getUILabels } from "../../shared/constants/ui.js";
 import {ButtonConfig} from "../config/button-config.js"
 
 export class AddIngredientButton {
-    constructor(path) {
+    constructor(path, lang) {
+        this.UI_LABELS = getUILabels(lang)
         this.path = path;
-        this.newButtonConfig = new ButtonConfig("new-ingredient", UI_LABELS.NEW_INGREDIENT);
+        this.newButtonConfig = new ButtonConfig("new-ingredient", this.UI_LABELS.NEW_INGREDIENT);
         this.newButtonConfig.addTemplaterCreateNoteAction(
             "source/templates/ingredient_template.md",
             "Ingredients",
             "ing"
         );
-        this.addButtonConfig = new ButtonConfig("add-ingredient", UI_LABELS.ADD_INGREDIENT);
+        this.addButtonConfig = new ButtonConfig("add-ingredient", this.UI_LABELS.ADD_INGREDIENT);
         this.addButtonConfig.addJsAction("source/src/templater/ingredients-input.js");
         
         this.addButtonOptions = this.addButtonConfig.render();

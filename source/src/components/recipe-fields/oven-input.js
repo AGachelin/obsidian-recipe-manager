@@ -1,12 +1,19 @@
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
+import { getUILabels } from "../../shared/i18n/index.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
 export class OvenInput extends InputConfig {
-    constructor(path) {
+    /**
+     * @param {string} path
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
+    constructor(path, lang) {
         super("number", null);
         this.path = path;
+        this.lang = lang;
+        this.UI_LABELS = getUILabels(lang);
         this.isGenerated = false;
         this.lastView = null;
         this.value = null;
@@ -24,7 +31,7 @@ export class OvenInput extends InputConfig {
         this.viewConfig = new ViewConfig("VIEW[{oven}]").render();
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
 
-        const declArgs = [{ name: "placeholder", value: ["Enter oven temperature"] }];
+        const declArgs = [{ name: "placeholder", value: [this.UI_LABELS.OVEN_PLACEHOLDER] }];
         if (value !== null && value !== undefined && value !== "") {
             declArgs.push({ name: "defaultValue", value: [`${value}`] });
         }
@@ -45,10 +52,10 @@ export class OvenInput extends InputConfig {
         }
 
         if (!view) {
-            const inputWrapper = container.createEl("div", {
+            const inputWrapper = container.createDiv({
                 cls: `${RECIPE_LAYOUT.inputField} oven-input`,
             });
-            inputWrapper.createEl("label", { text: "Oven Temperature: " });
+            inputWrapper.createEl("label", { text: this.UI_LABELS.OVEN_LABEL });
             return [
                 { parent: inputWrapper, field: this.inputField },
                 {
@@ -58,8 +65,8 @@ export class OvenInput extends InputConfig {
                 },
             ];
         }
-        const viewWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.viewField} oven-view` });
-        viewWrapper.createEl("label", { text: "Oven: " });
+        const viewWrapper = container.createDiv({ cls: `${RECIPE_LAYOUT.viewField} oven-view` });
+        viewWrapper.createEl("label", { text: this.UI_LABELS.OVEN_LABEL_SHORT });
         const mountSlot = viewWrapper.createEl("span", { cls: "oven-view-mdrc" });
         viewWrapper.createEl("span", { text: " °C" });
         return [{ parent: mountSlot, field: this.view }];

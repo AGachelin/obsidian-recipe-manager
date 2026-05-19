@@ -8,4 +8,5 @@ mb.mb.math.createUnit(CUSTOM_UNITS.PINCH, { definition: "0.0625 teaspoon", alias
 
 const mathUnits = initializeMathUnits(mb);
 await mb.mathJSImport(mathUnits);
+engine.plugin.language = this.globals.obsidian.getLanguage();
 engine.plugin.initiated = true;

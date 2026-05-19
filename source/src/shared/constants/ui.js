@@ -2,14 +2,7 @@
  * Cross-page UI tokens (vault cssclass, Meta Bind mount hosts, widgets reused on recipe + index).
  * Recipe page regions: {@link RECIPE_LAYOUT}. Index page regions: {@link FRONTPAGE_LAYOUT}.
  */
-export const UI_LABELS = Object.freeze({
-    INGREDIENTS: "Ingredients",
-    ADD_INGREDIENT: "Add ingredient",
-    NEW_INGREDIENT: "New ingredient",
-    DELETE: "Remove",
-    MODE_READ: "Reading",
-    MODE_EDIT: "Editing",
-});
+export { getUILabels } from "../i18n/index.js";
 
 export const UI_CLASSES = Object.freeze({
     /** Applied via note frontmatter `cssclasses` on recipe + front page templates */

@@ -1,5 +1,6 @@
 import { IngredientFilter } from "./ingredient-filter.js";
 import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
+import { getFrontpageLabels } from "../../shared/i18n/index.js";
 import { mountCollapsibleSection } from "./collapsible-sections.js";
 import {
     FrontpageRatingFilterSection,
@@ -12,14 +13,19 @@ import {
  * Sidebar “advanced search”: composes filter widgets + footer actions (apply / reset).
  */
 export class FrontpageAdvancedSidebar {
-    /** @param {string} path */
-    constructor(path) {
+    /**
+     * @param {string} path
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
+    constructor(path, lang) {
         this.path = path;
-        this.rating = new FrontpageRatingFilterSection(path);
-        this.durations = new FrontpageDurationFilterSection(path);
-        this.tags = new FrontpageTagsFilterSection(path);
-        this.source = new FrontpageSourceFilterSection(path);
-        this.ingredientFilter = new IngredientFilter(path);
+        this.lang = lang;
+        this.L = getFrontpageLabels(lang);
+        this.rating = new FrontpageRatingFilterSection(path, lang);
+        this.durations = new FrontpageDurationFilterSection(path, lang);
+        this.tags = new FrontpageTagsFilterSection(path, lang);
+        this.source = new FrontpageSourceFilterSection(path, lang);
+        this.ingredientFilter = new IngredientFilter(path, lang);
     }
 
     /** @param {*} mb */
@@ -43,22 +49,22 @@ export class FrontpageAdvancedSidebar {
 
         const secIngredients = mountCollapsibleSection(
             sidebarContent,
-            "Ingredients",
+            this.L.INGREDIENTS_SECTION,
             false,
             FRONTPAGE_LAYOUT.ingredientSection
         );
 
         await this.ingredientFilter.mount(mb, component, secIngredients, ingredientOptions);
 
-        const btnRow = sidebarContent.createEl("div", { cls: FRONTPAGE_LAYOUT.sidebarActions });
+        const btnRow = sidebarContent.createDiv({ cls: FRONTPAGE_LAYOUT.sidebarActions });
         const btnApply = btnRow.createEl("button", {
             cls: FRONTPAGE_LAYOUT.btnApply,
-            text: "Apply advanced filters",
+            text: this.L.APPLY_FILTERS,
             type: "button",
         });
         const btnReset = btnRow.createEl("button", {
             cls: FRONTPAGE_LAYOUT.btnReset,
-            text: "Reset all advanced filters",
+            text: this.L.RESET_FILTERS,
             type: "button",
         });
 

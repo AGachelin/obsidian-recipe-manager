@@ -1,4 +1,5 @@
 import { FRONTMATTER } from "../../shared/constants/recipe.js";
+import { getUILabels } from "../../shared/i18n/index.js";
 import {
     PERSON_CURRENT_MEMORY_BIND,
     createPersonCurrentMemoryBind,
@@ -9,8 +10,14 @@ import { ViewConfig } from "../config/view-config.js";
 import { ButtonConfig } from "../config/button-config.js";
 
 export class PersonButton {
-    constructor(path) {
+    /**
+     * @param {string} path
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
+    constructor(path, lang) {
         this.path = path;
+        this.lang = lang;
+        this.UI_LABELS = getUILabels(lang);
         this.isGenerated = false;
         /** @type {boolean | null} */
         this._wasViewMode = null;
@@ -36,7 +43,7 @@ export class PersonButton {
         this.incButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, "x + 1");
         this.decButtonConfig = new ButtonConfig("count-decrement", "-1");
         this.decButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, "Math.max(1, x - 1)");
-        this.resetButtonConfig = new ButtonConfig("count-reset", "Reset");
+        this.resetButtonConfig = new ButtonConfig("count-reset", this.UI_LABELS.RESET);
         const rawTarget = mb.parseBindTarget(FRONTMATTER.PERSON.RAW, this.path);
         const raw = mb.getMetadata(rawTarget);
         this.resetButtonConfig.addUpdateMetadataAction(PERSON_CURRENT_MEMORY_BIND, raw);
@@ -61,9 +68,10 @@ export class PersonButton {
         this.ResetButton = mb.createButtonMountable(this.path, this.resetButtonOptions);
         this.ButtonGroup = mb.createButtonGroupMountable(this.path, this.buttonGroupOptions);
 
+        const suffix = this.UI_LABELS.PERSON_SUFFIX;
         const personViewExpr = viewMode
-            ? `VIEW[{${PERSON_CURRENT_MEMORY_BIND}} personnes][text]`
-            : `VIEW[{${FRONTMATTER.PERSON.RAW}} personnes][text]`;
+            ? `VIEW[{${PERSON_CURRENT_MEMORY_BIND}} ${suffix}][text]`
+            : `VIEW[{${FRONTMATTER.PERSON.RAW}} ${suffix}][text]`;
         this.PersonView = mb.createViewFieldMountable(
             this.path,
             new ViewConfig(personViewExpr).render()

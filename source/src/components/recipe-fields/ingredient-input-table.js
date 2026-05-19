@@ -7,17 +7,18 @@ import {
     listIngredientIds,
 } from "../../shared/ingredients-utils.js";
 import { convertBackAmount } from "../../shared/startup/math-units.js";
-import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
+import { UI_CLASSES, getUILabels } from "../../shared/constants/ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ButtonConfig } from "../config/button-config.js";
 
 class IngredientInputRow {
-    constructor(path, id, name) {
+    constructor(path, id, name, lang) {
         this.path = path;
         this.id = id;
         this.name = name;
         this.unitOptionArguments = buildUnitSelectDeclarationArguments();
         this.isGenerated = false;
+        this.UI_LABELS = getUILabels(lang);
         this._canonicalAmount = 0;
         this._unit = "";
     }
@@ -50,7 +51,7 @@ class IngredientInputRow {
         mb.setMetadata(this.bindTargetUnitMemory, unit);
         mb.setMetadata(this.bindTargetNameMemory, this.name);
 
-        this.deleteButtonConfig = new ButtonConfig(`delete-${this.id}`, UI_LABELS.DELETE);
+        this.deleteButtonConfig = new ButtonConfig(`delete-${this.id}`, this.UI_LABELS.DELETE);
         this.deleteButtonConfig.addUpdateMetadataAction(FRONTMATTER.AVAILABLE_INGREDIENTS, `x==null?["${this.name}"]:["${this.name}",...x]`);
         this.deleteButtonConfig.addUpdateMetadataAction(FRONTMATTER.INGREDIENTS, `(delete x["${this.id}"])?x:x`);
 
@@ -117,7 +118,7 @@ class IngredientInputRow {
 }
 
 export class IngredientInputTable {
-    constructor(path) {
+    constructor(path, lang) {
         this.path = path;
         this.isGenerated = false;
         /** @type {IngredientInputRow[]} */
@@ -126,13 +127,13 @@ export class IngredientInputTable {
         this.ingredientsSnapshot = "";
     }
 
-    generate(mb, ingredients = {}) {
+    generate(mb, lang, ingredients = {}) {
         this.mb = mb;
         this.ingredientsSnapshot = ingredientsContentSignature(ingredients);
         this.rows = [];
         for (const id of listIngredientIds(ingredients)) {
             const rowData = ingredientEntry(ingredients, id);
-            const row = new IngredientInputRow(this.path, id, rowData.name);
+            const row = new IngredientInputRow(this.path, id, rowData.name, lang);
             row.render(mb, rowData.amount, rowData.unit);
             this.rows.push(row);
         }

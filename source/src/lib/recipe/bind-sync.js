@@ -1,4 +1,4 @@
-import { FRONTMATTER, FRONTMATTER_DEFAULTS, FRONTMATTER_LABELS } from "../../shared/constants/recipe.js";
+import { FRONTMATTER, FRONTMATTER_DEFAULTS, getFrontmatterLabels } from "../../shared/constants/recipe.js";
 
 /**
  * Values read from frontmatter / metadata for one render pass.
@@ -24,6 +24,7 @@ export function buildRecipeBindSnapshot(metadata) {
  * @param {{ prepDuration: { label: string }, cookDuration: { label: string }, restDuration: { label: string } }} renderer
  */
 export function assignDurationLabels(renderer) {
+    const FRONTMATTER_LABELS = getFrontmatterLabels(renderer.lang);
     renderer.prepDuration.label = FRONTMATTER_LABELS.PREP;
     renderer.cookDuration.label = FRONTMATTER_LABELS.COOK;
     renderer.restDuration.label = FRONTMATTER_LABELS.REST;

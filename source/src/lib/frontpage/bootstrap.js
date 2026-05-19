@@ -6,7 +6,10 @@
  * @param {HTMLElement} container
  * @param {import("obsidian").Component} component
  */
-export async function setupFrontpageLive(engine, context, container, component) {
+import { resolveLanguage } from "../../shared/i18n/index.js";
+
+export async function setupFrontpageLive(engine, context, container, component, lang) {
     const { FrontpageRenderer } = await engine.importJs("source/src/lib/frontpage/frontpage-renderer.js");
-    return new FrontpageRenderer(context.file.path).render(engine, context, container, component);
+    const resolvedLang = resolveLanguage(lang, engine);
+    return new FrontpageRenderer(context.file.path, resolvedLang).render(engine, context, container, component);
 }

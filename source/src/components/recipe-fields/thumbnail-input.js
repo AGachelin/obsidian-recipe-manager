@@ -1,11 +1,18 @@
 import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
+import { getUILabels } from "../../shared/i18n/index.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
 export class ThumbnailInput extends InputConfig {
-    constructor(path) {
+    /**
+     * @param {string} path
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
+    constructor(path, lang) {
         super("text", null);
         this.path = path;
+        this.lang = lang;
+        this.UI_LABELS = getUILabels(lang);
         this.isGenerated = false;
         this.lastView = null;
         this.lastValue = null;
@@ -19,7 +26,9 @@ export class ThumbnailInput extends InputConfig {
         this.bindTarget = btThumbnail;
         this.viewConfig = new ViewConfig("VIEW[{thumbnail}][text]").render();
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
-        this.declarationArguments = [{ name: "placeholder", value: ["Image path or wikilink"] }];
+        this.declarationArguments = [
+            { name: "placeholder", value: [this.UI_LABELS.THUMBNAIL_PLACEHOLDER] },
+        ];
         if (value !== null && value !== undefined) {
             this.declarationArguments.push({ name: "defaultValue", value: [`${value}`] });
         }
@@ -35,7 +44,7 @@ export class ThumbnailInput extends InputConfig {
             const inputWrapper = container.createDiv({
                 cls: `${RECIPE_LAYOUT.inputField} thumbnail-input`,
             });
-            inputWrapper.createEl("label", { text: "Thumbnail: " });
+            inputWrapper.createEl("label", { text: `${this.UI_LABELS.THUMBNAIL_LABEL}: ` });
             return [{ parent: inputWrapper, field: this.inputField }];
         }
         return [];

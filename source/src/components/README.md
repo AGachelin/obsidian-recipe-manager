@@ -11,3 +11,7 @@ Field widgets used by live page renderers (`RecipeRenderer`, `FrontpageRenderer`
 Shared DOM helpers: `src/lib/render/mdrc-layout.js` (`applyMdrcLayoutSteps`, `wrapMdrcInDedicatedMount`).
 
 Layout class names: `src/shared/constants/recipe-ui.js` (`RECIPE_LAYOUT`), `frontpage-ui.js` (`FRONTPAGE_LAYOUT`).
+
+## Languages
+
+User-visible strings go in `src/shared/i18n/labels.js` (`getUILabels`, `getFrontpageLabels`, …). Pass `lang` (`"en"` | `"fr"`) from the renderer into widgets that show labels.

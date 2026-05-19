@@ -1,13 +1,4 @@
-export const FRONTMATTER_LABELS = Object.freeze({
-    NOTE: 'Note',
-    OVEN: 'Oven temperature',
-    PERSON: 'Nombre de personnes',
-    COOK: 'Cuisson',
-    PREP: 'Préparation',
-    REST: 'Repos',
-    COOL: 'Frigo',
-    FREEZE: 'Congélateur'
-});
+export { getFrontmatterLabels } from "../i18n/index.js";
 
 export const FRONTMATTER = Object.freeze({
     AVAILABLE_INGREDIENTS: 'available_ingredients',
@@ -44,8 +35,21 @@ export const INGREDIENT_NOTEBOOK = Object.freeze({
 
 /** Frontmatter keys that trigger a full recipe live re-render when changed. */
 export const RECIPE_LIVE_SUBSCRIPTION_KEYS = Object.freeze([
-    FRONTMATTER.VIEW
+    FRONTMATTER.VIEW,
+    FRONTMATTER.INGREDIENTS,
+    FRONTMATTER.PREP_DURATION,
+    FRONTMATTER.COOK_DURATION,
+    FRONTMATTER.REST_DURATION,
+    FRONTMATTER.COOL_DURATION,
+    FRONTMATTER.FREEZE_DURATION,
+    FRONTMATTER.OVEN,
+    FRONTMATTER.NOTE,
+    FRONTMATTER.SOURCE,
+    FRONTMATTER.TAGS,
+    FRONTMATTER.THUMBNAIL,
+    FRONTMATTER.PERSON.RAW,
 ]);
+
 
 /** Keys read into the metadata snapshot passed to {@link RecipeRenderer#render}. */
 export const RECIPE_LIVE_READ_KEYS = Object.freeze([
@@ -81,3 +85,4 @@ export const FRONTMATTER_DEFAULTS = Object.freeze({
     [INGREDIENT_NOTEBOOK.RHO]: 1,
     [INGREDIENT_NOTEBOOK.SPECIFIC_WEIGHT]: 1,
 });
+

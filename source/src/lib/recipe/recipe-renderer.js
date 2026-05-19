@@ -4,7 +4,7 @@
  */
 import { FRONTMATTER, FRONTMATTER_DEFAULTS, RECIPE_LIVE_READ_KEYS } from "../../shared/constants/recipe.js";
 import { hasReadableIngredients, ingredientsContentSignature } from "../../shared/ingredients-utils.js";
-import { UI_CLASSES, UI_LABELS } from "../../shared/constants/ui.js";
+import { UI_CLASSES, getUILabels } from "../../shared/constants/ui.js";
 import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { Content } from "../../components/recipe-fields/content.js";
 import { DurationInput } from "../../components/shared/duration-input.js";
@@ -30,24 +30,26 @@ import {
 import {disableScrollToChange} from "../disable-scroll-change.js";
 
 export class RecipeRenderer {
-    constructor(path) {
+    constructor(path, lang) {
         this.path = path;
+        this.lang = lang;
+        this.UI_LABELS = getUILabels(lang);
         this.content = new Content(path);
         this.prepDuration = new DurationInput(path, FRONTMATTER.PREP_DURATION);
         this.cookDuration = new DurationInput(path, FRONTMATTER.COOK_DURATION);
         this.restDuration = new DurationInput(path, FRONTMATTER.REST_DURATION);
         this.coolDuration = new DurationInput(path, FRONTMATTER.COOL_DURATION);
         this.freezeDuration = new DurationInput(path, FRONTMATTER.FREEZE_DURATION);
-        this.ingredientInputTable = new IngredientInputTable(path);
+        this.ingredientInputTable = new IngredientInputTable(path, lang);
         this.ingredientViewTable = new IngredientViewTable(path);
         this.noteInput = new NoteInput(path);
-        this.ovenInput = new OvenInput(path);
-        this.personButton = new PersonButton(path);
-        this.sourceInput = new SourceInput(path);
-        this.thumbnailInput = new ThumbnailInput(path);
+        this.ovenInput = new OvenInput(path, lang);
+        this.personButton = new PersonButton(path, lang);
+        this.sourceInput = new SourceInput(path, lang);
+        this.thumbnailInput = new ThumbnailInput(path, lang);
         this.tagsInput = new TagsInput(path);
-        this.addIngredientButton = new AddIngredientButton(path);
-        this.toggleButton = new ToggleButton(path);
+        this.addIngredientButton = new AddIngredientButton(path, lang);
+        this.toggleButton = new ToggleButton(path, lang);
         this.metadata = {};
         /** @type {{ view: boolean; ingSig: string; rest: string } | null} */
         this._lastFingerprint = null;
@@ -185,7 +187,7 @@ export class RecipeRenderer {
             this.ingredientViewTable.generate(mb, ingredientsValue, true);
         } else {
             this.ingredientViewTable.discardMountables();
-            this.ingredientInputTable.generate(mb, ingredientsValue);
+            this.ingredientInputTable.generate(mb, this.lang, ingredientsValue);
         }
     }
 
@@ -193,7 +195,7 @@ export class RecipeRenderer {
         const el = container.createEl("div", { cls: RECIPE_LAYOUT.toggleBar });
         el.createEl("span", {
             cls: RECIPE_LAYOUT.modeLabel,
-            text: view ? UI_LABELS.MODE_READ : UI_LABELS.MODE_EDIT,
+            text: view ? this.UI_LABELS.MODE_READ : this.UI_LABELS.MODE_EDIT,
         });
         const actions = el.createEl("div", { cls: RECIPE_LAYOUT.toggleActions });
         this.toggleButton
@@ -263,7 +265,7 @@ export class RecipeRenderer {
     }
 
     #fillIngredientsSection(mb, component, section, view, ingredients, readFiltered) {
-        section.createEl("h3", { cls: RECIPE_LAYOUT.sectionHeading, text: UI_LABELS.INGREDIENTS });
+        section.createEl("h3", { cls: RECIPE_LAYOUT.sectionHeading, text: this.UI_LABELS.INGREDIENTS });
 
         if (view) {
             this.ingredientViewTable.render(mb, ingredients, readFiltered).forEach((row) => {
@@ -303,8 +305,8 @@ export class RecipeRenderer {
 
     #mountPersonBar(mb, component, container, view) {
         const el = container.createEl("div", { cls: RECIPE_LAYOUT.personContainer });
-        if(!view){
-            el.createEl("label", { text: "Nombre de personnes : " })
+        if (!view) {
+            el.createEl("label", { text: this.UI_LABELS.PERSON_FIELD_LABEL });
         }
         this.personButton
             .render(mb, view)

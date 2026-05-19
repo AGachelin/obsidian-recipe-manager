@@ -1,5 +1,6 @@
 import { queryFilteredRecipes, filterRecipesInstant, recipeDisplayName } from "../../lib/frontpage/query.js";
 import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
+import { getFrontpageLabels } from "../../shared/i18n/index.js";
 import { mountCollapsibleSection } from "./collapsible-sections.js";
 import { mountStarRating } from "../shared/star-rating.js";
 import { recipeResultsGroupLabel, resolveRecipeThumbnailUrl } from "../../shared/vault/recipes.js";
@@ -10,9 +11,12 @@ import { recipeResultsGroupLabel, resolveRecipeThumbnailUrl } from "../../shared
 export class FrontpageRecipeResultsPanel {
     /**
      * @param {string} path Front page note path (for Markdown link context).
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
      */
-    constructor(path) {
+    constructor(path, lang) {
         this.path = path;
+        this.lang = lang;
+        this.L = getFrontpageLabels(lang);
         /** @type {import("obsidian").App | null} */
         this.app = null;
         /** @type {HTMLElement | null} */
@@ -70,21 +74,21 @@ export class FrontpageRecipeResultsPanel {
         if (this.appliedRecipes.length === 0) {
             this.tableHost.createEl("p", {
                 cls: FRONTPAGE_LAYOUT.empty,
-                text: 'No recipes match the advanced filters. Adjust filters and click "Apply advanced filters".',
+                text: this.L.EMPTY_ADVANCED,
             });
             return;
         }
         if (filtered.length === 0) {
             this.tableHost.createEl("p", {
                 cls: FRONTPAGE_LAYOUT.empty,
-                text: "No recipes match the recipe name or ingredient text filter.",
+                text: this.L.EMPTY_INSTANT,
             });
             return;
         }
 
         const groups = new Map();
         for (const page of filtered) {
-            const label = recipeResultsGroupLabel(page, recipeDisplayName);
+            const label = recipeResultsGroupLabel(page, recipeDisplayName, this.lang);
             if (!groups.has(label)) {
                 groups.set(label, []);
             }
@@ -104,8 +108,8 @@ export class FrontpageRecipeResultsPanel {
             const table = content.createEl("table", { cls: FRONTPAGE_LAYOUT.table });
             const trh = table.createEl("thead").createEl("tr");
             trh.createEl("th", { text: "" });
-            trh.createEl("th", { text: "Recipe" });
-            trh.createEl("th", { text: "Rating" });
+            trh.createEl("th", { text: this.L.TABLE_RECIPE });
+            trh.createEl("th", { text: this.L.TABLE_RATING });
             const tbody = table.createEl("tbody");
 
             for (const p of pages) {

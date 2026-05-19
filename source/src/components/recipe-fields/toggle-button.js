@@ -1,10 +1,13 @@
 import { FRONTMATTER } from "../../shared/constants/recipe.js";
 import { ButtonConfig } from "../config/button-config.js";
+import { getUILabels } from "../../shared/i18n/index.js";
 
 export class ToggleButton {
-    constructor(path) {
+    constructor(path, lang) {
         this.path = path;
         this.isGenerated = false;
+        this.lang = lang;
+        this.UI_LABELS = getUILabels(lang);
     }
 
     generate(mb, isViewMode) {
@@ -14,10 +17,10 @@ export class ToggleButton {
 
         const bindKey = FRONTMATTER.VIEW;
 
-        this.viewModeButtonConfig = new ButtonConfig("switch-mode-view", "Read", "edit");
+        this.viewModeButtonConfig = new ButtonConfig("switch-mode-view", this.UI_LABELS.READ, "edit");
         this.viewModeButtonConfig.addUpdateMetadataAction(bindKey, true)
 
-        this.editModeButtonConfig = new ButtonConfig("switch-mode-edit", "Edit", "edit");
+        this.editModeButtonConfig = new ButtonConfig("switch-mode-edit", this.UI_LABELS.EDIT, "edit");
         this.editModeButtonConfig.addUpdateMetadataAction(bindKey, false)
 
         this.viewModeButtonOptions = this.viewModeButtonConfig.render(false);

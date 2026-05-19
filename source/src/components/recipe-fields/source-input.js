@@ -1,11 +1,18 @@
 import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
+import { getUILabels } from "../../shared/i18n/index.js";
 import { InputConfig } from "../config/input-config.js";
 import { ViewConfig } from "../config/view-config.js";
 
 export class SourceInput extends InputConfig {
-    constructor(path) {
+    /**
+     * @param {string} path
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
+    constructor(path, lang) {
         super("text", null);
         this.path = path;
+        this.lang = lang;
+        this.UI_LABELS = getUILabels(lang);
         this.isGenerated = false;
         this.lastView = null;
         this.lastValue = null;
@@ -19,7 +26,9 @@ export class SourceInput extends InputConfig {
         this.bindTarget = btSource;
         this.viewConfig = new ViewConfig("VIEW[{source}][text(renderMarkdown)]").render();
         this.view = mb.createViewFieldMountable(this.path, this.viewConfig);
-        this.declarationArguments = [{ name: "placeholder", value: ["Enter source"] }];
+        this.declarationArguments = [
+            { name: "placeholder", value: [this.UI_LABELS.SOURCE_PLACEHOLDER] },
+        ];
         if (value !== null && value !== undefined) {
             this.declarationArguments.push({ name: "defaultValue", value: [`${value}`] });
         }
@@ -31,15 +40,16 @@ export class SourceInput extends InputConfig {
         if (!this.isGenerated || this.lastView !== view || this.lastValue !== value) {
             this.generate(mb, view, value);
         }
+        const label = `${this.UI_LABELS.SOURCE_LABEL}: `;
         if (!view) {
-            const inputWrapper = container.createEl("div", {
+            const inputWrapper = container.createDiv({
                 cls: `${RECIPE_LAYOUT.inputField} source-input`,
             });
-            inputWrapper.createEl("label", { text: "Source: " });
+            inputWrapper.createEl("label", { text: label });
             return [{ parent: inputWrapper, field: this.inputField }];
         }
-        const viewWrapper = container.createEl("div", { cls: `${RECIPE_LAYOUT.viewField} source-view` });
-        viewWrapper.createEl("strong", { text: "Source: " });
+        const viewWrapper = container.createDiv({ cls: `${RECIPE_LAYOUT.viewField} source-view` });
+        viewWrapper.createEl("strong", { text: label });
         return [{ parent: viewWrapper, field: this.view }];
     }
 }

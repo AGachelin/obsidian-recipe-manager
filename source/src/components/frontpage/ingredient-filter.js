@@ -12,6 +12,7 @@ import {
 } from "../../shared/constants/frontpage.js";
 import { INGREDIENT_FILTER_LAYOUT } from "../../shared/constants/frontpage-ui.js";
 import { UI_CLASSES } from "../../shared/constants/ui.js";
+import { getFrontpageLabels, getIngredientFilterStateLabels } from "../../shared/i18n/index.js";
 import { InputConfig } from "../config/input-config.js";
 import { ButtonConfig } from "../config/button-config.js";
 
@@ -21,17 +22,18 @@ const FILTER_STATES = Object.freeze({
     MUST_NOT_HAVE: "must_not_have",
 });
 
-const STATE_LABELS = Object.freeze({
-    [FILTER_STATES.ALLOWED]: "Allowed",
-    [FILTER_STATES.MUST_HAVE]: "Must have",
-    [FILTER_STATES.MUST_NOT_HAVE]: "Must not have",
-});
-
 const STATE_CYCLE = [FILTER_STATES.ALLOWED, FILTER_STATES.MUST_HAVE, FILTER_STATES.MUST_NOT_HAVE];
 
 export class IngredientFilter {
-    constructor(path) {
+    /**
+     * @param {string} path
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
+    constructor(path, lang) {
         this.path = path;
+        this.lang = lang;
+        this.L = getFrontpageLabels(lang);
+        this.stateLabels = getIngredientFilterStateLabels(lang);
         this.isGenerated = false;
         this.containerEl = null;
         this.listEl = null;
@@ -98,7 +100,7 @@ export class IngredientFilter {
         this.searchInputEl = searchWrap.createEl("input", {
             type: "text",
             cls: INGREDIENT_FILTER_LAYOUT.searchInput,
-            attr: { placeholder: "Filter ingredients…", spellcheck: "false" },
+            attr: { placeholder: this.L.INGREDIENT_FILTER_PLACEHOLDER, spellcheck: "false" },
         });
         const searchBt = mb.parseBindTarget(FrontpageFm.FILTER_INGREDIENTS_SEARCH, this.path);
         const v = mb.getMetadata(searchBt);
@@ -116,7 +118,7 @@ export class IngredientFilter {
             }, 80);
         });
 
-        const resetButtonConfig = new ButtonConfig("reset-ingredient-filter", "Reset");
+        const resetButtonConfig = new ButtonConfig("reset-ingredient-filter", this.L.INGREDIENT_FILTER_RESET);
         resetButtonConfig.addUpdateMetadataAction(FrontpageFm.FILTER_INGREDIENTS_STATE, "Object.create(null)");
         const resetButton = mb.createButtonMountable(this.path, resetButtonConfig.render(false));
         const resetMount = headerEl.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.resetWrap });
@@ -148,7 +150,7 @@ export class IngredientFilter {
 
         if (visibleIngredients.length === 0) {
             this.listEl.createEl("p", {
-                text: "No ingredients match your search.",
+                text: this.L.INGREDIENT_FILTER_EMPTY,
                 cls: INGREDIENT_FILTER_LAYOUT.empty,
             });
         }
@@ -166,7 +168,7 @@ export class IngredientFilter {
         const rowEl = listEl.createEl("div", { cls: INGREDIENT_FILTER_LAYOUT.row });
 
         const buttonId = `filter-state-${ingredientName.replace(/[^a-z0-9]/gi, "-")}`;
-        const stateButtonConfig = new ButtonConfig(buttonId, STATE_LABELS[state] || state);
+        const stateButtonConfig = new ButtonConfig(buttonId, this.stateLabels[state] || state);
         stateButtonConfig.addUpdateMetadataAction(
             ingredientFilterStateBindKey(ingredientName),
             `(() => {
@@ -187,7 +189,7 @@ export class IngredientFilter {
                 "text",
                 mb.parseBindTarget(ingredientFilterAmountBindKey(ingredientName), this.path),
                 "inline",
-                [{ name: "placeholder", value: ["max amount"] }]
+                [{ name: "placeholder", value: [this.L.MAX_AMOUNT_PLACEHOLDER] }]
             ).render();
             const amountInput = mb.createInputFieldMountable(this.path, amountConfig);
             const amountMount = rowEl.createEl("span", { cls: UI_CLASSES.MDRC_MOUNT });

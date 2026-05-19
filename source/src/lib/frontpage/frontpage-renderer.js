@@ -15,11 +15,16 @@ import { createCoalescedScheduler } from "../coalesced-refresh.js";
 import { disableScrollToChange } from "../disable-scroll-change.js";
 
 export class FrontpageRenderer {
-    constructor(path) {
+    /**
+     * @param {string} path
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
+    constructor(path, lang) {
         this.path = path;
-        this.sidebar = new FrontpageAdvancedSidebar(this.path);
-        this.indexChrome = new FrontpageRecipeIndexChrome(this.path);
-        this.results = new FrontpageRecipeResultsPanel(this.path);
+        this.lang = lang;
+        this.sidebar = new FrontpageAdvancedSidebar(this.path, lang);
+        this.indexChrome = new FrontpageRecipeIndexChrome(this.path, lang);
+        this.results = new FrontpageRecipeResultsPanel(this.path, lang);
     }
 
     /** @param {*} mb */
@@ -42,7 +47,7 @@ export class FrontpageRenderer {
 
         disableScrollToChange(container);
 
-        const { sidebarContent, main } = createFrontpageChrome(container);
+        const { sidebarContent, main } = createFrontpageChrome(container, this.lang);
 
         const { btnApply, btnReset } = await this.#mountAdvancedSidebar(mb, sidebarContent, component);
 
