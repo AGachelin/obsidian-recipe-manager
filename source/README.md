@@ -1,6 +1,6 @@
-## Introduction
+## Obsidian Recipe Manager
 
-This repository implements interactive recipe notes and a searchable recipe index for [Obsidian](https://obsidian.md), with js-engine, Meta Bind, and optional Dataview. The [Hover Editor](https://github.com/nothingislost/obsidian-hover-editor) plugin is recommended, otherwise the recipe body has to be manually modified in `content.md` files. Recipe pages support read/edit modes, ingredient scaling, ratings and thumbnails amongst other miscellaneous parameters. The index page offers advanced filters, folder-grouped results and fast recipe creation.
+Interactive recipe notes and a searchable recipe index for [Obsidian](https://obsidian.md), built with js-engine, Meta Bind, and optional Dataview. The [Hover Editor](https://github.com/nothingislost/obsidian-hover-editor) plugin is recommended, otherwise the recipe body has to be manually modified in `content.md` files. Recipe pages support read/edit modes, ingredient scaling, ratings and thumbnails amongst other miscellaneous parameters. The index page offers advanced filters, folder-grouped results and fast recipe creation.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ Files in the `snippets` folder have to be copied to the `.obsidian/snippets` fol
 ## Vault layout
 
 ```
-recipes/                 # git / vault root
+obsidian-recipe-manager/                 # git / vault root
 ├── Recipes/             # all recipe notes (required folder name)
 │   └── <category>/
 │       └── <name>/
