@@ -39,6 +39,7 @@ export const FRONTPAGE_LAYOUT = Object.freeze({
     cellThumb: "live__cell-thumb",
     cellRating: "live__cell-rating",
     resultsGroups: "live__results-groups",
+    resultsNested: "live__results-nested",
 });
 
 export const INGREDIENT_FILTER_LAYOUT = Object.freeze({

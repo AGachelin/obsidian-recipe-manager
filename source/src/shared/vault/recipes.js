@@ -1,5 +1,4 @@
 import { FRONTMATTER } from "../constants/recipe.js";
-import { getFrontpageLabels } from "../i18n/index.js";
 
 /** Vault folder containing recipe notes (Dataview path and file walk). */
 export const RECIPES_FOLDER = "Recipes";
@@ -86,33 +85,6 @@ export function recipePageFromFile(app, file) {
         thumbnail: fm.thumbnail,
         ingredients: fm.ingredients,
     };
-}
-
-/**
- * Folder label for grouping index results (relative to `Recipes/`, skipping a trailing
- * folder whose name matches the recipe title).
- * @param {{ file: import("obsidian").TFile }} page
- * @param {(page: { file: import("obsidian").TFile }) => string} [displayName]
- * @param {import("../i18n/language.js").AppLanguage} [lang]
- */
-export function recipeResultsGroupLabel(page, displayName, lang = "en") {
-    const rootLabel = getFrontpageLabels(lang).RECIPES_ROOT;
-    const file = page.file;
-    const name = displayName ? displayName(page) : file.basename;
-    const prefix = `${RECIPES_FOLDER}/`;
-    const rel = file.path.startsWith(prefix) ? file.path.slice(prefix.length) : file.path;
-    const dirParts = rel.split("/").slice(0, -1);
-    if (dirParts.length === 0) {
-        return rootLabel;
-    }
-    const parts = [...dirParts];
-    while (parts.length > 0 && parts[parts.length - 1].toLowerCase() === name.toLowerCase()) {
-        parts.pop();
-    }
-    if (parts.length === 0) {
-        return rootLabel;
-    }
-    return parts.join(" / ");
 }
 
 /**

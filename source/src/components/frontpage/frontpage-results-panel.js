@@ -1,9 +1,13 @@
 import { queryFilteredRecipes, filterRecipesInstant, recipeDisplayName } from "../../lib/frontpage/query.js";
+import {
+    buildRecipeResultsTree,
+    sortedRecipeResultChildNodes,
+} from "../../lib/frontpage/recipe-results-tree.js";
 import { FRONTPAGE_LAYOUT } from "../../shared/constants/frontpage-ui.js";
 import { getFrontpageLabels } from "../../shared/i18n/index.js";
 import { mountCollapsibleSection } from "./collapsible-sections.js";
 import { mountStarRating } from "../shared/star-rating.js";
-import { recipeResultsGroupLabel, resolveRecipeThumbnailUrl } from "../../shared/vault/recipes.js";
+import { resolveRecipeThumbnailUrl } from "../../shared/vault/recipes.js";
 
 /**
  * Stateless table paint + asynchronous server-side filter query (Dataview/cache).
@@ -86,52 +90,91 @@ export class FrontpageRecipeResultsPanel {
             return;
         }
 
-        const groups = new Map();
-        for (const page of filtered) {
-            const label = recipeResultsGroupLabel(page, recipeDisplayName, this.lang);
-            if (!groups.has(label)) {
-                groups.set(label, []);
-            }
-            groups.get(label).push(page);
+        const tree = buildRecipeResultsTree(filtered, this.lang);
+        const host = this.tableHost.createDiv({ cls: FRONTPAGE_LAYOUT.resultsGroups });
+        this.#mountResultsTreeNode(host, tree, mb, true);
+    }
+
+    /**
+     * @param {HTMLElement} parent
+     * @param {import("../../lib/frontpage/recipe-results-tree.js").RecipeResultsTreeNode} node
+     * @param {*} mb
+     * @param {boolean} [isRoot=false]
+     */
+    #mountResultsTreeNode(parent, node, mb, isRoot = false) {
+        const childNodes = sortedRecipeResultChildNodes(node.children);
+        const hasChildren = childNodes.length > 0;
+        const hasPages = node.pages.length > 0;
+
+        if (!hasChildren && !hasPages) {
+            return;
         }
 
-        const sortedLabels = [...groups.keys()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-        const host = this.tableHost.createDiv({ cls: FRONTPAGE_LAYOUT.resultsGroups });
+        if (isRoot) {
+            if (hasPages) {
+                const rootContent = mountCollapsibleSection(parent, node.label, true);
+                this.#mountRecipeTable(rootContent, node.pages, mb);
+            }
+            for (const child of childNodes) {
+                this.#mountResultsTreeNode(parent, child, mb, false);
+            }
+            return;
+        }
+
+        const sectionContent = mountCollapsibleSection(parent, node.label, true);
+        const nestedHost = hasChildren
+            ? sectionContent.createDiv({ cls: FRONTPAGE_LAYOUT.resultsNested })
+            : sectionContent;
+
+        for (const child of childNodes) {
+            this.#mountResultsTreeNode(nestedHost, child, mb, false);
+        }
+
+        if (hasPages) {
+            this.#mountRecipeTable(hasChildren ? nestedHost : sectionContent, node.pages, mb);
+        }
+    }
+
+    /**
+     * @param {HTMLElement} parent
+     * @param {any[]} pages
+     * @param {*} mb
+     */
+    #mountRecipeTable(parent, pages, mb) {
+        const sorted = pages.slice().sort((a, b) =>
+            recipeDisplayName(a).localeCompare(recipeDisplayName(b), undefined, { sensitivity: "base" })
+        );
+
+        const table = parent.createEl("table", { cls: FRONTPAGE_LAYOUT.table });
+        const trh = table.createEl("thead").createEl("tr");
+        trh.createEl("th", { text: "" });
+        trh.createEl("th", { text: this.L.TABLE_RECIPE });
+        trh.createEl("th", { text: this.L.TABLE_RATING });
+        const tbody = table.createEl("tbody");
+
         const pathCtx = this.path;
         const app = this.app;
 
-        for (const label of sortedLabels) {
-            const pages = groups.get(label).slice().sort((a, b) =>
-                recipeDisplayName(a).localeCompare(recipeDisplayName(b), undefined, { sensitivity: "base" })
-            );
-            const content = mountCollapsibleSection(host, label, true);
-            const table = content.createEl("table", { cls: FRONTPAGE_LAYOUT.table });
-            const trh = table.createEl("thead").createEl("tr");
-            trh.createEl("th", { text: "" });
-            trh.createEl("th", { text: this.L.TABLE_RECIPE });
-            trh.createEl("th", { text: this.L.TABLE_RATING });
-            const tbody = table.createEl("tbody");
+        for (const p of sorted) {
+            const tr = tbody.createEl("tr");
+            const tdThumb = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellThumb });
+            const tdName = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellName });
+            const tdRate = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellRating });
+            const file = p.file;
+            const displayName = recipeDisplayName(p);
 
-            for (const p of pages) {
-                const tr = tbody.createEl("tr");
-                const tdThumb = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellThumb });
-                const tdName = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellName });
-                const tdRate = tr.createEl("td", { cls: FRONTPAGE_LAYOUT.cellRating });
-                const file = p.file;
-
-                if (app) {
-                    const thumbUrl = resolveRecipeThumbnailUrl(app, pathCtx, p.thumbnail);
-                    if (thumbUrl) {
-                        tdThumb.createEl("img", {
-                            cls: "live__thumb-img",
-                            attr: { src: thumbUrl, alt: "", loading: "lazy" },
-                        });
-                    }
+            if (app) {
+                const thumbUrl = resolveRecipeThumbnailUrl(app, pathCtx, p.thumbnail);
+                if (thumbUrl) {
+                    tdThumb.createEl("img", {
+                        cls: "live__thumb-img",
+                        attr: { src: thumbUrl, alt: "", loading: "lazy" },
+                    });
                 }
-
-                mountStarRating(tdRate, p.note);
-                mb.mb.internal.renderMarkdown(`[[${file.path}|${recipeDisplayName(p)}]]`, tdName, pathCtx);
             }
+
+            mountStarRating(tdRate, p.note);
+            mb.mb.internal.renderMarkdown(`[[${file.path}|${displayName}]]`, tdName, pathCtx);
         }
     }
 }
