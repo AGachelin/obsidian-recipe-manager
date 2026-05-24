@@ -3,6 +3,7 @@
  */
 import { convert } from "../../shared/startup/math-units.js";
 import { FRONTPAGE_DEFAULT_MAX_DURATION_SEC, FrontpageFm } from "../../shared/constants/frontpage.js";
+import { getIngredientRowsByName, sumRecipeAmountForName } from "../../shared/ingredients-utils.js";
 import {
     RECIPES_FOLDER,
     iterIngredientRows,
@@ -64,42 +65,34 @@ function recipeTagSet(p) {
     return set;
 }
 
-function findIngredientByName(ing, name) {
-    const nameLC = String(name).toLowerCase();
-    for (const row of iterIngredientRows(ing)) {
-        if (String(row.name ?? "").toLowerCase() === nameLC) {
-            return row;
-        }
-    }
-    return null;
+function hasIngredientName(ing, name) {
+    return getIngredientRowsByName(ing, name).length > 0;
 }
 
-function checkIngredientAmount(c, mb, ingRow, ingName){
-    if (!ingRow.amount) return true;
+function checkTotalIngredientAmount(c, mb, ing, ingName) {
     const maxAmount = c.filterIngredientAmounts[ingName];
+    if (maxAmount === "" || maxAmount == null) return true;
     const unit = c.filterIngredientUnits?.[ingName] ?? "";
-    if (maxAmount !== "" && maxAmount != null) {
-        const recipeAmount = Number(ingRow.amount);
-        const filterAmount = convert(mb, unit, Number(maxAmount), ingName);
-        if (Number.isFinite(recipeAmount) && Number.isFinite(filterAmount)) {
-            if (recipeAmount > filterAmount) return false;
-        }
-    }
-    return true;
+    const total = sumRecipeAmountForName(ing, ingName, mb);
+    if (total == null) return true;
+    const filterAmount = convert(mb, unit, Number(maxAmount), ingName);
+    if (!Number.isFinite(filterAmount)) return true;
+    return total <= filterAmount;
 }
 
-function ingredientFilterPasses(ing, c, mb, ingName) {
+function ingredientFilterPasses(ing, c, mb) {
     for (const [ingName, state] of Object.entries(c.filterIngredientStates)) {
-        const ingRow = findIngredientByName(ing, ingName);
-        if (!state || state === "allowed"){
-            if(ingRow && !checkIngredientAmount(c, mb, ingRow, ingName)) return false;
+        const hasRows = hasIngredientName(ing, ingName);
+        if (!state || state === "allowed") {
+            if (hasRows && !checkTotalIngredientAmount(c, mb, ing, ingName)) return false;
             continue;
-        };
+        }
         if (state === "must_have") {
-            if (!ingRow || !checkIngredientAmount(c, mb, ingRow, ingName)) return false;
+            if (!hasRows || !checkTotalIngredientAmount(c, mb, ing, ingName)) return false;
             continue;
-        } else if (state === "must_not_have") {
-            if (ingRow) return false;
+        }
+        if (state === "must_not_have") {
+            if (hasRows) return false;
         }
     }
     return true;

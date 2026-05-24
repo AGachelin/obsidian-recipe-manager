@@ -8,15 +8,14 @@ import { UI_CLASSES, getUILabels } from "../../shared/constants/ui.js";
 import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { Content } from "../../components/recipe-fields/content.js";
 import { DurationInput } from "../../components/shared/duration-input.js";
-import { IngredientInputTable } from "../../components/recipe-fields/ingredient-input-table.js";
 import { IngredientViewTable } from "../../components/recipe-fields/ingredients-view.js";
+import { RecipeIngredientsEditor } from "../../components/recipe-fields/recipe-ingredients-editor.js";
 import { NoteInput } from "../../components/recipe-fields/note-input.js";
 import { OvenInput } from "../../components/recipe-fields/oven-input.js";
 import { PersonButton } from "../../components/recipe-fields/person-button.js";
 import { SourceInput } from "../../components/recipe-fields/source-input.js";
 import { ThumbnailInput } from "../../components/recipe-fields/thumbnail-input.js";
 import { TagsInput } from "../../components/shared/tags-input.js";
-import { AddIngredientButton } from "../../components/recipe-fields/add-ingredient-button-group.js";
 import { ToggleButton } from "../../components/recipe-fields/toggle-button.js";
 import { applyMdrcLayoutSteps, wrapMdrcInDedicatedMount } from "../render/mdrc-layout.js";
 import { assignDurationLabels, buildRecipeBindSnapshot } from "./bind-sync.js";
@@ -40,15 +39,14 @@ export class RecipeRenderer {
         this.restDuration = new DurationInput(path, FRONTMATTER.REST_DURATION);
         this.coolDuration = new DurationInput(path, FRONTMATTER.COOL_DURATION);
         this.freezeDuration = new DurationInput(path, FRONTMATTER.FREEZE_DURATION);
-        this.ingredientInputTable = new IngredientInputTable(path, lang);
         this.ingredientViewTable = new IngredientViewTable(path);
+        this.recipeIngredientsEditor = new RecipeIngredientsEditor(path, lang, null);
         this.noteInput = new NoteInput(path);
         this.ovenInput = new OvenInput(path, lang);
         this.personButton = new PersonButton(path, lang);
         this.sourceInput = new SourceInput(path, lang);
         this.thumbnailInput = new ThumbnailInput(path, lang);
         this.tagsInput = new TagsInput(path);
-        this.addIngredientButton = new AddIngredientButton(path, lang);
         this.toggleButton = new ToggleButton(path, lang);
         this.metadata = {};
         /** @type {{ view: boolean; ingSig: string; rest: string } | null} */
@@ -73,7 +71,7 @@ export class RecipeRenderer {
         this.coolDuration.generate(mb, view, snap.coolSec);
         this.freezeDuration.generate(mb, view, snap.freezeSec);
 
-        this.#syncIngredientTables(mb, view, snap.ingredientsValue);
+        this.#syncIngredientTables(mb, view, snap.ingredientsValue, snap.groupsValue);
 
         this.noteInput.generate(mb, view, snap.noteValue);
         this.ovenInput.generate(mb, view, snap.ovenValue);
@@ -81,11 +79,11 @@ export class RecipeRenderer {
         this.sourceInput.generate(mb, view, snap.sourceValue);
         this.thumbnailInput.generate(mb, view, snap.thumbnailValue);
         this.tagsInput.generate(mb);
-        this.addIngredientButton.generate(mb);
         this.toggleButton.generate(mb, view);
     }
 
     render(mb, container, component, view, metadata) {
+        this.recipeIngredientsEditor.app = mb.mb?.app ?? mb.app;
         const meta = metadata ?? {};
         const fingerprint = this.#renderFingerprint(meta, view);
 
@@ -105,14 +103,17 @@ export class RecipeRenderer {
 
         const ingredients =
             this.metadata[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
+        const groups =
+            this.metadata[FRONTMATTER.INGREDIENT_GROUPS] ??
+            FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENT_GROUPS];
 
         this.#mountToggleBar(mb, component, container, view);
 
         let mainEl = null;
         if (view) {
-            mainEl = this.#mountReadBody(mb, component, container, view, ingredients);
+            mainEl = this.#mountReadBody(mb, component, container, view, ingredients, groups);
         } else {
-            this.#mountEditBody(mb, component, container, view, ingredients);
+            this.#mountEditBody(mb, component, container, view, ingredients, groups);
         }
 
         const contentParent = mainEl ?? container;
@@ -136,15 +137,18 @@ export class RecipeRenderer {
     #renderFingerprint(meta, view) {
         const ing =
             meta[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
+        const groups =
+            meta[FRONTMATTER.INGREDIENT_GROUPS] ??
+            FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENT_GROUPS];
         const rest = {};
         for (const key of RECIPE_LIVE_READ_KEYS) {
-            if (key !== FRONTMATTER.INGREDIENTS) {
+            if (key !== FRONTMATTER.INGREDIENTS && key !== FRONTMATTER.INGREDIENT_GROUPS) {
                 rest[key] = meta[key];
             }
         }
         return {
             view,
-            ingSig: ingredientsContentSignature(ing),
+            ingSig: ingredientsContentSignature(ing, groups),
             rest: JSON.stringify(rest),
         };
     }
@@ -168,6 +172,9 @@ export class RecipeRenderer {
 
         const ingredients =
             meta[FRONTMATTER.INGREDIENTS] ?? FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENTS];
+        const groups =
+            meta[FRONTMATTER.INGREDIENT_GROUPS] ??
+            FRONTMATTER_DEFAULTS[FRONTMATTER.INGREDIENT_GROUPS];
         mount.section.empty();
         this.#fillIngredientsSection(
             mb,
@@ -175,20 +182,21 @@ export class RecipeRenderer {
             mount.section,
             view,
             ingredients,
+            groups,
             mount.readFiltered
         );
         this._lastFingerprint = fingerprint;
         return true;
     }
 
-    #syncIngredientTables(mb, view, ingredientsValue) {
+    #syncIngredientTables(mb, view, ingredientsValue, groupsValue) {
         if (view) {
-            this.ingredientInputTable.discardMountables();
-            this.ingredientViewTable.generate(mb, ingredientsValue, true);
+            this.ingredientViewTable.discardMountables();
         } else {
             this.ingredientViewTable.discardMountables();
-            this.ingredientInputTable.generate(mb, this.lang, ingredientsValue);
         }
+        void ingredientsValue;
+        void groupsValue;
     }
 
     #mountToggleBar(mb, component, container, view) {
@@ -203,7 +211,7 @@ export class RecipeRenderer {
             .forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, actions));
     }
 
-    #mountReadBody(mb, component, container, view, ingredients) {
+    #mountReadBody(mb, component, container, view, ingredients, groups) {
         const summary = container.createEl("div", { cls: RECIPE_LAYOUT.readSummary });
 
         const times = summary.createEl("div", { cls: RECIPE_LAYOUT.readTimes });
@@ -235,7 +243,9 @@ export class RecipeRenderer {
         if (hasReadableIngredients(ingredients)) {
             const aside = body.createEl("aside", { cls: RECIPE_LAYOUT.readAside });
             this.#mountPersonBar(mb, component, aside, view);
-            this.#mountIngredients(mb, component, aside, view, ingredients, { readFiltered: true });
+            this.#mountIngredients(mb, component, aside, view, ingredients, groups, {
+                readFiltered: true,
+            });
         }
 
         const main = body.createEl("div", { cls: RECIPE_LAYOUT.readMain });
@@ -243,8 +253,10 @@ export class RecipeRenderer {
         return main;
     }
 
-    #mountEditBody(mb, component, container, view, ingredients) {
-        this.#mountIngredients(mb, component, container, view, ingredients, { readFiltered: false });
+    #mountEditBody(mb, component, container, view, ingredients, groups) {
+        this.#mountIngredients(mb, component, container, view, ingredients, groups, {
+            readFiltered: false,
+        });
 
         const metaStrip = container.createEl("div", { cls: RECIPE_LAYOUT.metaStrip });
         this.#mountPersonBar(mb, component, metaStrip, view);
@@ -258,29 +270,36 @@ export class RecipeRenderer {
         this.#mountOven(mb, component, timingRow, view);
     }
 
-    #mountIngredients(mb, component, parent, view, ingredients, { readFiltered = false } = {}) {
+    #mountIngredients(mb, component, parent, view, ingredients, groups, { readFiltered = false } = {}) {
         const section = parent.createEl("div", { cls: RECIPE_LAYOUT.ingredientsContainer });
         this._ingredientsMount = { section, readFiltered };
-        this.#fillIngredientsSection(mb, component, section, view, ingredients, readFiltered);
+        this.#fillIngredientsSection(mb, component, section, view, ingredients, groups, readFiltered);
     }
 
-    #fillIngredientsSection(mb, component, section, view, ingredients, readFiltered) {
-        section.createEl("h3", { cls: RECIPE_LAYOUT.sectionHeading, text: this.UI_LABELS.INGREDIENTS });
-
+    #fillIngredientsSection(mb, component, section, view, ingredients, groups, readFiltered) {
         if (view) {
-            this.ingredientViewTable.render(mb, ingredients, readFiltered).forEach((row) => {
-                const rowEl = section.createEl("div", { cls: RECIPE_LAYOUT.ingredientRow });
-                row.forEach((field) => wrapMdrcInDedicatedMount(mb, component, field, rowEl));
-            });
+            this.ingredientViewTable.renderGrouped(
+                mb,
+                component,
+                section,
+                ingredients,
+                groups,
+                readFiltered
+            );
             return;
         }
 
-        this.ingredientInputTable.render(mb, ingredients).forEach((row) => {
-            const rowEl = section.createEl("div", { cls: RECIPE_LAYOUT.ingredientRow });
-            applyMdrcLayoutSteps(mb, component, row.layoutSteps(rowEl));
-        });
-        const addRow = section.createEl("div", { cls: RECIPE_LAYOUT.addIngredientContainer });
-        applyMdrcLayoutSteps(mb, component, this.addIngredientButton.layoutMDRC(mb, addRow));
+        const onRefresh = () => {
+            if (typeof this._onLiveRefresh === "function") {
+                this._onLiveRefresh();
+            }
+        };
+        this.recipeIngredientsEditor.mount(section, mb, component, ingredients, groups, onRefresh);
+    }
+
+    /** @param {() => void} fn */
+    setLiveRefreshHandler(fn) {
+        this._onLiveRefresh = fn;
     }
 
     #mountSingleDuration(mb, component, parent, durationInput, view) {

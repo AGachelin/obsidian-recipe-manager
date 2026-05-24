@@ -1,9 +1,9 @@
 import { buildUnitSelectDeclarationArguments } from "../../shared/constants/custom-units.js";
 import {
-    attachIngredientNameIndexInvalidation,
-    getCachedIngredientNames,
-    refreshIngredientNames,
-} from "../../shared/vault/ingredient-name-index.js";
+    attachIngredientCatalogInvalidation,
+    getIngredientCatalog,
+    refreshIngredientCatalog,
+} from "../../shared/vault/ingredient-catalog.js";
 import {
     FrontpageFm,
     ingredientFilterAmountBindKey,
@@ -13,6 +13,7 @@ import {
 import { INGREDIENT_FILTER_LAYOUT } from "../../shared/constants/frontpage-ui.js";
 import { UI_CLASSES } from "../../shared/constants/ui.js";
 import { getFrontpageLabels, getIngredientFilterStateLabels } from "../../shared/i18n/index.js";
+import { mountIngredientCatalogTree } from "../shared/ingredient-catalog-tree-mount.js";
 import { InputConfig } from "../config/input-config.js";
 import { ButtonConfig } from "../config/button-config.js";
 
@@ -39,7 +40,6 @@ export class IngredientFilter {
         this.listEl = null;
         /** @type {HTMLInputElement | null} */
         this.searchInputEl = null;
-        this.allIngredients = [];
         this.mb = null;
         this._searchDebounce = null;
     }
@@ -50,14 +50,12 @@ export class IngredientFilter {
     async generate(mb) {
         this.isGenerated = true;
         this.mb = mb;
-        const app = mb.mb.app;
-        attachIngredientNameIndexInvalidation(app);
-        this.allIngredients = await getCachedIngredientNames(app);
+        attachIngredientCatalogInvalidation(mb.mb.app);
+        getIngredientCatalog(mb.mb.app);
     }
 
-    /** Force-refresh name list after vault changes (e.g. reset filters). */
     async reloadIngredientNames(mb) {
-        this.allIngredients = await refreshIngredientNames(mb.mb.app);
+        refreshIngredientCatalog(mb.mb.app);
     }
 
     /**
@@ -71,11 +69,10 @@ export class IngredientFilter {
             const bt = mb.parseBindTarget(ingredientFilterStateBindKey(ingredientName), this.path);
             const state = mb.getMetadata(bt) || FILTER_STATES.ALLOWED;
             return STATE_CYCLE.includes(state) ? state : FILTER_STATES.ALLOWED;
-        } catch (e) {
+        } catch {
             return FILTER_STATES.ALLOWED;
         }
     }
-
 
     /**
      * @param {*} mb
@@ -114,6 +111,7 @@ export class IngredientFilter {
                 try {
                     this._onSearchChange?.();
                 } catch {
+                    /* ignore */
                 }
             }, 80);
         });
@@ -128,27 +126,20 @@ export class IngredientFilter {
         await this.refreshList(mb, component);
     }
 
-    /**
-     * Rebuilds only the scrollable ingredient rows (state / amount / unit mounts).
-     *
-     * @param {*} mb
-     * @param {import("obsidian").Component} component
-     */
     async refreshList(mb, component) {
         if (!this.listEl) return;
 
-        this.listEl.empty();
-        const searchLower = String(this.searchInputEl?.value ?? "").toLowerCase();
-        const visibleIngredients = this.allIngredients.filter((ing) =>
-            ing.toLowerCase().includes(searchLower)
-        );
+        const searchNeedle = String(this.searchInputEl?.value ?? "");
+        const app = mb.mb.app;
+        let any = false;
 
-        for (const ingredientName of visibleIngredients) {
+        mountIngredientCatalogTree(this.listEl, app, this.lang, searchNeedle, (ingredientName, leafParent) => {
+            any = true;
             const state = this.getIngredientState(mb, ingredientName);
-            this.renderIngredientRow(mb, component, this.listEl, ingredientName, state);
-        }
+            this.renderIngredientRow(mb, component, leafParent, ingredientName, state);
+        });
 
-        if (visibleIngredients.length === 0) {
+        if (!any) {
             this.listEl.createEl("p", {
                 text: this.L.INGREDIENT_FILTER_EMPTY,
                 cls: INGREDIENT_FILTER_LAYOUT.empty,

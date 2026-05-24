@@ -1,17 +1,19 @@
 import { buildUnitSelectDeclarationArguments } from "../../shared/constants/custom-units.js";
 import { FRONTMATTER } from "../../shared/constants/recipe.js";
-import {
-    bindIngredientMemory,
-    ingredientsContentSignature,
-    ingredientEntry,
-    listIngredientIds,
-} from "../../shared/ingredients-utils.js";
+import { bindIngredientMemory } from "../../shared/ingredients-utils.js";
 import { convertBackAmount } from "../../shared/startup/math-units.js";
 import { UI_CLASSES, getUILabels } from "../../shared/constants/ui.js";
+import { RECIPE_LAYOUT } from "../../shared/constants/recipe-ui.js";
 import { InputConfig } from "../config/input-config.js";
 import { ButtonConfig } from "../config/button-config.js";
 
-class IngredientInputRow {
+export class IngredientInputRow {
+    /**
+     * @param {string} path
+     * @param {string} id
+     * @param {string} name
+     * @param {import("../../shared/i18n/language.js").AppLanguage} lang
+     */
     constructor(path, id, name, lang) {
         this.path = path;
         this.id = id;
@@ -52,14 +54,12 @@ class IngredientInputRow {
         mb.setMetadata(this.bindTargetNameMemory, this.name);
 
         this.deleteButtonConfig = new ButtonConfig(`delete-${this.id}`, this.UI_LABELS.DELETE);
-        this.deleteButtonConfig.addUpdateMetadataAction(FRONTMATTER.AVAILABLE_INGREDIENTS, `x==null?["${this.name}"]:["${this.name}",...x]`);
-        this.deleteButtonConfig.addUpdateMetadataAction(FRONTMATTER.INGREDIENTS, `(delete x["${this.id}"])?x:x`);
-
-        this.changeButtonConfig = new ButtonConfig(`ingredient-${this.id}`,`${this.name}`);
-        this.changeButtonConfig.addJsAction("source/src/templater/ingredients-input.js", { id: this.id });
+        this.deleteButtonConfig.addUpdateMetadataAction(
+            FRONTMATTER.INGREDIENTS,
+            `(delete x["${this.id}"])?x:x`
+        );
 
         this.deleteButton = mb.createButtonMountable(this.path, this.deleteButtonConfig.render(false));
-        this.changeButton = mb.createButtonMountable(this.path, this.changeButtonConfig.render(false));
         this.amountInput = mb.createInputFieldMountable(this.path, this.createAmountInputConfig(memoryAmount));
         this.amountHiddenView = mb.createViewFieldMountable(this.path, {
             renderChildType: "inline",
@@ -95,11 +95,17 @@ class IngredientInputRow {
 
     /**
      * @param {HTMLElement} rowEl
+     * @param {{ draggable?: boolean }} [options]
      * @returns {Array<{ parent: HTMLElement, field: unknown, wrapperCls?: string }>}
      */
-    layoutSteps(rowEl) {
+    layoutSteps(rowEl, options = {}) {
+        if (options.draggable) {
+            rowEl.setAttr("draggable", "true");
+            rowEl.dataset.ingredientRowId = String(this.id);
+            rowEl.classList.add("ingredient-row--draggable");
+        }
+        rowEl.createEl("span", { cls: `${RECIPE_LAYOUT.ingredientRow}__name`, text: this.name });
         return [
-            { parent: rowEl, field: this.changeButton },
             { parent: rowEl, field: this.amountInput },
             {
                 parent: rowEl,
@@ -114,46 +120,5 @@ class IngredientInputRow {
             },
             { parent: rowEl, field: this.deleteButton },
         ];
-    }
-}
-
-export class IngredientInputTable {
-    constructor(path, lang) {
-        this.path = path;
-        this.isGenerated = false;
-        /** @type {IngredientInputRow[]} */
-        this.rows = [];
-        /** @type {string} */
-        this.ingredientsSnapshot = "";
-    }
-
-    generate(mb, lang, ingredients = {}) {
-        this.mb = mb;
-        this.ingredientsSnapshot = ingredientsContentSignature(ingredients);
-        this.rows = [];
-        for (const id of listIngredientIds(ingredients)) {
-            const rowData = ingredientEntry(ingredients, id);
-            const row = new IngredientInputRow(this.path, id, rowData.name, lang);
-            row.render(mb, rowData.amount, rowData.unit);
-            this.rows.push(row);
-        }
-        this.isGenerated = true;
-    }
-
-    discardMountables() {
-        this.isGenerated = false;
-        this.rows = [];
-        this.ingredientsSnapshot = "";
-    }
-
-    /**
-     * @returns {IngredientInputRow[]}
-     */
-    render(mb, ingredients = {}) {
-        const nextSnapshot = ingredientsContentSignature(ingredients);
-        if (!this.isGenerated || this.ingredientsSnapshot !== nextSnapshot) {
-            this.generate(mb, ingredients);
-        }
-        return this.rows;
     }
 }

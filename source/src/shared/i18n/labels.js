@@ -23,6 +23,14 @@ const RECIPE_UI_FR = Object.freeze({
     OVEN_LABEL: "Température du four : ",
     OVEN_LABEL_SHORT: "Four : ",
     RESET: "Réinitialiser",
+    ADD_GROUP: "Ajouter un groupe",
+    DELETE_GROUP: "Supprimer le groupe",
+    GROUP_NAME_PLACEHOLDER: "Nom du groupe",
+    CATALOG_PICKER_TITLE: "Ajouter un ingrédient",
+    CATALOG_SEARCH_PLACEHOLDER: "Filtrer les ingrédients…",
+    CATALOG_UNCATEGORIZED: "Sans catégorie",
+    CATALOG_ADD: "Ajouter",
+    DRAG_HANDLE: "Glisser",
 });
 
 const RECIPE_UI_EN = Object.freeze({
@@ -44,6 +52,14 @@ const RECIPE_UI_EN = Object.freeze({
     OVEN_LABEL: "Oven temperature: ",
     OVEN_LABEL_SHORT: "Oven: ",
     RESET: "Reset",
+    ADD_GROUP: "Add group",
+    DELETE_GROUP: "Delete group",
+    GROUP_NAME_PLACEHOLDER: "Group name",
+    CATALOG_PICKER_TITLE: "Add ingredient",
+    CATALOG_SEARCH_PLACEHOLDER: "Filter ingredients…",
+    CATALOG_UNCATEGORIZED: "Uncategorized",
+    CATALOG_ADD: "Add",
+    DRAG_HANDLE: "Drag",
 });
 
 const FRONTMATTER_LABELS_FR = Object.freeze({

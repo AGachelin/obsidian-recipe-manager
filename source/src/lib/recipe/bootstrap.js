@@ -15,13 +15,11 @@ export async function setupRecipeLive(engine, context, container, component, lan
         ]);
 
     const renderer = new RecipeRenderer(path, resolvedLang);
-
-    function renderRecipe() {
+    const reactive = engine.reactive(() => {
         const meta = readRecipeLiveMetadata(mb, path);
         renderer.render(mb, container, component, isRecipeViewMode(meta), meta);
-    }
-
-    const reactive = engine.reactive(renderRecipe);
+    });
+    renderer.setLiveRefreshHandler(() => reactive.refresh());
     attachRecipeLiveSubscriptions(mb, component, path, () => reactive.refresh());
     return reactive;
 }

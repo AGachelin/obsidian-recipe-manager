@@ -14,6 +14,13 @@ filter_ingredients_unit: {}
 filter_ingredients_search: ""
 filter_cool_max_sec: 604800
 filter_freeze_max_sec: 604800
+note: 0
+cook_duration: 0
+rest_duration: 0
+prep_duration: 0
+cool_duration: 0
+freeze_duration: 0
+oven:
 ---
 
 ```js-engine

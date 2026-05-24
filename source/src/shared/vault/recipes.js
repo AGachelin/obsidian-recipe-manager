@@ -84,6 +84,7 @@ export function recipePageFromFile(app, file) {
         tags: fm.tags,
         thumbnail: fm.thumbnail,
         ingredients: fm.ingredients,
+        ingredient_groups: fm.ingredient_groups,
     };
 }
 

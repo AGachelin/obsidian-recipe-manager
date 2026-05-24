@@ -239,6 +239,10 @@
 	gap: var(--recipe-space-md);
 }
 
+.catalog-tree-nested {
+	margin-left: var(--recipe-space-md);
+}
+
 .live__results-groups .live__section-content > .live__results-nested {
 	margin-top: var(--recipe-space-sm);
 	margin-left: var(--recipe-space-md);

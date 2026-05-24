@@ -11,8 +11,11 @@ if (fill_in) {
 ---
 view: false
 note: <% Number(note) || 0 %>
+ingredient_groups:
+  - id: default
+    label: Ingrédients
+    order: 0
 ingredients: {last_id: 0}
-available_ingredients: []
 prep_duration: 0
 cook_duration: 0
 rest_duration: 0
