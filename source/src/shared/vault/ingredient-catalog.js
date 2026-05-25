@@ -179,6 +179,17 @@ export function filterCatalogNode(node, needle) {
  * @param {ReadonlySet<string>} excludeLower Lowercase names to omit
  * @returns {CatalogNode}
  */
+/**
+ * @param {CatalogNode} node
+ */
+export function countCatalogLeaves(node) {
+    let count = node.ingredients.length;
+    for (const child of node.children.values()) {
+        count += countCatalogLeaves(child);
+    }
+    return count;
+}
+
 export function excludeNamesFromCatalogNode(node, excludeLower) {
     if (excludeLower.size === 0) return node;
     const filtered = createCatalogNode(node.label);

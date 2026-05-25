@@ -85,7 +85,7 @@ export class IngredientGroupPanel {
             },
             usedInGroup
         );
-        picker.mount(panel, this.app, false);
+        picker.mount(panel, this.app, component, false);
 
         const rowsHost = panel.createDiv({ cls: RECIPE_LAYOUT.ingredientGroupRows });
         for (const rowId of listRowIdsForGroup(ingredients, this.group.id)) {

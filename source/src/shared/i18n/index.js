@@ -9,5 +9,6 @@ export {
     getUILabels,
     getFrontmatterLabels,
     getFrontpageLabels,
+    getIngredientNoteLabels,
     getIngredientFilterStateLabels,
 } from "./labels.js";

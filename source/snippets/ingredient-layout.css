@@ -1,0 +1,41 @@
+@scope(.ingredient-ui){
+.ingredient-root {
+	display: flex;
+	flex-direction: column;
+	gap: var(--recipe-space-lg);
+	max-width: 36rem;
+	margin-block: 0.5rem 1rem;
+	padding-inline: 0.15rem;
+}
+
+.ingredient-field-row {
+	display: flex;
+	flex-direction: column;
+	gap: var(--recipe-space-xs);
+}
+
+.ingredient-field-label {
+	font-size: 0.82rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--recipe-muted);
+}
+
+.ingredient-field-input {
+	display: flex;
+	align-items: center;
+}
+
+.ingredient-field-input input[type="text"],
+.ingredient-field-input input[type="number"] {
+	width: 100%;
+	max-width: 20rem;
+}
+
+.ingredient-taxonomy-hint {
+	margin: 0;
+	font-size: 0.78rem;
+	color: var(--recipe-muted);
+}
+}

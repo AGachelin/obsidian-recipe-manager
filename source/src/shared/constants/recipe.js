@@ -30,10 +30,8 @@ export const FRONTMATTER = Object.freeze({
     VIEW: 'view',
 });
 
-export const INGREDIENT_NOTEBOOK = Object.freeze({
-    RHO: "liquid",
-    SPECIFIC_WEIGHT: "single",
-});
+export { INGREDIENT_NOTEBOOK } from "./ingredient.js";
+import { INGREDIENT_NOTEBOOK } from "./ingredient.js";
 
 /** Frontmatter keys that trigger a full recipe live re-render when changed. */
 export const DEFAULT_INGREDIENT_GROUP_ID = 'default';

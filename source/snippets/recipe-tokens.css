@@ -4,7 +4,8 @@
  */
 
 .recipe-ui,
-.frontpage-ui {
+.frontpage-ui,
+.ingredient-ui {
 	/* Spacing */
 	--recipe-space-xs: 0.35rem;
 	--recipe-space-sm: 0.55rem;

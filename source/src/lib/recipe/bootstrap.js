@@ -1,10 +1,12 @@
 import { resetPersonCurrentFromRaw } from "./person-memory.js";
 import { waitForMetaBind } from "../render/wait-for-plugins.js";
 import { resolveLanguage } from "../../shared/i18n/index.js";
+import { attachIngredientCatalogInvalidation } from "../../shared/vault/ingredient-catalog.js";
 
 export async function setupRecipeLive(engine, context, container, component, lang) {
     const path = context.file.path;
     const mb = await waitForMetaBind(engine);
+    attachIngredientCatalogInvalidation(engine.app);
     resetPersonCurrentFromRaw(mb, path);
     const resolvedLang = resolveLanguage(lang, engine);
 

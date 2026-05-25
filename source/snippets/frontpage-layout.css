@@ -1,4 +1,4 @@
-@scope(.frontpage-ui){
+.frontpage-ui{
 /* -------------------------------------------------------------------------- */
 /* Frontpage (js-engine): full layout + results                                 */
 /* -------------------------------------------------------------------------- */
@@ -39,7 +39,7 @@
 	min-width: 0;
 }
 
-.live__sidebar-title {
+.live__sidebar-title, h2.live__sidebar-title {
 	margin: 0 0 var(--recipe-space-sm) 0;
 	font-size: 1rem;
 	font-weight: 700;
@@ -71,6 +71,11 @@
 	padding: 0;
 	display: flex;
 	flex-direction: column;
+	transition: box-shadow 0.15s ease;
+}
+
+.live__section:has(.live__section-toggle[aria-expanded="true"]) {
+	box-shadow: var(--recipe-shadow), 0 0 0 1px var(--background-modifier-border-hover, transparent);
 }
 
 
@@ -135,6 +140,13 @@
 	color: var(--text-accent);
 }
 
+.live__section-toggle:focus-visible,
+.live__sidebar-toggle:focus-visible {
+	outline: 2px solid var(--recipe-accent);
+	outline-offset: 2px;
+	border-radius: var(--recipe-radius-sm);
+}
+
 .live__sidebar-toggle::before,
 .live__section-toggle::before {
 	content: "▼";
@@ -178,22 +190,16 @@
 
 .live__section-content {
 	padding: var(--recipe-space-md) var(--recipe-space-lg);
+	overflow-x: scroll;
 }
 
-.live__section-title {
+.live__section-title{
 	margin: 0;
 	font-size: 0.82rem;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	color: var(--recipe-muted);
-}
-
-.live__section-title[aria-expanded="false"] {
-	h3{
-		display: none;
-	}
-	display: contents;
 }
 
 .live__actions {

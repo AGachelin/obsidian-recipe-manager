@@ -5,6 +5,7 @@ import { listGroupsOrdered, normalizeIngredientGroups } from "../../shared/ingre
 import { addIngredientGroup, writeIngredientState } from "../../lib/recipe/ingredient-mutations.js";
 import { attachIngredientListDrag } from "../../lib/recipe/ingredient-drag.js";
 import { IngredientGroupPanel } from "./ingredient-group-panel.js";
+import { createIngredientNote } from "../../lib/ingredient/create-ingredient-note.js";
 
 export class RecipeIngredientsEditor {
     /**
@@ -46,7 +47,8 @@ export class RecipeIngredientsEditor {
         }
 
         const footer = section.createDiv({ cls: RECIPE_LAYOUT.ingredientGroupsFooter });
-        const addGroupBtn = footer.createEl("button", {
+        const footerActions = footer.createDiv({ cls: RECIPE_LAYOUT.ingredientGroupsFooterActions });
+        const addGroupBtn = footerActions.createEl("button", {
             type: "button",
             text: this.L.ADD_GROUP,
         });
@@ -58,6 +60,19 @@ export class RecipeIngredientsEditor {
                 groups: next,
                 ingredients,
             });
+            onRefresh();
+        });
+        const newIngredientBtn = footerActions.createEl("button", {
+            type: "button",
+            text: this.L.NEW_INGREDIENT,
+        });
+        newIngredientBtn.addEventListener("click", async () => {
+            const name = await this.app.plugins.plugins["js-engine"].api.prompt.text({
+                title: this.L.NEW_INGREDIENT,
+                placeholder: this.L.CATALOG_SEARCH_PLACEHOLDER,
+            });
+            if (name == null || !String(name).trim()) return;
+            await createIngredientNote(this.app, String(name).trim());
             onRefresh();
         });
 

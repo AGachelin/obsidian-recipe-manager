@@ -30,6 +30,8 @@ const RECIPE_UI_FR = Object.freeze({
     CATALOG_SEARCH_PLACEHOLDER: "Filtrer les ingrédients…",
     CATALOG_UNCATEGORIZED: "Sans catégorie",
     CATALOG_ADD: "Ajouter",
+    CATALOG_NO_MATCH: "Aucun ingrédient correspondant.",
+    CREATE_INGREDIENT: "Créer l'ingrédient",
     DRAG_HANDLE: "Glisser",
 });
 
@@ -59,6 +61,8 @@ const RECIPE_UI_EN = Object.freeze({
     CATALOG_SEARCH_PLACEHOLDER: "Filter ingredients…",
     CATALOG_UNCATEGORIZED: "Uncategorized",
     CATALOG_ADD: "Add",
+    CATALOG_NO_MATCH: "No matching ingredient found.",
+    CREATE_INGREDIENT: "Create ingredient",
     DRAG_HANDLE: "Drag",
 });
 
@@ -190,6 +194,29 @@ export function getFrontpageLabels(language) {
 /**
  * @param {unknown} language
  */
+const INGREDIENT_NOTE_FR = Object.freeze({
+    VOLUMETRIC_WEIGHT: "Masse volumique (ρ)",
+    UNIT_WEIGHT: "Poids d'une unité",
+    TAXONOMY: "Taxonomie",
+    TAXONOMY_HINT: "Segments séparés par « / » (ex. Viande / Viande rouge)",
+    TAXONOMY_PLACEHOLDER: "Catégorie / Sous-catégorie",
+});
+
+const INGREDIENT_NOTE_EN = Object.freeze({
+    VOLUMETRIC_WEIGHT: "Volumetric weight (ρ)",
+    UNIT_WEIGHT: "Weight of one unit",
+    TAXONOMY: "Taxonomy",
+    TAXONOMY_HINT: "Segments separated by « / » (e.g. Vegetables / Roots)",
+    TAXONOMY_PLACEHOLDER: "Category / Subcategory",
+});
+
+/**
+ * @param {unknown} language
+ */
+export function getIngredientNoteLabels(language) {
+    return normalizeLanguage(language) === "fr" ? INGREDIENT_NOTE_FR : INGREDIENT_NOTE_EN;
+}
+
 export function getIngredientFilterStateLabels(language) {
     const L = getFrontpageLabels(language);
     return Object.freeze({

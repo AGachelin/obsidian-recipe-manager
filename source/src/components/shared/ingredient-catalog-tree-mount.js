@@ -31,7 +31,8 @@ export function mountIngredientCatalogTree(parent, app, lang, searchNeedle, rend
                 container,
                 child.label,
                 false,
-                FRONTPAGE_LAYOUT.ingredientSection
+                FRONTPAGE_LAYOUT.ingredientSection,
+                { variant: "frontpage" }
             );
 
             for (const name of child.ingredients) {
@@ -50,7 +51,9 @@ export function mountIngredientCatalogTree(parent, app, lang, searchNeedle, rend
         : catalog.uncategorized;
 
     if (unc.length > 0) {
-        const content = mountCollapsibleSection(parent, L.CATALOG_UNCATEGORIZED, false);
+        const content = mountCollapsibleSection(parent, L.CATALOG_UNCATEGORIZED, false, "", {
+            variant: "frontpage",
+        });
         for (const name of unc) {
             renderLeaf(name, content);
         }
